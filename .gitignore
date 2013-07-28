@@ -11,3 +11,14 @@
 *.lai
 *.la
 *.a
+
+vs2012/swiftly/swiftly.sdf
+vs2012/swiftly/swiftly.opensdf
+vs2012/swiftly/Win32
+vs2012/swiftly/Debug
+vs2012/swiftly/Release
+
+*.suo
+*.ipch
+
+vs2012/libswift
