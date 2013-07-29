@@ -1,5 +1,5 @@
 #include "asserts.hpp"
-#include "reader.hpp"
+#include "bit_reader.hpp"
 
 namespace swf
 {
@@ -14,11 +14,21 @@ namespace swf
 	fixed_point::fixed_point(int hi, int lo) : high(hi), low(lo)
 	{}
 
+	double fixed_point::to_double()
+	{
+		return double(high) + double(low/65536.0);
+	}
+
 	fixed_point8::fixed_point8() : high(0), low(0)
 	{}
 
 	fixed_point8::fixed_point8(int hi, int lo) : high(hi), low(lo)
 	{}
+
+	float fixed_point8::to_float()
+	{
+		return float(high) + float(low/256.0f);
+	}
 
 	color_transform::color_transform(bool has_alpha)
 		: transform_alpha(has_alpha)
@@ -28,8 +38,14 @@ namespace swf
 	{}
 
 	bit_stream::bit_stream(const std::vector<uint8_t>& data)
+		: last_read_bits_remaining_(0), last_read_(0)
 	{
-		std::copy(data.begin(), data.end(), bitstream_.begin());
+		std::copy(data.begin(), data.end(), std::back_inserter(bitstream_));
+	}
+
+	size_t bit_stream::size()
+	{
+		return bitstream_.size() + used_bits_.size();
 	}
 
 	bit_stream::~bit_stream()
@@ -71,18 +87,25 @@ namespace swf
 		return fp;
 	}
 
+	fixed_point8 bit_stream::read_fixedpoint8()
+	{
+		return read_fixedpoint8_bits(16);
+	}
+
 	std::string bit_stream::read_string()
 	{
 		std::string s;
 		uint8_t c = read_signed8();
 		while(c != 0) {
-			s += read_signed8();
+			s += c;
+			c = read_signed8();
 		}
 		return s;
 	}
 
 	int8_t bit_stream::read_signed8()
 	{
+		ASSERT_LOG(bitstream_.size() != 0, "Tried to read bytes when none available.");
 		int8_t result = int8_t(bitstream_.front());
 		last_read_bits_remaining_ = 0;
 		bitstream_.pop_front();
@@ -124,6 +147,7 @@ namespace swf
 
 	uint8_t bit_stream::read_unsigned8()
 	{
+		ASSERT_LOG(bitstream_.size() != 0, "Tried to read bytes when none available.");
 		uint8_t result = bitstream_.front();
 		last_read_bits_remaining_ = 0;
 		bitstream_.pop_front();
@@ -140,8 +164,8 @@ namespace swf
 
 	uint32_t bit_stream::read_unsigned32()
 	{
-		uint32_t lsb = uint32_t(read_unsigned8());
-		uint32_t msb = uint32_t(read_unsigned8());
+		uint32_t lsb = uint32_t(read_unsigned16());
+		uint32_t msb = uint32_t(read_unsigned16());
 		return (msb << 16) | lsb;
 	}
 
@@ -339,26 +363,165 @@ namespace swf
 		return ct;
 	}
 
+	gradient_record bit_stream::read_gradient_record()
+	{
+		// XX FIXME shape3 reads rgba not rgb.
+		gradient_record gr;
+		gr.ratio = unsigned(read_unsigned8());
+		rgb color = read_rgb();
+		gr.color.r = color.r;
+		gr.color.g = color.g;
+		gr.color.b = color.b;
+		gr.color.a = 255;
+		return gr;		
+	}
+
+	gradient bit_stream::read_gradient()
+	{
+		gradient g;
+		g.spread = gradient::spread_mode(read_bits(2));
+		g.interpolation = gradient::interpolation_mode(read_bits(2));
+		unsigned num_gradients = unsigned(read_bits(4));
+		for(unsigned n = 0; n != num_gradients; ++n) {
+			g.gradient_records.push_back(read_gradient_record());
+		}
+		return g;
+	}
+
+	focal_gradient bit_stream::read_focal_gradient()
+	{
+		focal_gradient fg;
+		fg.g = read_gradient();
+		fg.focal_point = read_fixedpoint8().to_float();
+		return fg;
+	}
+
+	fill_style bit_stream::read_fillstyle()
+	{
+		fill_style fs;
+		fs.type = (fill_style::fill_style_type)read_unsigned8();
+		if(fs.type == fill_style::FILL_SOLID) {
+			fs.	color = read_rgba();
+		}
+		if(fs.type == fill_style::FILL_FOCAL_RADIAL_GRADIENT 
+			|| fs.type == fill_style::FILL_LINEAR_GRADIENT 
+			|| fs.type == fill_style::FILL_RADIAL_GRADIENT) {
+			fs.gradient_matrix = read_matrix();
+			if(fs.type == fill_style::FILL_FOCAL_RADIAL_GRADIENT) {
+				fs.fg = read_focal_gradient();
+			} else {
+				fs.g = read_gradient();
+			}
+		}
+		if(fs.type == fill_style::FILL_REPEATING_BITMAP
+			|| fs.type == fill_style::FILL_CLIPPED_BITMAP
+			|| fs.type == fill_style::FILL_NON_SMOOTHED_REPEATING_BITMAP
+			|| fs.type == fill_style::FILL_NON_SMOOTHED_CLIPPED_BITMAP) {
+			fs.bitmap_id = read_unsigned16();
+			fs.bitmap_matrix = read_matrix();
+		}
+		return fs;
+	}
+
+	std::vector<fill_style> bit_stream::read_fillstyle_array()
+	{
+		std::vector<fill_style> fs;
+		unsigned count = read_unsigned8();
+		if(count == 255) {
+			count = read_unsigned16();
+		}
+		for(int n = 0; n != count; ++n) {
+			fs.push_back(read_fillstyle());
+		}
+		return fs;
+	}
+
+	line_style bit_stream::read_linestyle()
+	{
+		line_style ls;
+		ls.width = read_unsigned16();
+		// XX FIXME shape3 reads rgba not rgb.
+		rgb color = read_rgb();
+		ls.color.r = color.r;
+		ls.color.g = color.g;
+		ls.color.b = color.b;
+		ls.color.a = 255;
+		return ls;
+	}
+
+	std::vector<line_style> bit_stream::read_linestyle_array()
+	{
+		std::vector<line_style> ls;
+		unsigned count = read_unsigned8();
+		if(count == 255) {
+			count = read_unsigned16();
+		}
+		for(int n = 0; n != count; ++n) {
+			ls.push_back(read_linestyle());
+		}
+		return ls;
+	}
+
+	shape_record bit_stream::read_shape_record()
+	{
+		bool edge_record = read_bits(1) ? true : false;
+		unsigned flags = unsigned(read_bits(5));
+		shape_record sr;
+		if(flags == 0) {
+			sr.type = shape_record::TYPE_END;
+			return sr;
+		}
+#error more work to do here
+		return sr;
+	}
+
+	std::vector<shape_record> bit_stream::read_shape_records()
+	{
+		std::vector<shape_record> sr;
+		bool done = false;
+		while(!done) {
+			shape_record r = read_shape_record();
+			if(r.type == shape_record::TYPE_END) {
+				done = true;
+			}
+		}
+		return sr;
+	}
+
+	shape_with_style bit_stream::read_shape_with_style()
+	{
+		shape_with_style ss;
+		ss.fill_styles_ = read_fillstyle_array();
+		ss.line_styles_ = read_linestyle_array();
+		ss.fill_bits_ = read_unsigned_bits(4);
+		ss.line_bits_ = read_unsigned_bits(4);
+		ss.shape_records_ = read_shape_records();
+		return ss;
+	}
+
 	uint64_t bit_stream::read_bits(size_t n)
 	{
-		ASSERT_LOG(n > 64, "Can only read a maximum of 64-bits at once.");
-		uint64_t result;
+		ASSERT_LOG(n <= 64, "Can only read a maximum of 64-bits at once.");
+		
+		uint64_t result = 0;
 		while(n > 0) {
 			if(last_read_bits_remaining_ == 0) {
+				ASSERT_LOG(bitstream_.size() != 0, "Tried to read bytes when none available.");
 				last_read_ = bitstream_.front();
 				bitstream_.pop_front();
 				used_bits_.push_back(last_read_);
 				last_read_bits_remaining_ = 8;
 			}
-			if(n  < last_read_bits_remaining_) {
-				result <<= last_read_bits_remaining_;
+			if(n < last_read_bits_remaining_) {
+				result <<= n;
 				last_read_bits_remaining_ -= n;
 				result |= last_read_ >> (8-n);
 				last_read_ <<= n;
+				n = 0;
 			} else {
-				result = (result << 8) | last_read_;
+				result = (result << last_read_bits_remaining_) | (last_read_ >> (8-last_read_bits_remaining_));
+				n -= last_read_bits_remaining_;
 				last_read_bits_remaining_ = 0;
-				n -= 8;
 			}
 		}
 		return result;

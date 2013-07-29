@@ -4,6 +4,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include "sdl_wrapper.hpp"
+#include "../swf.hpp"
+#include "../swf_reader.hpp"
 #include "wm.hpp"
 
 // Approximate delay between frames.
@@ -70,6 +72,9 @@ int main(int argc, char* argv[])
 			height = boost::lexical_cast<int>(arg_value);
 		}
 	}
+
+	swf::swf swf_object;
+	swf::reader swf_reader("data\\test-menu.swf", swf_object);
 
 	try {
 		graphics::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);

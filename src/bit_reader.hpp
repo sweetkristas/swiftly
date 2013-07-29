@@ -13,6 +13,7 @@ namespace swf
 	{
 		fixed_point();
 		explicit fixed_point(int hi, int lo);
+		double to_double();
 		int16_t high;
 		uint16_t low;
 	};
@@ -21,6 +22,7 @@ namespace swf
 	{
 		fixed_point8();
 		explicit fixed_point8(int hi, int lo);
+		float to_float();
 		int8_t high;
 		uint8_t low;
 	};
@@ -78,16 +80,92 @@ namespace swf
 		bool transform_alpha;
 	};
 
+	struct gradient_record
+	{
+		unsigned ratio;
+		rgba color;
+	};
+
+	struct gradient
+	{
+		enum spread_mode {
+			SPREAD_PAD,
+			SPREAD_REFLECT,
+			SPREAD_REPEAT,
+		} spread;
+		enum interpolation_mode {
+			INTERPOLATE_NORMAL_RGB,
+			INTERPOLATE_LINEAR_RGB,
+		} interpolation;
+		std::vector<gradient_record> gradient_records;
+	};
+
+	struct focal_gradient
+	{
+		gradient g;
+		float focal_point;
+	};
+
+	struct fill_style
+	{
+		enum fill_style_type {
+			FILL_SOLID,
+			FILL_LINEAR_GRADIENT = 16,
+			FILL_RADIAL_GRADIENT = 18,
+			FILL_FOCAL_RADIAL_GRADIENT = 19,
+			FILL_REPEATING_BITMAP = 64,
+			FILL_CLIPPED_BITMAP,
+			FILL_NON_SMOOTHED_REPEATING_BITMAP,
+			FILL_NON_SMOOTHED_CLIPPED_BITMAP,
+		} type;
+		rgba color;
+		matrix2x3 gradient_matrix;
+		gradient g;
+		focal_gradient fg;
+		unsigned bitmap_id;
+		matrix2x3 bitmap_matrix;
+	};
+
+	struct line_style
+	{
+		unsigned width;
+		rgba color;
+	};
+
+	struct shape_record
+	{
+		enum shape_record_type {
+			TYPE_END,
+			TYPE_STYLE_CHANGE,
+			TYPE_STRAIGHT_EDGE,
+			TYPE_CURVED_EDGE,
+		} type;
+	};
+
+	
+
+	struct shape_with_style
+	{
+		std::vector<fill_style> fill_styles_;
+		std::vector<line_style> line_styles_;
+		unsigned fill_bits_;
+		unsigned line_bits_;
+		std::vector<shape_record> shape_records_;
+	};
+
 	class bit_stream
 	{
 	public:
 		explicit bit_stream(const std::vector<uint8_t>& data);
 		virtual ~bit_stream();
+
+		size_t size();
 		
 		int32_t read_signed_bits(size_t bits);
 		uint32_t read_unsigned_bits(size_t bits);
 		fixed_point read_fixedpoint_bits(size_t bits);
 		fixed_point8 read_fixedpoint8_bits(size_t bits);
+		fixed_point8 read_fixedpoint8();
 		
 		std::string read_string();
 
@@ -123,6 +201,17 @@ namespace swf
 
 		color_transform read_cxform();
 		color_transform read_cxform_with_alpha();
+
+		shape_record read_shape_record();
+		gradient_record read_gradient_record();
+		gradient read_gradient();
+		focal_gradient read_focal_gradient();
+		fill_style read_fillstyle();
+		line_style read_linestyle();
+		std::vector<fill_style> read_fillstyle_array();
+		std::vector<line_style> read_linestyle_array();
+		std::vector<shape_record> read_shape_records();
+		shape_with_style read_shape_with_style();
 	private:
 		uint64_t read_bits(size_t n);
 
