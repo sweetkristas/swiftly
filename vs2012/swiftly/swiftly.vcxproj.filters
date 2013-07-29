@@ -24,7 +24,16 @@
     <ClCompile Include="..\..\src\test\shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\reader.cpp">
+    <ClCompile Include="..\..\src\bit_reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\decompress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,10 +56,22 @@
     <ClInclude Include="..\..\src\test\asserts.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\test\ref_counted_ptr.hpp">
+    <ClInclude Include="..\..\src\bit_reader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\reader.hpp">
+    <ClInclude Include="..\..\src\decompress.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\asserts.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_reader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ref_counted_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -61,5 +82,6 @@
     <Library Include="..\..\..\SDL\VisualC\SDLmain\Win32\Release\SDLmain.lib" />
     <Library Include="..\..\..\SDL_mixer\VisualC\Release\SDL2_mixer.lib" />
     <Library Include="..\..\..\SDL_ttf\VisualC\Release\SDL2_ttf.lib" />
+    <Library Include="..\..\..\zlib\zlib.lib" />
   </ItemGroup>
 </Project>

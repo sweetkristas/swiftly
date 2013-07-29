@@ -363,54 +363,76 @@ namespace swf
 		return ct;
 	}
 
-	gradient_record bit_stream::read_gradient_record()
+	gradient_record bit_stream::read_gradient_record(int version)
 	{
-		// XX FIXME shape3 reads rgba not rgb.
+		// shape3 reads rgba not rgb.
 		gradient_record gr;
 		gr.ratio = unsigned(read_unsigned8());
-		rgb color = read_rgb();
-		gr.color.r = color.r;
-		gr.color.g = color.g;
-		gr.color.b = color.b;
-		gr.color.a = 255;
+		if(version == 3) {
+			gr.color = read_rgba();
+		} else {
+			rgb color = read_rgb();
+			gr.color.r = color.r;
+			gr.color.g = color.g;
+			gr.color.b = color.b;
+			gr.color.a = 255;
+		}
 		return gr;		
 	}
 
-	gradient bit_stream::read_gradient()
+	gradient bit_stream::read_gradient(int version)
 	{
 		gradient g;
 		g.spread = gradient::spread_mode(read_bits(2));
 		g.interpolation = gradient::interpolation_mode(read_bits(2));
 		unsigned num_gradients = unsigned(read_bits(4));
 		for(unsigned n = 0; n != num_gradients; ++n) {
-			g.gradient_records.push_back(read_gradient_record());
+			g.gradient_records.push_back(read_gradient_record(version));
 		}
 		return g;
 	}
 
-	focal_gradient bit_stream::read_focal_gradient()
+	focal_gradient bit_stream::read_focal_gradient(int version)
 	{
 		focal_gradient fg;
-		fg.g = read_gradient();
+		fg.g = read_gradient(version);
 		fg.focal_point = read_fixedpoint8().to_float();
 		return fg;
 	}
 
-	fill_style bit_stream::read_fillstyle()
+	fill_style bit_stream::read_fillstyle(int version)
 	{
 		fill_style fs;
 		fs.type = (fill_style::fill_style_type)read_unsigned8();
+		ASSERT_LOG(fs.type == fill_style::FILL_SOLID 
+			|| fs.type == fill_style::FILL_FOCAL_RADIAL_GRADIENT 
+			|| fs.type == fill_style::FILL_LINEAR_GRADIENT 
+			|| fs.type == fill_style::FILL_RADIAL_GRADIENT
+			|| fs.type == fill_style::FILL_REPEATING_BITMAP
+			|| fs.type == fill_style::FILL_CLIPPED_BITMAP
+			|| fs.type == fill_style::FILL_NON_SMOOTHED_REPEATING_BITMAP
+			|| fs.type == fill_style::FILL_NON_SMOOTHED_CLIPPED_BITMAP,
+			"fill style type unrecognised: " << fs.type);
 		if(fs.type == fill_style::FILL_SOLID) {
-			fs.	color = read_rgba();
+			// shape1&2 read rgb, shape 3 reads rgba
+			if(version == 3) {
+				fs.color = read_rgba();
+			} else {
+				rgb color = read_rgb();
+				fs.color.r = color.r;
+				fs.color.g = color.g;
+				fs.color.b = color.b;
+				fs.color.a = 255;
+			}
 		}
 		if(fs.type == fill_style::FILL_FOCAL_RADIAL_GRADIENT 
 			|| fs.type == fill_style::FILL_LINEAR_GRADIENT 
 			|| fs.type == fill_style::FILL_RADIAL_GRADIENT) {
 			fs.gradient_matrix = read_matrix();
 			if(fs.type == fill_style::FILL_FOCAL_RADIAL_GRADIENT) {
-				fs.fg = read_focal_gradient();
+				fs.fg = read_focal_gradient(version);
 			} else {
-				fs.g = read_gradient();
+				fs.g = read_gradient(version);
 			}
 		}
 		if(fs.type == fill_style::FILL_REPEATING_BITMAP
@@ -423,7 +445,7 @@ namespace swf
 		return fs;
 	}
 
-	std::vector<fill_style> bit_stream::read_fillstyle_array()
+	std::vector<fill_style> bit_stream::read_fillstyle_array(int version)
 	{
 		std::vector<fill_style> fs;
 		unsigned count = read_unsigned8();
@@ -431,25 +453,28 @@ namespace swf
 			count = read_unsigned16();
 		}
 		for(int n = 0; n != count; ++n) {
-			fs.push_back(read_fillstyle());
+			fs.push_back(read_fillstyle(version));
 		}
 		return fs;
 	}
 
-	line_style bit_stream::read_linestyle()
+	line_style bit_stream::read_linestyle(int version)
 	{
 		line_style ls;
 		ls.width = read_unsigned16();
-		// XX FIXME shape3 reads rgba not rgb.
-		rgb color = read_rgb();
-		ls.color.r = color.r;
-		ls.color.g = color.g;
-		ls.color.b = color.b;
-		ls.color.a = 255;
+		if(version == 3) {
+			ls.color = read_rgba();
+		} else {
+			rgb color = read_rgb();
+			ls.color.r = color.r;
+			ls.color.g = color.g;
+			ls.color.b = color.b;
+			ls.color.a = 255;
+		}
 		return ls;
 	}
 
-	std::vector<line_style> bit_stream::read_linestyle_array()
+	std::vector<line_style> bit_stream::read_linestyle_array(int version)
 	{
 		std::vector<line_style> ls;
 		unsigned count = read_unsigned8();
@@ -457,45 +482,110 @@ namespace swf
 			count = read_unsigned16();
 		}
 		for(int n = 0; n != count; ++n) {
-			ls.push_back(read_linestyle());
+			ls.push_back(read_linestyle(version));
 		}
 		return ls;
 	}
 
-	shape_record bit_stream::read_shape_record()
+	shape_styles bit_stream::read_style(int version)
+	{
+		shape_styles ss;
+		ss.fill_styles_ = read_fillstyle_array(version);
+		ss.line_styles_ = read_linestyle_array(version);
+		ss.fill_bits_ = read_unsigned_bits(4);
+		ss.line_bits_ = read_unsigned_bits(4);
+		return ss;
+	}
+
+	shape_record_ptr bit_stream::shape_record_factory(int version, unsigned& fill_bits, unsigned& line_bits)
 	{
 		bool edge_record = read_bits(1) ? true : false;
 		unsigned flags = unsigned(read_bits(5));
-		shape_record sr;
 		if(flags == 0) {
-			sr.type = shape_record::TYPE_END;
-			return sr;
+			return shape_record_ptr();
 		}
-#error more work to do here
-		return sr;
+		if(edge_record) {
+			if(flags & 16) {
+				// straight
+				shape_record* srp = new shape_record;
+				unsigned num_bits = (flags & 0x0f) + 2;
+				bool general_line = read_bits(1) ? true : false;
+				delta_record dr;
+				if(general_line) {
+					dr.delta_x = int32_t(read_bits(num_bits));
+					dr.delta_y = int32_t(read_bits(num_bits));
+				} else {
+					bool vertical_line = read_bits(1) ? true : false;
+					if(vertical_line) {
+						dr.delta_x = int32_t(read_bits(num_bits));
+						dr.delta_y = 0;
+					} else {
+						dr.delta_x = 0;
+						dr.delta_y = int32_t(read_bits(num_bits));
+					}
+				}
+				srp->set_delta(dr);
+				return shape_record_ptr(srp);
+			} else {
+				curve_edge_record* cer = new curve_edge_record;
+				unsigned num_bits = (flags & 0x0f) + 2;
+				delta_record dr;
+				dr.delta_x = int32_t(read_bits(num_bits));
+				dr.delta_y = int32_t(read_bits(num_bits));
+				cer->set_control(dr);
+				dr.delta_x = int32_t(read_bits(num_bits));
+				dr.delta_y = int32_t(read_bits(num_bits));
+				cer->set_anchor(dr);
+				return shape_record_ptr(cer);
+			}
+		} else {
+			style_change_record* srp = new style_change_record;
+			if(flags & 1) {
+				delta_record moves;
+				unsigned move_bits = unsigned(read_bits(5));
+				moves.delta_x = int32_t(read_signed_bits(move_bits));
+				moves.delta_y = int32_t(read_signed_bits(move_bits));
+				srp->set_moves(moves);
+			}
+			if(flags & 2) {
+				srp->set_fillstyle0_index(read_unsigned_bits(fill_bits));
+			}
+			if(flags & 4) {
+				srp->set_fillstyle1_index(read_unsigned_bits(fill_bits));
+			}
+			if(flags & 8) {
+				srp->set_linestyle_index(read_unsigned_bits(line_bits));
+			}
+			if(flags & 16) {
+				shape_styles ss = read_style(version);
+				fill_bits = ss.fill_bits_;
+				line_bits = ss.line_bits_;
+				srp->set_styles(ss);
+			}
+			return shape_record_ptr(srp);
+		}
 	}
 
-	std::vector<shape_record> bit_stream::read_shape_records()
+	std::vector<shape_record_ptr> bit_stream::read_shape_records(int version, unsigned fill_bits, unsigned line_bits)
 	{
-		std::vector<shape_record> sr;
+		std::vector<shape_record_ptr> sr;
 		bool done = false;
 		while(!done) {
-			shape_record r = read_shape_record();
-			if(r.type == shape_record::TYPE_END) {
+			shape_record_ptr p = shape_record_factory(version, fill_bits, line_bits);
+			if(p) {
+				sr.push_back(p);
+			} else {
 				done = true;
 			}
 		}
 		return sr;
 	}
 
-	shape_with_style bit_stream::read_shape_with_style()
+	shape_with_style bit_stream::read_shape_with_style(int version)
 	{
 		shape_with_style ss;
-		ss.fill_styles_ = read_fillstyle_array();
-		ss.line_styles_ = read_linestyle_array();
-		ss.fill_bits_ = read_unsigned_bits(4);
-		ss.line_bits_ = read_unsigned_bits(4);
-		ss.shape_records_ = read_shape_records();
+		ss.style_ = read_style(version);
+		ss.shape_records_ = read_shape_records(version, ss.style_.fill_bits_, ss.style_.line_bits_);
 		return ss;
 	}
 

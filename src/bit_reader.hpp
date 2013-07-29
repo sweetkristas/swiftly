@@ -3,9 +3,10 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <list>
+#include <memory>
 #include <string>
 #include <vector>
-#include <list>
 
 namespace swf
 {
@@ -132,25 +133,83 @@ namespace swf
 		rgba color;
 	};
 
-	struct shape_record
+	struct delta_record
 	{
-		enum shape_record_type {
-			TYPE_END,
-			TYPE_STYLE_CHANGE,
-			TYPE_STRAIGHT_EDGE,
-			TYPE_CURVED_EDGE,
-		} type;
+		delta_record() : delta_x(0), delta_y(0) {}
+		int32_t delta_x;
+		int32_t delta_y;
 	};
 
-	
+	class shape_record
+	{
+	public:
+		shape_record() {}
+		virtual ~shape_record() {}
 
-	struct shape_with_style
+		void set_delta(const delta_record& delta) { delta_ = delta; }
+
+		void draw() { handle_draw(); }
+	protected:
+		virtual void handle_draw() { std::cerr << "Drew a straight edge" << std::endl; }
+	private:
+		delta_record delta_;
+	};
+
+	typedef std::shared_ptr<shape_record> shape_record_ptr;
+
+	struct shape_styles
 	{
 		std::vector<fill_style> fill_styles_;
 		std::vector<line_style> line_styles_;
 		unsigned fill_bits_;
 		unsigned line_bits_;
-		std::vector<shape_record> shape_records_;
+	};
+
+	class style_change_record : public shape_record
+	{
+	public:
+		style_change_record() : shape_record() {}
+		virtual ~style_change_record() {}
+		void set_moves(const delta_record& moves) { moves_.reset(new delta_record(moves)); }
+		void set_fillstyle0_index(uint32_t fs) { fillstyle0_.reset(new uint32_t); *fillstyle0_ = fs; }
+		void set_fillstyle1_index(uint32_t fs) { fillstyle1_.reset(new uint32_t); *fillstyle1_ = fs; }
+		void set_linestyle_index(uint32_t ls) { linestyle_.reset(new uint32_t); *linestyle_ = ls; }
+		void set_styles(const shape_styles& styles) { styles_.reset(new shape_styles(styles)); }
+	protected:
+		void handle_draw() { std::cerr << "Changed styles" << std::endl; }
+	private:
+		std::unique_ptr<delta_record> moves_;
+		std::unique_ptr<uint32_t> fillstyle0_;
+		std::unique_ptr<uint32_t> fillstyle1_;
+		std::unique_ptr<uint32_t> linestyle_;
+		std::unique_ptr<shape_styles> styles_;
+
+		style_change_record(const style_change_record&);
+	};
+
+	class curve_edge_record : public shape_record
+	{
+	public:
+		curve_edge_record() : shape_record() {}
+		virtual ~curve_edge_record() {}
+
+		void set_anchor(const delta_record& delta) { anchor_ = delta; }
+		void set_control(const delta_record& delta) { control_ = delta; }
+	protected:
+		void handle_draw() { std::cerr << "Drew a curved edge" << std::endl; }
+	private:
+		delta_record control_;
+		delta_record anchor_;
+
+		curve_edge_record(const curve_edge_record&);
+	};
+
+	shape_record_ptr shape_record_factory();
+
+	struct shape_with_style
+	{
+		shape_styles style_;
+		std::vector<shape_record_ptr> shape_records_;
 	};
 
 	class bit_stream
@@ -202,16 +261,17 @@ namespace swf
 		color_transform read_cxform();
 		color_transform read_cxform_with_alpha();
 
-		shape_record read_shape_record();
-		gradient_record read_gradient_record();
-		gradient read_gradient();
-		focal_gradient read_focal_gradient();
-		fill_style read_fillstyle();
-		line_style read_linestyle();
-		std::vector<fill_style> read_fillstyle_array();
-		std::vector<line_style> read_linestyle_array();
-		std::vector<shape_record> read_shape_records();
-		shape_with_style read_shape_with_style();
+		gradient_record read_gradient_record(int version);
+		gradient read_gradient(int version);
+		focal_gradient read_focal_gradient(int version);
+		shape_styles read_style(int version);
+		fill_style read_fillstyle(int version);
+		line_style read_linestyle(int version);
+		std::vector<fill_style> read_fillstyle_array(int version);
+		std::vector<line_style> read_linestyle_array(int version);
+		shape_record_ptr shape_record_factory(int version, unsigned& fill_bits, unsigned& line_bits);
+		std::vector<shape_record_ptr> read_shape_records(int version, unsigned fill_bits, unsigned line_bits);
+		shape_with_style read_shape_with_style(int version);
 	private:
 		uint64_t read_bits(size_t n);
 

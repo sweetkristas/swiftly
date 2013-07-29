@@ -146,6 +146,7 @@ namespace swf
 		void ProcessDefineFont4(unsigned length);
 		void ProcessEnableTelemetry(unsigned length);
 
+		void read_tags();
 		void eat_bit_stream(unsigned length);
 
 		reader();

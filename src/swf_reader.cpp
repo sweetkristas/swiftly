@@ -133,6 +133,11 @@ namespace swf
 		obj.set_frame_rate(frame_rate);
 		obj.set_frame_count(frame_count);
 
+		read_tags();
+	}
+
+	void reader::read_tags()
+	{
 		// Read tagged blocks until we get the end block.
 		bool finished = false;
 		while(!finished) {
@@ -237,7 +242,8 @@ namespace swf
 	{
 		uint16_t shape_id = bits_->read_unsigned16();
 		rect bounds = bits_->read_rect();
-		shape_with_style shape = bits_->read_shape_with_style();
+		shape_with_style shape = bits_->read_shape_with_style(1);
+		// XXX save shape in display list
 	}
 
 
@@ -346,7 +352,10 @@ namespace swf
 
 	void reader::ProcessDefineShape2(unsigned length)
 	{
-		eat_bit_stream(length);
+		uint16_t shape_id = bits_->read_unsigned16();
+		rect bounds = bits_->read_rect();
+		shape_with_style shape = bits_->read_shape_with_style(2);
+		// XXX save shape in display list
 	}
 
 
@@ -376,7 +385,10 @@ namespace swf
 
 	void reader::ProcessDefineShape3(unsigned length)
 	{
-		eat_bit_stream(length);
+		uint16_t shape_id = bits_->read_unsigned16();
+		rect bounds = bits_->read_rect();
+		shape_with_style shape = bits_->read_shape_with_style(3);
+		// XXX save shape in display list
 	}
 
 
@@ -412,7 +424,9 @@ namespace swf
 
 	void reader::ProcessDefineSprite(unsigned length)
 	{
-		eat_bit_stream(length);
+		uint16_t sprite_id = bits_->read_unsigned16();
+		uint16_t sprite_frame_count = bits_->read_unsigned16();
+		read_tags();
 	}
 
 
