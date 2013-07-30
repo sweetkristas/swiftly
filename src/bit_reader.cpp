@@ -107,7 +107,7 @@ namespace swf
 	{
 		ASSERT_LOG(bitstream_.size() != 0, "Tried to read bytes when none available.");
 		int8_t result = int8_t(bitstream_.front());
-		last_read_bits_remaining_ = 0;
+		force_byte_align();
 		bitstream_.pop_front();
 		used_bits_.push_back(result);
 		return result;
@@ -149,7 +149,7 @@ namespace swf
 	{
 		ASSERT_LOG(bitstream_.size() != 0, "Tried to read bytes when none available.");
 		uint8_t result = bitstream_.front();
-		last_read_bits_remaining_ = 0;
+		force_byte_align();
 		bitstream_.pop_front();
 		used_bits_.push_back(result);
 		return result;
@@ -291,6 +291,7 @@ namespace swf
 
 	rect bit_stream::read_rect()
 	{
+		force_byte_align();
 		uint32_t nbits = read_unsigned_bits(5);
 		rect r;
 		r.x1 = read_signed_bits(nbits);
@@ -302,6 +303,7 @@ namespace swf
 
 	matrix2x3 bit_stream::read_matrix()
 	{
+		force_byte_align();
 		matrix2x3 mat;
 		uint32_t has_scale = read_unsigned_bits(1);
 		if(has_scale) {
@@ -317,12 +319,13 @@ namespace swf
 		}
 		uint32_t translate_bits = read_unsigned_bits(5);
 		mat.translate_x = read_signed_bits(translate_bits);
-		mat.translate_x = read_signed_bits(translate_bits);
+		mat.translate_y = read_signed_bits(translate_bits);
 		return mat;
 	}
 
 	color_transform bit_stream::read_cxform()
 	{
+		force_byte_align();
 		color_transform ct;
 		uint32_t has_add_values = read_unsigned_bits(1);
 		uint32_t has_mul_values = read_unsigned_bits(1);
@@ -343,6 +346,7 @@ namespace swf
 
 	color_transform bit_stream::read_cxform_with_alpha()
 	{
+		force_byte_align();
 		color_transform ct(true);
 		uint32_t has_add_values = read_unsigned_bits(1);
 		uint32_t has_mul_values = read_unsigned_bits(1);
@@ -368,7 +372,7 @@ namespace swf
 		// shape3 reads rgba not rgb.
 		gradient_record gr;
 		gr.ratio = unsigned(read_unsigned8());
-		if(version == 3) {
+		if(version >= 3) {
 			gr.color = read_rgba();
 		} else {
 			rgb color = read_rgb();
@@ -415,7 +419,7 @@ namespace swf
 			"fill style type unrecognised: " << fs.type);
 		if(fs.type == fill_style::FILL_SOLID) {
 			// shape1&2 read rgb, shape 3 reads rgba
-			if(version == 3) {
+			if(version >= 3) {
 				fs.color = read_rgba();
 			} else {
 				rgb color = read_rgb();
@@ -429,6 +433,7 @@ namespace swf
 			|| fs.type == fill_style::FILL_LINEAR_GRADIENT 
 			|| fs.type == fill_style::FILL_RADIAL_GRADIENT) {
 			fs.gradient_matrix = read_matrix();
+			force_byte_align();
 			if(fs.type == fill_style::FILL_FOCAL_RADIAL_GRADIENT) {
 				fs.fg = read_focal_gradient(version);
 			} else {
@@ -462,7 +467,7 @@ namespace swf
 	{
 		line_style ls;
 		ls.width = read_unsigned16();
-		if(version == 3) {
+		if(version >= 3) {
 			ls.color = read_rgba();
 		} else {
 			rgb color = read_rgb();
@@ -581,12 +586,150 @@ namespace swf
 		return sr;
 	}
 
+	shape bit_stream::read_shape()
+	{
+		shape ss;
+		ss.fill_bits_ = read_unsigned_bits(4);
+		ss.line_bits_ = read_unsigned_bits(4);
+		ss.shape_records_ = read_shape_records(swf_version_, ss.fill_bits_, ss.line_bits_);
+		return ss;
+	}
+
 	shape_with_style bit_stream::read_shape_with_style(int version)
 	{
 		shape_with_style ss;
 		ss.style_ = read_style(version);
 		ss.shape_records_ = read_shape_records(version, ss.style_.fill_bits_, ss.style_.line_bits_);
 		return ss;
+	}
+
+	action_record_ptr bit_stream::read_action_record()
+	{
+		uint8_t code = read_unsigned8();
+		if(code == 0) {
+			return std::shared_ptr<action_record>();
+		}
+		std::shared_ptr<action_record> ar = std::shared_ptr<action_record>(new action_record);
+		ar->set_code(code);
+		if(code & 0x80) {
+			int length = read_unsigned16();
+		}
+		switch(code) {
+			case action_record::ACTION_GOTO_FRAME: {
+				uint16_t frame_index = read_unsigned16();
+				break;
+			}
+			case action_record::ACTION_GET_URL: {
+				std::string url = read_string();
+				std::string target = read_string();
+				break;
+			}
+			case action_record::ACTION_WAIT_FOR_FRAME: {
+				uint16_t frame_to_wait = read_unsigned16();
+				uint8_t skip_count = read_unsigned8();
+				break;
+			}
+			case action_record::ACTION_SET_TARGET: {
+				std::string target = read_string();
+				break;
+			}
+			case action_record::ACTION_GOTO_LABEL: {
+				std::string frame_label = read_string();
+				break;
+			}
+			case action_record::ACTION_NEXT_FRAME:
+				// fallthrough
+			case action_record::ACTION_PREVIOUS_FRAME:
+				// fallthrough
+			case action_record::ACTION_PLAY:
+				// fallthrough
+			case action_record::ACTION_STOP:
+				// fallthrough
+			case action_record::ACTION_TOGGLE_QUALITY:
+				// fallthrough
+			case action_record::ACTION_STOP_SOUNDS:
+				break;
+		}
+		return ar;
+	}
+
+	std::vector<action_record_ptr> bit_stream::read_action_records()
+	{
+		std::shared_ptr<action_record> ptr;
+		std::vector<std::shared_ptr<action_record> > ars;
+		do {
+			ptr = read_action_record();
+			if(ptr) {
+				ars.push_back(ptr);
+			}
+		} while(ptr != NULL);
+		return ars;
+	}
+
+	clip_event bit_stream::parse_clip_event_flags(uint32_t flags)
+	{
+		clip_event e;
+		e.key_up_			= flags & 0x80000000 ? true : false;
+		e.key_down_			= flags & 0x40000000 ? true : false;
+		e.mouse_up_			= flags & 0x20000000 ? true : false;
+		e.mouse_down_		= flags & 0x10000000 ? true : false;
+		e.mouse_move_		= flags & 0x08000000 ? true : false;
+		e.unload_			= flags & 0x04000000 ? true : false;
+		e.enter_frame_		= flags & 0x02000000 ? true : false;
+		e.load_				= flags & 0x01000000 ? true : false;
+		// swf 6 and greater only
+		e.drag_over_		= flags & 0x00800000 ? true : false;
+		e.roll_out			= flags & 0x00400000 ? true : false;
+		e.roll_over_		= flags & 0x00200000 ? true : false;
+		e.release_outside_	= flags & 0x00100000 ? true : false;
+		e.mouse_release_	= flags & 0x00080000 ? true : false;
+		e.mouse_press_		= flags & 0x00040000 ? true : false;
+		e.initialise_		= flags & 0x00020000 ? true : false;
+		e.data_received_	= flags & 0x00010000 ? true : false;
+		// SWF >= 7, SWF = 6, then 0
+		e.construct_		= flags & 0x00000400 ? true : false;
+		e.key_press_		= flags & 0x00000200 ? true : false;
+		e.drag_out_			= flags & 0x00000100 ? true : false;
+		return e;
+	}
+
+	std::vector<clip_action_record> bit_stream::read_clip_action_records()
+	{
+		std::vector<clip_action_record> cars;
+		bool finished = false;
+		while(!finished) {
+			uint32_t flags;
+			if(swf_version() >= 6) {
+				flags = read_unsigned32();
+			} else {
+				flags = uint32_t(read_unsigned16()) << 16;
+			}
+			if(flags == 0) { // end?
+			}
+			clip_action_record car;
+			car.flags = parse_clip_event_flags(flags);
+			uint32_t offset = read_unsigned32();
+			if(car.flags.key_press_) {
+				car.key_code = read_unsigned8();
+			}
+			car.actions = read_action_records();
+		}
+		return cars;
+	}
+
+	clip_actions bit_stream::read_clip_actions()
+	{
+		clip_actions acts;
+		read_unsigned16(); // reserved
+		uint32_t flags;
+		if(swf_version() >= 6) {
+			flags = read_unsigned32();
+		} else {
+			flags = uint32_t(read_unsigned16());
+		}
+		acts.flags = parse_clip_event_flags(flags);
+		acts.clip_records = read_clip_action_records();
+		return acts;
 	}
 
 	uint64_t bit_stream::read_bits(size_t n)

@@ -212,6 +212,77 @@ namespace swf
 		std::vector<shape_record_ptr> shape_records_;
 	};
 
+	struct shape
+	{
+		unsigned fill_bits_;
+		unsigned line_bits_;
+		std::vector<shape_record_ptr> shape_records_;
+	};
+
+	class action_record
+	{
+	public:
+		enum {
+			ACTION_GOTO_FRAME = 0x81,
+			ACTION_GET_URL = 0x83,
+			ACTION_NEXT_FRAME = 0x04,
+			ACTION_PREVIOUS_FRAME = 0x05,
+			ACTION_PLAY = 0x06,
+			ACTION_STOP = 0x07,
+			ACTION_TOGGLE_QUALITY = 0x08,
+			ACTION_STOP_SOUNDS = 0x09,
+			ACTION_WAIT_FOR_FRAME = 0x8a,
+			ACTION_SET_TARGET = 0x8b,
+			ACTION_GOTO_LABEL = 0x8c,
+		};
+		action_record() {}
+		virtual ~action_record() {}
+		uint8_t code() const { return code_; }
+		void set_code(uint8_t c) { code_ = c; }
+	private:
+		uint8_t code_;
+	};
+
+	typedef std::shared_ptr<action_record> action_record_ptr;
+
+	struct clip_event
+	{
+		bool key_up_;
+		bool key_down_;
+		bool mouse_up_;
+		bool mouse_down_;
+		bool mouse_move_;
+		bool unload_;
+		bool enter_frame_;
+		bool load_;
+		// swf 6 and greater only
+		bool drag_over_;
+		bool roll_out;
+		bool roll_over_;
+		bool release_outside_;
+		bool mouse_release_;
+		bool mouse_press_;
+		bool initialise_;
+		bool data_received_;
+		// SWF >= 7, SWF = 6, then 0
+		bool construct_;
+		bool key_press_;
+		bool drag_out_;
+	};
+
+	struct clip_action_record
+	{
+		clip_event flags;
+		uint8_t key_code;
+		std::vector<action_record_ptr> actions;
+	};
+
+	struct clip_actions
+	{
+		clip_event flags;
+		std::vector<clip_action_record> clip_records;
+	};
+
 	class bit_stream
 	{
 	public:
@@ -219,6 +290,12 @@ namespace swf
 		virtual ~bit_stream();
 
 		size_t size();
+
+		void force_byte_align() { last_read_bits_remaining_ = 0; }
+
+		// Some commands need to know this information
+		int swf_version() const { return swf_version_; }
+		void set_swf_version(int version) { swf_version_ = version; }
 		
 		int32_t read_signed_bits(size_t bits);
 		uint32_t read_unsigned_bits(size_t bits);
@@ -261,6 +338,13 @@ namespace swf
 		color_transform read_cxform();
 		color_transform read_cxform_with_alpha();
 
+		action_record_ptr read_action_record();
+		std::vector<action_record_ptr> read_action_records();
+
+		clip_event parse_clip_event_flags(uint32_t flags);
+		std::vector<clip_action_record> read_clip_action_records();
+		clip_actions read_clip_actions();
+
 		gradient_record read_gradient_record(int version);
 		gradient read_gradient(int version);
 		focal_gradient read_focal_gradient(int version);
@@ -272,8 +356,11 @@ namespace swf
 		shape_record_ptr shape_record_factory(int version, unsigned& fill_bits, unsigned& line_bits);
 		std::vector<shape_record_ptr> read_shape_records(int version, unsigned fill_bits, unsigned line_bits);
 		shape_with_style read_shape_with_style(int version);
+		shape read_shape();
 	private:
 		uint64_t read_bits(size_t n);
+
+		int swf_version_;
 
 		uint8_t last_read_;
 		size_t last_read_bits_remaining_;

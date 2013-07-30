@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
 #include <string>
 #include <zlib.h>
 #include "bit_reader.hpp"
@@ -79,7 +78,7 @@ namespace swf
 			TAG_ENABLE_TELEMETRY,
 		};
 	private:
-		boost::scoped_ptr<bit_stream> bits_;
+		std::shared_ptr<bit_stream> bits_;
 		swf& obj_;
 
 		void ProcessShowFrame(unsigned length);

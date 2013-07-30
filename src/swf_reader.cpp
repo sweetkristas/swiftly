@@ -3,6 +3,7 @@
 #include "asserts.hpp"
 #include "decompress.hpp"
 #include "swf_reader.hpp"
+#include "swf_font.hpp"
 
 namespace swf
 {
@@ -106,6 +107,7 @@ namespace swf
 		char s2 = bits_->read_signed8();
 		char s3 = bits_->read_signed8();
 		uint8_t swf_version = bits_->read_unsigned8();
+		bits_->set_swf_version(swf_version);
 		uint32_t file_length = bits_->read_unsigned32();
 		std::cerr << fname << ", Signature: " << s1 << s2 << s3 << ", Version: " << int(swf_version) << ", File Length: " << file_length << std::endl;
 
@@ -115,6 +117,7 @@ namespace swf
 		} else if(s1 == 'C') {
 			// zlib compressed
 			bits_.reset(new bit_stream(zip::decompress(&bits[8], bits.size()-8)));
+			bits_->set_swf_version(swf_version);
 			ASSERT_LOG(bits_->size()+8 == file_length, "File length different from read data. " << (bits_->size()+8) << " : " << file_length);
 		} else if(s1 == 'Z') {
 			// lzma compressed
@@ -234,7 +237,7 @@ namespace swf
 
 	void reader::ProcessShowFrame(unsigned length)
 	{
-		eat_bit_stream(length);
+		// XXX display the frame.
 	}
 
 
@@ -373,7 +376,42 @@ namespace swf
 
 	void reader::ProcessPlaceObject2(unsigned length)
 	{
-		eat_bit_stream(length);
+		bool has_clip_actions = bits_->read_unsigned_bits(1) ? true : false;
+		bool has_clip_depth = bits_->read_unsigned_bits(1) ? true : false;
+		bool has_name = bits_->read_unsigned_bits(1) ? true : false;
+		bool has_ratio = bits_->read_unsigned_bits(1) ? true : false;
+		bool has_color_transform = bits_->read_unsigned_bits(1) ? true : false;
+		bool has_matrix = bits_->read_unsigned_bits(1) ? true : false;
+		bool has_character = bits_->read_unsigned_bits(1) ? true : false;
+		bool move = bits_->read_unsigned_bits(1) ? true : false;
+		uint16_t depth = bits_->read_unsigned16();
+		uint16_t character_id = 0;
+		matrix2x3 transform;
+		color_transform ctransform(true);
+		uint16_t ratio = 0;
+		std::string name;
+		uint16_t clip_depth = 0;
+		if(has_character) {
+			character_id = bits_->read_unsigned16();
+		}
+		if(has_matrix) {
+			transform = bits_->read_matrix();
+		}
+		if(has_color_transform) {
+			ctransform = bits_->read_cxform_with_alpha();
+		}
+		if(has_ratio) {
+			ratio = bits_->read_unsigned16();
+		}
+		if(has_name) {
+			name = bits_->read_string();
+		}
+		if(has_clip_depth) {
+			clip_depth = bits_->read_unsigned16();
+		}
+		if(has_clip_actions) {
+			bits_->read_clip_actions();
+		}
 	}
 
 
@@ -548,7 +586,10 @@ namespace swf
 
 	void reader::ProcessDefineFont3(unsigned length)
 	{
-		eat_bit_stream(length);
+		font* f = new font;
+		f->read3(bits_);
+		// Add front to character list.
+		obj_.add_character(f->id(), f);
 	}
 
 
