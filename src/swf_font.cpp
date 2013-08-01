@@ -10,7 +10,7 @@ namespace swf
 	{
 	}
 
-	void font::read3(std::shared_ptr<bit_stream> bits)
+	void font::read3(bit_stream_ptr bits)
 	{
 		set_id(bits->read_unsigned16());
 		bool has_layout = bits->read_unsigned_bits(1) ? true : false;
@@ -23,9 +23,9 @@ namespace swf
 		bool bold = bits->read_unsigned_bits(1) ? true : false;
 		language_code_ = bits->read_unsigned8();
 		unsigned font_name_length = unsigned(bits->read_unsigned8());
-		std::string s;
+		font_name_.clear();
 		for(unsigned n = 0; n != font_name_length; ++n) {
-			s += char(bits->read_unsigned8());
+			font_name_ += char(bits->read_unsigned8());
 		}
 		unsigned glyph_count = unsigned(bits->read_unsigned16());
 		// read, and discard, offset table
@@ -38,10 +38,15 @@ namespace swf
 		}
 		uint32_t code_table_offset = wide_offsets ? bits->read_unsigned32() : uint32_t(bits->read_unsigned16());
 		// Read glyph shapes.
+		glyphs_.clear();
 		for(unsigned n = 0; n != glyph_count; ++n) {
-			glyphs_.push_back(bits->read_shape());
+			shape* shp = new shape();
+			shp->set_id(0);
+			shp->read(bits);
+			glyphs_.push_back(shp);
 		}
 		// Read ucs-2 codes table
+		code_points_.clear();
 		for(unsigned n = 0; n != glyph_count; ++n) {
 			code_points_.push_back(bits->read_unsigned16());
 		}
@@ -49,19 +54,20 @@ namespace swf
 			font_ascender_height_ = bits->read_unsigned16();
 			font_descender_height_ = bits->read_unsigned16();
 			font_leading_height_ = bits->read_signed16();
+			font_advance_table_.clear();
 			for(unsigned n = 0; n != glyph_count; ++n) {
 				font_advance_table_.push_back(bits->read_signed16());
 			}
+			font_bounds_table_.clear();
 			for(unsigned n = 0; n != glyph_count; ++n) {
 				font_bounds_table_.push_back(bits->read_rect());
 			}
 			unsigned kerning_count = bits->read_unsigned16();
-			for(unsigned n = 0; n != kerning_count; ++n) {
-				kerning_record kr;
-				kr.code[0] = wide_codes ? bits->read_unsigned16() : bits->read_unsigned8();
-				kr.code[1] = wide_codes ? bits->read_unsigned16() : bits->read_unsigned8();
-				kr.adjust = bits->read_signed16();
-				kerning_records_.push_back(kr);
+			kerning_records_.clear();
+			for(unsigned n = 0; n != kerning_count; ++n) {				
+				uint16_t cp0 = wide_codes ? bits->read_unsigned16() : bits->read_unsigned8();
+				uint16_t cp1 = wide_codes ? bits->read_unsigned16() : bits->read_unsigned8();
+				kerning_records_[std::make_pair(cp0,cp1)] = bits->read_signed16();
 			}
 		}
 	}

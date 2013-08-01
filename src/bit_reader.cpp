@@ -92,6 +92,11 @@ namespace swf
 		return read_fixedpoint8_bits(16);
 	}
 
+	fixed_point bit_stream::read_fixedpoint()
+	{
+		return read_fixedpoint_bits(32);
+	}
+
 	std::string bit_stream::read_string()
 	{
 		std::string s;
@@ -466,8 +471,29 @@ namespace swf
 	line_style bit_stream::read_linestyle(int version)
 	{
 		line_style ls;
+		ls.is_linestyle2 = false;
 		ls.width = read_unsigned16();
-		if(version >= 3) {
+
+		if(version == 4) {
+			ls.is_linestyle2 = true;
+			ls.start_cap_style = read_unsigned_bits(2);
+			ls.join_style = read_unsigned_bits(2);
+			ls.has_fill_flag = read_unsigned_bits(1) ? true : false;
+			ls.no_h_scale = read_unsigned_bits(1) ? true : false;
+			ls.no_v_scale = read_unsigned_bits(1) ? true : false;
+			ls.pixel_hinting = read_unsigned_bits(1) ? true : false;
+			read_unsigned_bits(5); // reserved
+			ls.no_close = read_unsigned_bits(1) ? true : false;
+			ls.end_cap_style = read_unsigned_bits(2);
+			if(ls.join_style == line_style::JOIN_STYLE_MITER) {
+				ls.miter_limit_factor = read_unsigned16(); 
+			}
+			if(ls.has_fill_flag) {
+				ls.fs = read_fillstyle(version);
+			} else {
+				ls.color = read_rgba();
+			}
+		} else if(version == 3) {
 			ls.color = read_rgba();
 		} else {
 			rgb color = read_rgb();
@@ -490,117 +516,6 @@ namespace swf
 			ls.push_back(read_linestyle(version));
 		}
 		return ls;
-	}
-
-	shape_styles bit_stream::read_style(int version)
-	{
-		shape_styles ss;
-		ss.fill_styles_ = read_fillstyle_array(version);
-		ss.line_styles_ = read_linestyle_array(version);
-		ss.fill_bits_ = read_unsigned_bits(4);
-		ss.line_bits_ = read_unsigned_bits(4);
-		return ss;
-	}
-
-	shape_record_ptr bit_stream::shape_record_factory(int version, unsigned& fill_bits, unsigned& line_bits)
-	{
-		bool edge_record = read_bits(1) ? true : false;
-		unsigned flags = unsigned(read_bits(5));
-		if(flags == 0) {
-			return shape_record_ptr();
-		}
-		if(edge_record) {
-			if(flags & 16) {
-				// straight
-				shape_record* srp = new shape_record;
-				unsigned num_bits = (flags & 0x0f) + 2;
-				bool general_line = read_bits(1) ? true : false;
-				delta_record dr;
-				if(general_line) {
-					dr.delta_x = int32_t(read_bits(num_bits));
-					dr.delta_y = int32_t(read_bits(num_bits));
-				} else {
-					bool vertical_line = read_bits(1) ? true : false;
-					if(vertical_line) {
-						dr.delta_x = int32_t(read_bits(num_bits));
-						dr.delta_y = 0;
-					} else {
-						dr.delta_x = 0;
-						dr.delta_y = int32_t(read_bits(num_bits));
-					}
-				}
-				srp->set_delta(dr);
-				return shape_record_ptr(srp);
-			} else {
-				curve_edge_record* cer = new curve_edge_record;
-				unsigned num_bits = (flags & 0x0f) + 2;
-				delta_record dr;
-				dr.delta_x = int32_t(read_bits(num_bits));
-				dr.delta_y = int32_t(read_bits(num_bits));
-				cer->set_control(dr);
-				dr.delta_x = int32_t(read_bits(num_bits));
-				dr.delta_y = int32_t(read_bits(num_bits));
-				cer->set_anchor(dr);
-				return shape_record_ptr(cer);
-			}
-		} else {
-			style_change_record* srp = new style_change_record;
-			if(flags & 1) {
-				delta_record moves;
-				unsigned move_bits = unsigned(read_bits(5));
-				moves.delta_x = int32_t(read_signed_bits(move_bits));
-				moves.delta_y = int32_t(read_signed_bits(move_bits));
-				srp->set_moves(moves);
-			}
-			if(flags & 2) {
-				srp->set_fillstyle0_index(read_unsigned_bits(fill_bits));
-			}
-			if(flags & 4) {
-				srp->set_fillstyle1_index(read_unsigned_bits(fill_bits));
-			}
-			if(flags & 8) {
-				srp->set_linestyle_index(read_unsigned_bits(line_bits));
-			}
-			if(flags & 16) {
-				shape_styles ss = read_style(version);
-				fill_bits = ss.fill_bits_;
-				line_bits = ss.line_bits_;
-				srp->set_styles(ss);
-			}
-			return shape_record_ptr(srp);
-		}
-	}
-
-	std::vector<shape_record_ptr> bit_stream::read_shape_records(int version, unsigned fill_bits, unsigned line_bits)
-	{
-		std::vector<shape_record_ptr> sr;
-		bool done = false;
-		while(!done) {
-			shape_record_ptr p = shape_record_factory(version, fill_bits, line_bits);
-			if(p) {
-				sr.push_back(p);
-			} else {
-				done = true;
-			}
-		}
-		return sr;
-	}
-
-	shape bit_stream::read_shape()
-	{
-		shape ss;
-		ss.fill_bits_ = read_unsigned_bits(4);
-		ss.line_bits_ = read_unsigned_bits(4);
-		ss.shape_records_ = read_shape_records(swf_version_, ss.fill_bits_, ss.line_bits_);
-		return ss;
-	}
-
-	shape_with_style bit_stream::read_shape_with_style(int version)
-	{
-		shape_with_style ss;
-		ss.style_ = read_style(version);
-		ss.shape_records_ = read_shape_records(version, ss.style_.fill_bits_, ss.style_.line_bits_);
-		return ss;
 	}
 
 	action_record_ptr bit_stream::read_action_record()

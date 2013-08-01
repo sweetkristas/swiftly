@@ -13,6 +13,9 @@
 
 void sdl_gl_setup()
 {
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
@@ -55,8 +58,8 @@ int main(int argc, char* argv[])
 		args.push_back(argv[i]);
 	}
 
-	int width = 1024;
-	int height = 768;
+	int width = -1;
+	int height = -1;
 	for(auto it  = args.begin(); it != args.end(); ++it) {
 		size_t sep = it->find('=');
 		std::string arg_name = *it;
@@ -74,7 +77,14 @@ int main(int argc, char* argv[])
 	}
 
 	swf::swf swf_object;
-	swf::reader swf_reader("data\\test-menu.swf", swf_object);
+	swf_object.set_transparent_background();
+	//swf::reader swf_reader("data\\test-menu.swf", swf_object);
+	swf::reader swf_reader("data\\swf-test2.swf", swf_object);
+	if(width == -1 || height == -1) {
+		const swf::rect& r = swf_object.frame_size();
+		width = (r.x2 - r.x1)/swf_object.twip();
+		height = (r.y2 - r.y1)/swf_object.twip();
+	}
 
 	try {
 		graphics::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);

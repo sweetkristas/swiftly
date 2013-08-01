@@ -36,6 +36,24 @@
     <ClCompile Include="..\..\src\swf_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\swf_font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_shape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\polygon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp">
@@ -74,14 +92,32 @@
     <ClInclude Include="..\..\src\swf.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\swf_font.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_text.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_button.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_filter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_shape.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\polygon.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\glee\DATA\output\GLee.lib" />
-    <Library Include="..\..\..\SDL\VisualC\SDL\Win32\Release\SDL.lib" />
-    <Library Include="..\..\..\SDL_image\VisualC\Win32\Release\SDL2_image.lib" />
-    <Library Include="..\..\..\SDL\VisualC\SDLmain\Win32\Release\SDLmain.lib" />
-    <Library Include="..\..\..\SDL_mixer\VisualC\Release\SDL2_mixer.lib" />
-    <Library Include="..\..\..\SDL_ttf\VisualC\Release\SDL2_ttf.lib" />
     <Library Include="..\..\..\zlib\zlib.lib" />
+    <Library Include="..\..\..\SDL\VisualC\SDL\Win32\Release\SDL2.lib" />
+    <Library Include="..\..\..\SDL\VisualC\SDLmain\Win32\Release\SDL2main.lib" />
+    <Library Include="..\..\..\SDL_image\VisualC\Win32\Release\SDL2_image.lib" />
+    <Library Include="..\..\..\SDL_mixer\VisualC\Release\SDL2_mixer.lib" />
+    <Library Include="..\..\..\SDL_ttf\VisualC\Win32\Release\SDL2_ttf.lib" />
   </ItemGroup>
 </Project>

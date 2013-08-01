@@ -2,8 +2,11 @@
 #include <sstream>
 #include "asserts.hpp"
 #include "decompress.hpp"
+#include "swf_button.hpp"
 #include "swf_reader.hpp"
 #include "swf_font.hpp"
+#include "swf_shape.hpp"
+#include "swf_text.hpp"
 
 namespace swf
 {
@@ -181,7 +184,7 @@ namespace swf
 			case TAG_DEFINE_BITS_JPEG2:                 ProcessDefineBitsJPEG2(length); break;
 			case TAG_DEFINE_SHAPE2:                     ProcessDefineShape2(length); break;
 			case TAG_DEFINE_BUTTON_CXFORM:              ProcessDefineButtonCxform(length); break;
-			case TAG_PROTECT:                           ProcessProtext(length); break;
+			case TAG_PROTECT:                           ProcessProtect(length); break;
 			case TAG_PLACE_OBJECT2:                     ProcessPlaceObject2(length); break;
 			case TAG_REMOVE_OBJECT2:                    ProcessRemoveObject2(length); break;
 			case TAG_DEFINE_SHAPE3:                     ProcessDefineShape3(length); break;
@@ -237,16 +240,16 @@ namespace swf
 
 	void reader::ProcessShowFrame(unsigned length)
 	{
-		// XXX display the frame.
+		obj_.draw();
 	}
 
 
 	void reader::ProcessDefineShape(unsigned length)
 	{
-		uint16_t shape_id = bits_->read_unsigned16();
-		rect bounds = bits_->read_rect();
-		shape_with_style shape = bits_->read_shape_with_style(1);
-		// XXX save shape in display list
+		shape* s = new shape;
+		s->set_id(bits_->read_unsigned16());
+		s->read(1, bits_);
+		obj_.add_character(s->id(), s);
 	}
 
 
@@ -259,24 +262,28 @@ namespace swf
 
 	void reader::ProcessRemoveObject(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'RemoveObject'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineBits(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineBits'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineButton(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineButton'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessJPEGTables(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'JPEGTables'");
 		eat_bit_stream(length);
 	}
 
@@ -289,87 +296,102 @@ namespace swf
 
 	void reader::ProcessDefineFont(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineFont'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineText(unsigned length)
 	{
-		eat_bit_stream(length);
+		text* t = new text;
+		t->read(bits_);
+		// Add text to character list.
+		obj_.add_character(t->id(), t);
 	}
 
 
 	void reader::ProcessDoAction(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DoAction'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineFontInfo(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineFontInfo'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineSound(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineSound'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessStartSound(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'StartSound'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineButtonSound(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineButtonSound'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessSoundStreamHead(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'SoundStreamHead'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessSoundStreamBlock(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'SoundStreamBlock'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessBitsLossless(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'BitsLossless'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineBitsJPEG2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineBitsJPEG2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineShape2(unsigned length)
 	{
-		uint16_t shape_id = bits_->read_unsigned16();
-		rect bounds = bits_->read_rect();
-		shape_with_style shape = bits_->read_shape_with_style(2);
-		// XXX save shape in display list
+		shape* s = new shape;
+		s->set_id(bits_->read_unsigned16());
+		s->read(2, bits_);
+		obj_.add_character(s->id(), s);
 	}
 
 
 	void reader::ProcessDefineButtonCxform(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineButtonCxform'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessProtext(unsigned length)
+	void reader::ProcessProtect(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'Protect'");
 		eat_bit_stream(length);
 	}
 
@@ -385,77 +407,95 @@ namespace swf
 		bool has_character = bits_->read_unsigned_bits(1) ? true : false;
 		bool move = bits_->read_unsigned_bits(1) ? true : false;
 		uint16_t depth = bits_->read_unsigned16();
-		uint16_t character_id = 0;
-		matrix2x3 transform;
-		color_transform ctransform(true);
-		uint16_t ratio = 0;
-		std::string name;
-		uint16_t clip_depth = 0;
+
+		displayable_ptr display_instance;
+
 		if(has_character) {
-			character_id = bits_->read_unsigned16();
+			display_instance = displayable_ptr(new displayable(obj_.find_character(bits_->read_unsigned16())));
+		} else {
+			display_instance = obj_.find_displayable(depth);
 		}
+
 		if(has_matrix) {
-			transform = bits_->read_matrix();
+			display_instance->set_transform(bits_->read_matrix());
 		}
 		if(has_color_transform) {
-			ctransform = bits_->read_cxform_with_alpha();
+			display_instance->set_cxtransform(bits_->read_cxform_with_alpha());
 		}
 		if(has_ratio) {
-			ratio = bits_->read_unsigned16();
+			display_instance->set_ratio(bits_->read_unsigned16());
 		}
 		if(has_name) {
-			name = bits_->read_string();
+			display_instance->set_name(bits_->read_string());
 		}
 		if(has_clip_depth) {
-			clip_depth = bits_->read_unsigned16();
+			display_instance->set_clip_depth(bits_->read_unsigned16());
 		}
 		if(has_clip_actions) {
+			// XXX
 			bits_->read_clip_actions();
+			ASSERT_LOG(false, "clip actions not supported.");
+		}
+
+		if(has_character) {
+			if(move) {
+				obj_.remove_character_from_display_list(depth);
+			}
+			obj_.add_character_to_display_list(depth, display_instance);
 		}
 	}
 
 
 	void reader::ProcessRemoveObject2(unsigned length)
 	{
-		eat_bit_stream(length);
+		uint16_t depth = bits_->read_unsigned16();
+		obj_.remove_character_from_display_list(depth);
 	}
 
 
 	void reader::ProcessDefineShape3(unsigned length)
 	{
-		uint16_t shape_id = bits_->read_unsigned16();
-		rect bounds = bits_->read_rect();
-		shape_with_style shape = bits_->read_shape_with_style(3);
-		// XXX save shape in display list
+		shape* s = new shape;
+		s->set_id(bits_->read_unsigned16());
+		s->read(3, bits_);
+		obj_.add_character(s->id(), s);
 	}
 
 
 	void reader::ProcessDefineText2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineText2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineButton2(unsigned length)
 	{
-		eat_bit_stream(length);
+		button* b = new button;
+		b->set_id(bits_->read_unsigned16());
+		b->read2(bits_);
+		// Add text to character list.
+		obj_.add_character(b->id(), b);		
 	}
 
 
 	void reader::ProcessDefineBitsJPEG3(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineBitsJPEG3'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineBitsLossless2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineBitsLossless2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineEditText(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineEditText'");
 		eat_bit_stream(length);
 	}
 
@@ -470,78 +510,91 @@ namespace swf
 
 	void reader::ProcessFrameLabel(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'FrameLabel'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessSoundStreamHead2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'SoundStreamHead2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineMorphShape(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineMorphShape'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineFont2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineFont2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessExportAssets(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'ExportAssets'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessImportAssets(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'ImportAssets'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessEnableDebugger(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'EnableDebugger'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDoInitAction(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DoInitAction'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineVideoStream(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineVideoStream'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineFontInfo2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineFontInfo2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessEnableDebugger2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'EnableDebugger2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessScriptLimits(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'ScriptLimits'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessSetTabIndex(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'SetTabIndex'");
 		eat_bit_stream(length);
 	}
 
@@ -562,25 +615,56 @@ namespace swf
 
 	void reader::ProcessPlaceObject3(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'PlaceObject3'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessImportAssets2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'ImportAssets2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineFontAlignZones(unsigned length)
 	{
-		eat_bit_stream(length);
+		uint16_t font_id = bits_->read_unsigned16();
+		unsigned csm_table_hint = bits_->read_unsigned_bits(2);
+		bits_->read_unsigned_bits(6); // reserved
+
+		font_ptr f = boost::dynamic_pointer_cast<font>(obj_.find_character(font_id));
+		ASSERT_LOG(f != NULL, "Couldn't convert character at position " << font_id << " to a font.");
+		f->set_csm_hint(csm_table_hint);
+		std::vector<zone_record> zrs;
+		for(size_t n = 0; n != f->size(); ++n) {
+			zone_record zr;
+			unsigned num_zone_data = bits_->read_unsigned8();
+			ASSERT_LOG(num_zone_data == 2, "NumZoneData expected to be 2 in specification.");
+			zr.zone_data[0].alignment_coordinate = bits_->read_half_float();
+			zr.zone_data[0].range = bits_->read_half_float();
+			zr.zone_data[1].alignment_coordinate = bits_->read_half_float();
+			zr.zone_data[1].range = bits_->read_half_float();
+			bits_->read_unsigned_bits(6); // reserved
+			zr.zone_mask_x = bits_->read_unsigned_bits(1) ? true : false;
+			zr.zone_mask_y = bits_->read_unsigned_bits(1) ? true : false;
+			zrs.push_back(zr);
+		}
+		f->set_zone_records(&zrs);
 	}
 
 
 	void reader::ProcessDefineCSMTextSettings(unsigned length)
 	{
-		eat_bit_stream(length);
+		uint16_t text_id = bits_->read_unsigned16();
+		text_ptr t = boost::dynamic_pointer_cast<text>(obj_.find_character(text_id));
+		ASSERT_LOG(t != NULL, "Couldn't convert character with id: " << text_id << " to a text entity");
+		t->set_render_type(bits_->read_unsigned_bits(2));
+		t->set_grid_fit(bits_->read_unsigned_bits(3));
+		bits_->read_unsigned_bits(3); // reserved
+		t->set_thickness(bits_->read_float());
+		t->set_sharpness(bits_->read_float());
+		bits_->read_unsigned8(); // reserved
 	}
 
 
@@ -595,6 +679,7 @@ namespace swf
 
 	void reader::ProcessSymbolClass(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'SymbolClass'");
 		eat_bit_stream(length);
 	}
 
@@ -602,30 +687,37 @@ namespace swf
 	void reader::ProcessMetadata(unsigned length)
 	{
 		// deliberately ignore the metadata tag.
+		std::cerr << "Ignoring metadata tag" << std::endl;
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineScalingGrid(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineScalingGrid'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDoABC(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DoABC'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineShape4(unsigned length)
 	{
-		eat_bit_stream(length);
+		shape* s = new shape;
+		s->set_id(bits_->read_unsigned16());
+		s->read(4, bits_);
+		obj_.add_character(s->id(), s);
 	}
 
 
 	void reader::ProcessDefineMorphShape2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineMorphShape2'");
 		eat_bit_stream(length);
 	}
 
@@ -654,36 +746,42 @@ namespace swf
 
 	void reader::ProcessDefineBinaryData(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'DefineBinaryData'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineFontName(unsigned length)
 	{
+		std::cerr << "Ignoring DefineFontName tag" << std::endl;
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessStartSound2(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'StartSound2'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineJPEGBits4(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'JPEGBits4'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessDefineFont4(unsigned length)
 	{
+		ASSERT_LOG(false, "Unhandled tag 'JPEGBits4'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessEnableTelemetry(unsigned length)
 	{
+		std::cerr << "Ignoring EnableTelemetry tag" << std::endl;
 		eat_bit_stream(length);
 	}
 

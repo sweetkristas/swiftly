@@ -102,7 +102,7 @@ namespace swf
 		void ProcessDefineBitsJPEG2(unsigned length);
 		void ProcessDefineShape2(unsigned length);
 		void ProcessDefineButtonCxform(unsigned length);
-		void ProcessProtext(unsigned length);
+		void ProcessProtect(unsigned length);
 		void ProcessPlaceObject2(unsigned length);
 		void ProcessRemoveObject2(unsigned length);
 		void ProcessDefineShape3(unsigned length);

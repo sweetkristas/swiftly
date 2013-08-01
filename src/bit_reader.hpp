@@ -131,6 +131,29 @@ namespace swf
 	{
 		unsigned width;
 		rgba color;
+
+		enum {
+			CAP_STYLE_ROUND,
+			CAP_STYLE_NONE,
+			CAP_STYLE_SQUARE,
+		};
+		enum {
+			JOIN_STYLE_ROUND,
+			JOIN_STYLE_BEVEL,
+			JOIN_STYLE_MITER,
+		};
+		// linestyle2 features
+		bool is_linestyle2;
+		unsigned start_cap_style;
+		unsigned join_style;
+		bool has_fill_flag;
+		bool no_h_scale;
+		bool no_v_scale;
+		bool pixel_hinting;
+		bool no_close;
+		unsigned end_cap_style;
+		float miter_limit_factor; // only if join_style = 2
+		fill_style fs; // only use if has_fill_flag=1, else use color.
 	};
 
 	struct delta_record
@@ -138,85 +161,6 @@ namespace swf
 		delta_record() : delta_x(0), delta_y(0) {}
 		int32_t delta_x;
 		int32_t delta_y;
-	};
-
-	class shape_record
-	{
-	public:
-		shape_record() {}
-		virtual ~shape_record() {}
-
-		void set_delta(const delta_record& delta) { delta_ = delta; }
-
-		void draw() { handle_draw(); }
-	protected:
-		virtual void handle_draw() { std::cerr << "Drew a straight edge" << std::endl; }
-	private:
-		delta_record delta_;
-	};
-
-	typedef std::shared_ptr<shape_record> shape_record_ptr;
-
-	struct shape_styles
-	{
-		std::vector<fill_style> fill_styles_;
-		std::vector<line_style> line_styles_;
-		unsigned fill_bits_;
-		unsigned line_bits_;
-	};
-
-	class style_change_record : public shape_record
-	{
-	public:
-		style_change_record() : shape_record() {}
-		virtual ~style_change_record() {}
-		void set_moves(const delta_record& moves) { moves_.reset(new delta_record(moves)); }
-		void set_fillstyle0_index(uint32_t fs) { fillstyle0_.reset(new uint32_t); *fillstyle0_ = fs; }
-		void set_fillstyle1_index(uint32_t fs) { fillstyle1_.reset(new uint32_t); *fillstyle1_ = fs; }
-		void set_linestyle_index(uint32_t ls) { linestyle_.reset(new uint32_t); *linestyle_ = ls; }
-		void set_styles(const shape_styles& styles) { styles_.reset(new shape_styles(styles)); }
-	protected:
-		void handle_draw() { std::cerr << "Changed styles" << std::endl; }
-	private:
-		std::unique_ptr<delta_record> moves_;
-		std::unique_ptr<uint32_t> fillstyle0_;
-		std::unique_ptr<uint32_t> fillstyle1_;
-		std::unique_ptr<uint32_t> linestyle_;
-		std::unique_ptr<shape_styles> styles_;
-
-		style_change_record(const style_change_record&);
-	};
-
-	class curve_edge_record : public shape_record
-	{
-	public:
-		curve_edge_record() : shape_record() {}
-		virtual ~curve_edge_record() {}
-
-		void set_anchor(const delta_record& delta) { anchor_ = delta; }
-		void set_control(const delta_record& delta) { control_ = delta; }
-	protected:
-		void handle_draw() { std::cerr << "Drew a curved edge" << std::endl; }
-	private:
-		delta_record control_;
-		delta_record anchor_;
-
-		curve_edge_record(const curve_edge_record&);
-	};
-
-	shape_record_ptr shape_record_factory();
-
-	struct shape_with_style
-	{
-		shape_styles style_;
-		std::vector<shape_record_ptr> shape_records_;
-	};
-
-	struct shape
-	{
-		unsigned fill_bits_;
-		unsigned line_bits_;
-		std::vector<shape_record_ptr> shape_records_;
 	};
 
 	class action_record
@@ -300,6 +244,7 @@ namespace swf
 		int32_t read_signed_bits(size_t bits);
 		uint32_t read_unsigned_bits(size_t bits);
 		fixed_point read_fixedpoint_bits(size_t bits);
+		fixed_point read_fixedpoint();
 		fixed_point8 read_fixedpoint8_bits(size_t bits);
 		fixed_point8 read_fixedpoint8();
 		
@@ -348,15 +293,10 @@ namespace swf
 		gradient_record read_gradient_record(int version);
 		gradient read_gradient(int version);
 		focal_gradient read_focal_gradient(int version);
-		shape_styles read_style(int version);
 		fill_style read_fillstyle(int version);
 		line_style read_linestyle(int version);
 		std::vector<fill_style> read_fillstyle_array(int version);
 		std::vector<line_style> read_linestyle_array(int version);
-		shape_record_ptr shape_record_factory(int version, unsigned& fill_bits, unsigned& line_bits);
-		std::vector<shape_record_ptr> read_shape_records(int version, unsigned fill_bits, unsigned line_bits);
-		shape_with_style read_shape_with_style(int version);
-		shape read_shape();
 	private:
 		uint64_t read_bits(size_t n);
 
@@ -370,4 +310,6 @@ namespace swf
 		bit_stream();
 		bit_stream(const bit_stream&);
 	};
+
+	typedef std::shared_ptr<bit_stream> bit_stream_ptr;
 }

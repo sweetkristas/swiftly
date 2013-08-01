@@ -43,4 +43,26 @@ namespace swf
 		scene_info_ = scene;
 		frame_label_ = frame_label;
 	}
+
+	void swf::draw() const
+	{
+		for(auto d : display_list_) {
+			d.second->draw();
+		}
+	}
+
+	displayable::displayable(character_ptr cp)
+		: character_(cp), clip_depth_(0), ratio_(1.0f)
+	{
+	}
+
+	displayable::~displayable()
+	{
+	}
+
+	void displayable::draw() const
+	{
+		ASSERT_LOG(character_ != NULL, "No character to draw");
+		character_->draw();
+	}
 }
