@@ -12,7 +12,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\bit_reader.cpp" />
+    <ClCompile Include="..\..\src\clipper\clipper.cpp" />
     <ClCompile Include="..\..\src\decompress.cpp" />
+    <ClCompile Include="..\..\src\poly2tri\common\shapes.cc" />
+    <ClCompile Include="..\..\src\poly2tri\sweep\advancing_front.cc" />
+    <ClCompile Include="..\..\src\poly2tri\sweep\cdt.cc" />
+    <ClCompile Include="..\..\src\poly2tri\sweep\sweep.cc" />
+    <ClCompile Include="..\..\src\poly2tri\sweep\sweep_context.cc" />
     <ClCompile Include="..\..\src\polygon.cpp" />
     <ClCompile Include="..\..\src\swf.cpp" />
     <ClCompile Include="..\..\src\swf_button.cpp" />
@@ -28,7 +34,15 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\asserts.hpp" />
     <ClInclude Include="..\..\src\bit_reader.hpp" />
+    <ClInclude Include="..\..\src\clipper\clipper.hpp" />
     <ClInclude Include="..\..\src\decompress.hpp" />
+    <ClInclude Include="..\..\src\poly2tri\common\shapes.h" />
+    <ClInclude Include="..\..\src\poly2tri\common\utils.h" />
+    <ClInclude Include="..\..\src\poly2tri\poly2tri.h" />
+    <ClInclude Include="..\..\src\poly2tri\sweep\advancing_front.h" />
+    <ClInclude Include="..\..\src\poly2tri\sweep\cdt.h" />
+    <ClInclude Include="..\..\src\poly2tri\sweep\sweep.h" />
+    <ClInclude Include="..\..\src\poly2tri\sweep\sweep_context.h" />
     <ClInclude Include="..\..\src\polygon.hpp" />
     <ClInclude Include="..\..\src\ref_counted_ptr.hpp" />
     <ClInclude Include="..\..\src\swf.hpp" />

@@ -51,7 +51,7 @@ namespace swf
 		void set_linestyle_index(uint32_t ls) { has_ls_ = true; linestyle_ = ls; }
 		void set_styles(const styles& s) { has_new_styles_ = true; styles_ = s; }
 	protected:
-		void handle_draw(shape& shp) const { std::cerr << "Changed styles" << std::endl; }
+		void handle_draw(shape& shp) const;
 	private:
 		bool has_moves_;
 		bool has_fs0_;
@@ -151,7 +151,7 @@ namespace swf
 		void draw() const;
 	private:
 		styles style_;
-		rect bounds_;
+		geometry::rect bounds_;
 		std::vector<shape_record_ptr> shape_records_;
 
 		mutable int current_fill_style0_;
@@ -164,7 +164,7 @@ namespace swf
 		mutable int32_t current_y_;
 
 		// Stuff for DefineShape4
-		rect edge_bounds_;
+		geometry::rect edge_bounds_;
 		bool uses_fill_winding_rule_;
 		bool has_non_scaling_strokes_;
 		bool has_scaling_strokes_;

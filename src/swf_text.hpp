@@ -20,7 +20,7 @@ namespace swf
 
 		void draw() const;
 	private:
-		rect text_bounds_;
+		geometry::rect text_bounds_;
 		matrix2x3 text_matrix_;
 
 		uint16_t font_id_;

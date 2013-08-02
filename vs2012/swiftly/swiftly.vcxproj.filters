@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="poly2tri">
+      <UniqueIdentifier>{f245888f-eede-44e8-a79c-3352c0d3010d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="clipper">
+      <UniqueIdentifier>{c102ed50-82ef-4510-885d-a61cca439780}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\test\swiftly.cpp">
@@ -50,6 +56,24 @@
     </ClCompile>
     <ClCompile Include="..\..\src\swf_shape.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\poly2tri\common\shapes.cc">
+      <Filter>poly2tri</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\poly2tri\sweep\advancing_front.cc">
+      <Filter>poly2tri</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\poly2tri\sweep\cdt.cc">
+      <Filter>poly2tri</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\poly2tri\sweep\sweep.cc">
+      <Filter>poly2tri</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\poly2tri\sweep\sweep_context.cc">
+      <Filter>poly2tri</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\clipper\clipper.cpp">
+      <Filter>clipper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\polygon.cpp">
       <Filter>Source Files</Filter>
@@ -106,6 +130,30 @@
     </ClInclude>
     <ClInclude Include="..\..\src\swf_shape.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\poly2tri\poly2tri.h">
+      <Filter>poly2tri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\poly2tri\common\shapes.h">
+      <Filter>poly2tri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\poly2tri\common\utils.h">
+      <Filter>poly2tri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\poly2tri\sweep\advancing_front.h">
+      <Filter>poly2tri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\poly2tri\sweep\cdt.h">
+      <Filter>poly2tri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\poly2tri\sweep\sweep.h">
+      <Filter>poly2tri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\poly2tri\sweep\sweep_context.h">
+      <Filter>poly2tri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\clipper\clipper.hpp">
+      <Filter>clipper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\polygon.hpp">
       <Filter>Header Files</Filter>

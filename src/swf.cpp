@@ -14,7 +14,7 @@ namespace swf
 		version_ = vers;
 	}
 
-	void swf::set_frame_size(rect frame_size)
+	void swf::set_frame_size(geometry::rect frame_size)
 	{
 		frame_size_ = frame_size;
 	}

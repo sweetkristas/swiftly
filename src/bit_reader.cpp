@@ -294,11 +294,11 @@ namespace swf
 		return color;
 	}
 
-	rect bit_stream::read_rect()
+	geometry::rect bit_stream::read_rect()
 	{
 		force_byte_align();
 		uint32_t nbits = read_unsigned_bits(5);
-		rect r;
+		geometry::rect r;
 		r.x1 = read_signed_bits(nbits);
 		r.x2 = read_signed_bits(nbits);
 		r.y1 = read_signed_bits(nbits);

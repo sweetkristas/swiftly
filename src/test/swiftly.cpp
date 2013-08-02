@@ -3,6 +3,10 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "sdl_wrapper.hpp"
 #include "../swf.hpp"
 #include "../swf_reader.hpp"
@@ -81,7 +85,7 @@ int main(int argc, char* argv[])
 	//swf::reader swf_reader("data\\test-menu.swf", swf_object);
 	swf::reader swf_reader("data\\swf-test2.swf", swf_object);
 	if(width == -1 || height == -1) {
-		const swf::rect& r = swf_object.frame_size();
+		const geometry::rect& r = swf_object.frame_size();
 		width = (r.x2 - r.x1)/swf_object.twip();
 		height = (r.y2 - r.y1)/swf_object.twip();
 	}
@@ -95,7 +99,7 @@ int main(int argc, char* argv[])
 			SDL_WINDOWPOS_CENTERED, 
 			width, 
 			height, 
-			SDL_WINDOW_OPENGL);
+			SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 		wm.set_icon("images/icon.png");
 		wm.gl_init();
 
@@ -104,6 +108,12 @@ int main(int argc, char* argv[])
 		uint64_t render_acc = 0;
 		int render_cnt = 0;
 
+		glMatrixMode(GL_PROJECTION);
+		glm::mat4 projmat = glm::ortho(0.0f, float(width), 0.0f, float(height));
+		glLoadMatrixf(glm::value_ptr(projmat));
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();
 
@@ -111,6 +121,7 @@ int main(int argc, char* argv[])
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 			running = process_events();
+
 
 			wm.swap();
 

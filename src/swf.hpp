@@ -83,8 +83,8 @@ namespace swf
 
 		unsigned version() const { return version_; }
 		void set_version(unsigned vers);
-		const rect& frame_size() const { return frame_size_; }
-		void set_frame_size(rect frame_size);
+		const geometry::rect& frame_size() const { return frame_size_; }
+		void set_frame_size(geometry::rect frame_size);
 		double frame_rate() const { return frame_rate_; }
 		void set_frame_rate(fixed_point frame_rate);
 		size_t frame_count() const { return frames_.size(); }
@@ -135,7 +135,7 @@ namespace swf
 		void draw() const;
 	private:
 		int version_;
-		rect frame_size_;
+		geometry::rect frame_size_;
 		double frame_rate_;
 
 		// file attributes

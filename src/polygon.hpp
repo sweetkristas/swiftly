@@ -1,45 +1,26 @@
 #pragma once
 
+#include <cstdint>
 #include <vector>
-#include <set>
+#include <glm/glm.hpp>
 
 namespace geometry
 {
-	class point2d
+	struct point2d_twip
 	{
-	public:
-		point2d() : x_(0), y_(0)
-		{}
-		explicit point2d(int x, int y) : x_(x), y_(y)
-		{}
-		virtual ~point2d()
-		{}
-		int x() const { return x_; }
-		int y() const { return y_; }
-		bool operator<(const point2d& rhs) {
-			if(y_ < rhs.y_ || y_ == rhs.y_ && x_ <= rhs.x_) {
-				return true;
-			}
-			return false;
-		}
-	private:
-		int x_;
-		int y_;
+		point2d_twip() : x(0), y(0) {}
+		explicit point2d_twip(int32_t xx, int32_t yy) : x(xx), y(yy) {}
+		int32_t x;
+		int32_t y;
 	};
 
-	typedef std::vector<point2d> point_array;
-	typedef std::pair<point2d, point2d> edge;
-
-	class polygon
+	struct rect
 	{
-	public:
-		polygon();
-		explicit polygon(point_array points);
-		virtual ~polygon();
-		
-		void monotonate();
-	private:
-		std::vector<edge> edges_;
-		std::set<point2d> vertices_;
+		size_t x1;
+		size_t y1;
+		size_t x2;
+		size_t y2;
 	};
+
+	void generate_triangles(const std::vector<point2d_twip>& points, const rect& bounds, std::vector<float>& triangles);
 }

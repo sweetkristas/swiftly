@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "polygon.hpp"
+
 namespace swf
 {
 	struct fixed_point
@@ -42,14 +44,6 @@ namespace swf
 		uint8_t g;
 		uint8_t b;
 		uint8_t a;
-	};
-
-	struct rect
-	{
-		size_t x1;
-		size_t y1;
-		size_t x2;
-		size_t y2;
 	};
 
 	struct matrix2x3
@@ -276,7 +270,7 @@ namespace swf
 		rgba read_rgba();
 		rgba read_argb();
 
-		rect read_rect();
+		geometry::rect read_rect();
 
 		matrix2x3 read_matrix();
 

@@ -127,7 +127,7 @@ namespace swf
 			ASSERT_LOG(false, "LZMA compression not currently supported.");
 		}
 
-		rect frame_size = bits_->read_rect();
+		geometry::rect frame_size = bits_->read_rect();
 		fixed_point frame_rate = bits_->read_fixedpoint_bits(16);
 		uint16_t frame_count = bits_->read_unsigned16();
 

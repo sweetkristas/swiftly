@@ -49,7 +49,7 @@ namespace swf
 		uint16_t font_descender_height_;
 		int16_t font_leading_height_;
 		std::vector<int16_t> font_advance_table_;
-		std::vector<rect> font_bounds_table_;
+		std::vector<geometry::rect> font_bounds_table_;
 		kerning_map kerning_records_;
 		std::vector<shape_ptr> glyphs_;
 		std::string font_name_;
