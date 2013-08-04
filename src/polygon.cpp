@@ -77,7 +77,7 @@ namespace geometry
 
 	   for(size_t i = 0; i < polygonList.size(); i++)
 	   {
-		  std::vector<p2t::Point> currentPoly = polygonList[i];
+		  const std::vector<p2t::Point>& currentPoly = polygonList[i];
 
 		  if(isWoundClockwise(currentPoly))
 		  {

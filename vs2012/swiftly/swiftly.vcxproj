@@ -36,6 +36,7 @@
     <ClInclude Include="..\..\src\bit_reader.hpp" />
     <ClInclude Include="..\..\src\clipper\clipper.hpp" />
     <ClInclude Include="..\..\src\decompress.hpp" />
+    <ClInclude Include="..\..\src\graphics.hpp" />
     <ClInclude Include="..\..\src\poly2tri\common\shapes.h" />
     <ClInclude Include="..\..\src\poly2tri\common\utils.h" />
     <ClInclude Include="..\..\src\poly2tri\poly2tri.h" />
