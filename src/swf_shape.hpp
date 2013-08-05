@@ -22,17 +22,23 @@ namespace swf
 	class shape_record
 	{
 	public:
-		shape_record() {}
+		enum ShapeRecordTypes {
+			SR_STYLE_CHANGE,
+			SR_LINE,
+			SR_CURVE,
+		};
+
+		shape_record() : type_(SR_LINE) {}
 		virtual ~shape_record() {}
 
 		void set_delta(const delta_record& delta) { delta_ = delta; }
 		const delta_record& get_delta() const { return delta_; }
 
-		void draw(shape& shp) const { handle_draw(shp); }
-	protected:
-		virtual void handle_draw(shape& shp) const { std::cerr << "Drew a straight edge" << std::endl; }
+		ShapeRecordTypes type() const { return type_; }
+		void set_type(ShapeRecordTypes t) { type_ = t; }
 	private:
 		delta_record delta_;
+		ShapeRecordTypes type_;
 	};
 
 	typedef std::shared_ptr<shape_record> shape_record_ptr;
@@ -43,15 +49,21 @@ namespace swf
 		style_change_record() : shape_record(), has_moves_(false), 
 			has_fs0_(false), has_fs1_(false), has_ls_(false), has_new_styles_(false),
 			fillstyle0_(0), fillstyle1_(0), linestyle_(0)
-		{}
+		{
+			set_type(SR_STYLE_CHANGE);
+		}
 		virtual ~style_change_record() {}
 		void set_moves(const delta_record& moves) { has_moves_ = true; moves_ = moves; }
 		void set_fillstyle0_index(uint32_t fs) { has_fs0_ = true; fillstyle0_ = fs; }
 		void set_fillstyle1_index(uint32_t fs) { has_fs1_ = true; fillstyle1_ = fs; }
 		void set_linestyle_index(uint32_t ls) { has_ls_ = true; linestyle_ = ls; }
 		void set_styles(const styles& s) { has_new_styles_ = true; styles_ = s; }
-	protected:
-		void handle_draw(shape& shp) const;
+
+		bool has_moves() const { return has_moves_; }
+		bool has_linestyle_change() const { return has_ls_; }
+		bool has_fillstyle0_change() const { return has_fs0_; }
+		bool has_fillstyle1_change() const { return has_fs1_; }
+		bool has_newstyles() const { return has_new_styles_; }
 	private:
 		bool has_moves_;
 		bool has_fs0_;
@@ -71,13 +83,17 @@ namespace swf
 	class curve_edge_record : public shape_record
 	{
 	public:
-		curve_edge_record() : shape_record() {}
+		curve_edge_record() : shape_record() 
+		{
+			set_type(SR_CURVE);
+		}
 		virtual ~curve_edge_record() {}
 
 		void set_anchor(const delta_record& delta) { anchor_ = delta; }
 		void set_control(const delta_record& delta) { control_ = delta; }
-	protected:
-		void handle_draw(shape& shp) const { std::cerr << "Drew a curved edge" << std::endl; }
+
+		const delta_record& anchor() const { return anchor_; }
+		const delta_record& control() const { return control_; }
 	private:
 		delta_record control_;
 		delta_record anchor_;
@@ -147,6 +163,10 @@ namespace swf
 			current_x_ = x;
 			current_y_ = y;
 		}
+
+		const std::vector<shape_record_ptr>& get_shape_records() const { return shape_records_; }
+
+		void prepare_for_draw();
 
 		void draw() const;
 	private:

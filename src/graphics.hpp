@@ -4,16 +4,17 @@
 
 namespace graphics
 {
-	// virtual base class for generating the list of commands used to make a shape
 	class shape
 	{
-	public:
 		shape();
+		shape(const swf::shape& shape);
 		virtual ~shape();
 
-		void prepare_shape();
-
 		void draw() const;
+		void prepare(const swf::shape& shape);	
 	private:
+		bool ready_for_draw_;
+
+		shape(const shape&);
 	};
 }

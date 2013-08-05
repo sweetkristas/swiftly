@@ -4,6 +4,7 @@
 
 #include "asserts.hpp"
 #include "bit_reader.hpp"
+#include "graphics.hpp"
 #include "ref_counted_ptr.hpp"
 
 namespace swf

@@ -124,28 +124,35 @@ namespace swf
 
 	void shape::draw() const
 	{
-		for(auto sr : shape_records_) {
-			sr->draw(const_cast<shape&>(*this));
-		}
 	}
 
-	void style_change_record::handle_draw(shape& shp) const 
-	{ 
-		if(has_new_styles_) {
-			shp.set_current_fillstyle_array(styles_.fill_styles_);
-			shp.set_current_linestyle_array(styles_.line_styles_);
-		}
-		if(has_fs0_) {
-			shp.set_current_fillstyle0(fillstyle0_);
-		}
-		if(has_fs1_) {
-			shp.set_current_fillstyle1(fillstyle1_);
-		}
-		if(has_ls_) {
-			shp.set_current_linestyle(linestyle_);
-		}
-		if(has_moves_) {
-			shp.move_to(get_delta().delta_x, get_delta().delta_y);
+	void shape::prepare_for_draw()
+	{
+		bool in_shape = false;
+		for(auto sr : shape_records_) {
+			if(sr->type() == shape_record::SR_STYLE_CHANGE) {
+				std::shared_ptr<style_change_record> p = std::dynamic_pointer_cast<style_change_record>(sr);
+				if(p->has_newstyles()) {
+					// XXX
+				}
+				if(p->has_fillstyle0_change()) {
+				}
+				if(p->has_fillstyle1_change()) {
+				}
+				if(p->has_linestyle_change()) {
+				}
+				if(p->has_moves()) {
+					if(in_shape) {
+						// XXX
+					}
+					current_x_ = p->get_delta().delta_x;
+					current_y_ = p->get_delta().delta_y;
+				}
+			} else if(sr->type() == shape_record::SR_LINE) {
+				// line from current_x_/current_y_ to sr->get_delta().x/.y
+			} else if(sr->type() == shape_record::SR_CURVE) {
+				// curve from current_x_/current_y_ to sr->anchor().x/y with sr->control().x/y
+			}
 		}
 	}
 }
