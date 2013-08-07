@@ -132,6 +132,58 @@ namespace swf
 		return (msb << 8) | lsb;
 	}
 
+	uint32_t bit_stream::read_u30()
+	{
+		uint32_t ret_val = 0;
+		uint8_t uc;
+		int shift_cnt = 0;
+		do {
+			uc = read_unsigned8();
+			ret_val |= uint32_t(uc & 0x7f) << shift_cnt; 
+			shift_cnt += 7;
+		} while(uc & 0x80);
+		return ret_val;
+	}
+
+	uint32_t bit_stream::read_u32()
+	{
+		uint32_t ret_val = 0;
+		uint8_t uc;
+		int shift_cnt = 0;
+		do {
+			uc = read_unsigned8();
+			ret_val |= uint32_t(uc & 0x7f) << shift_cnt; 
+			shift_cnt += 7;
+		} while(uc & 0x80);
+		return ret_val;
+	}
+
+	int32_t bit_stream::read_s24()
+	{
+		uint32_t lsb = uint32_t(read_unsigned8());
+		uint32_t xsb = uint32_t(read_unsigned8());
+		uint32_t msb = uint32_t(read_unsigned8());
+		return lsb | (xsb << 8) | (msb << 16) | ((msb & 0x80 ? 0xff : 0x00) << 24);
+	}
+
+	int32_t bit_stream::read_s32()
+	{
+		uint32_t ret_val = 0;
+		uint8_t uc;
+		uint32_t shift_cnt = 0;
+		do {
+			uc = read_unsigned8();
+			ret_val |= uint32_t(uc & 0x7f) << shift_cnt; 
+			shift_cnt += 7;
+		} while(uc & 0x80);
+		// is sign bit set
+		if(uc & 0x40) {
+			// yes, so we need to sign extend the result.
+			ret_val |= ~((1 << shift_cnt)-1);
+		}
+		return int32_t(ret_val);
+	}
+
 	std::vector<int8_t> bit_stream::read_signed8(size_t n)
 	{
 		std::vector<int8_t> v;

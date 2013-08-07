@@ -254,6 +254,11 @@ namespace swf
 		uint16_t read_unsigned16();
 		uint32_t read_unsigned32();
 
+		uint32_t read_u30();
+		uint32_t read_u32();
+		int32_t read_s24();
+		int32_t read_s32();
+
 		std::vector<uint8_t> read_unsigned8(size_t n);
 		std::vector<uint16_t> read_unsigned16(size_t n);
 		std::vector<uint32_t> read_unsigned24(size_t n);

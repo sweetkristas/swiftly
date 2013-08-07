@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\avm2.cpp" />
     <ClCompile Include="..\..\src\bit_reader.cpp" />
     <ClCompile Include="..\..\src\clipper\clipper.cpp" />
     <ClCompile Include="..\..\src\decompress.cpp" />
@@ -34,6 +35,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\asserts.hpp" />
+    <ClInclude Include="..\..\src\avm2.hpp" />
+    <ClInclude Include="..\..\src\avm2_fwd.hpp" />
+    <ClInclude Include="..\..\src\avm2_instructions.hpp" />
+    <ClInclude Include="..\..\src\avm2_reader.hpp" />
+    <ClInclude Include="..\..\src\avm2_variant.hpp" />
     <ClInclude Include="..\..\src\bit_reader.hpp" />
     <ClInclude Include="..\..\src\clipper\clipper.hpp" />
     <ClInclude Include="..\..\src\decompress.hpp" />
