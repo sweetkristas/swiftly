@@ -83,7 +83,8 @@ int main(int argc, char* argv[])
 	swf::swf swf_object;
 	swf_object.set_transparent_background();
 	//swf::reader swf_reader("data\\test-menu.swf", swf_object);
-	swf::reader swf_reader("data\\swf-test2.swf", swf_object);
+	//swf::reader swf_reader("data\\swf-test2.swf", swf_object);
+	swf::reader swf_reader("data\\as3_test1.swf", swf_object);
 	if(width == -1 || height == -1) {
 		const geometry::rect& r = swf_object.frame_size();
 		width = (r.x2 - r.x1)/swf_object.twip();

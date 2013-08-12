@@ -99,6 +99,8 @@ namespace avm2
 
 	struct option_info
 	{
+		option_info();
+		explicit option_info(uint8_t knd, uint32_t val, const constant_pool& cp);
 		enum OptionKind {
 			CONSTANT_Int					= 0x03,
 			CONSTANT_UInt					= 0x04,
@@ -244,13 +246,13 @@ namespace avm2
 		std::vector<trait_info_ptr> traits_;
 	};
 	
-	class exception_info
+	class vm_exception_info
 	{
 	public:
-		exception_info() {}
-		virtual ~exception_info() {}
+		vm_exception_info() {}
+		virtual ~vm_exception_info() {}
 
-		static exception_info_ptr read(swf::bit_stream_ptr bits, const abc_file& abc, const method_body_info& method_body);
+		static vm_exception_info_ptr read(swf::bit_stream_ptr bits, const abc_file& abc, const method_body_info& method_body);
 	private:
 		code_type_iterator from_;
 		code_type_iterator to_;
@@ -282,14 +284,14 @@ namespace avm2
 		uint32_t max_scope_depth_;
 		// AVM2 instructions
 		code_type code_;
-		std::vector<exception_info_ptr> exceptions_;
+		std::vector<vm_exception_info_ptr> exceptions_;
 		std::vector<trait_info_ptr> traits_;
 	};
 
 	class abc_file
 	{
 	public:
-		abc_file(swf::bit_stream_ptr bits);
+		abc_file(uint32_t flags, const std::string& name, swf::bit_stream_ptr bits);
 		virtual ~abc_file();
 
 		const constant_pool& constants() const { return *constants_; }
@@ -300,6 +302,12 @@ namespace avm2
 		script_info_ptr find_script(uint32_t index) const;
 		method_body_info_ptr find_method_body(uint32_t index) const;
 	private:
+		enum {
+			ABC_LAZY_INITIALISE = 1
+		};
+		uint32_t flags_;
+		std::string name_;
+
 		uint16_t minor_version_;
 		uint16_t major_version_;
 		constant_pool_ptr constants_;

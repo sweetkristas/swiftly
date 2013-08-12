@@ -3,7 +3,8 @@
 
 namespace avm2
 {
-	abc_file::abc_file(swf::bit_stream_ptr bits)
+	abc_file::abc_file(uint32_t flags, const std::string& name, swf::bit_stream_ptr bits)
+		: flags_(flags), name_(name)
 	{
 		// read version
 		minor_version_ = bits->read_unsigned16();
@@ -16,7 +17,6 @@ namespace avm2
 			methods_.push_back(method_info::read(bits, *constants_));
 		}
 		// Read and discard metadata
-		bits->read_u30();	// name, index into string constants
 		uint32_t item_count = bits->read_u30();
 		for(uint32_t n = 0; n != item_count; ++n) {
 			bits->read_u30();	// key, index into string constants
@@ -81,39 +81,45 @@ namespace avm2
 		size_t int_count = bits->read_u30();
 		integers_.reserve(int_count);
 		integers_.push_back(0);
-		for(size_t n = 0;  n != int_count-1; ++n) {
+		for(size_t n = 0; int_count && n != int_count-1; ++n) {
 			integers_.push_back(bits->read_s32());
 		}
 		size_t uint_count = bits->read_u30();
 		uintegers_.reserve(uint_count);
 		uintegers_.push_back(0);
-		for(size_t n = 0;  n != uint_count-1; ++n) {
+		for(size_t n = 0; uint_count && n != uint_count-1; ++n) {
 			uintegers_.push_back(bits->read_u32());
 		}
 		size_t double_count = bits->read_u30();
 		doubles_.reserve(double_count);
 		doubles_.push_back(0.0);
-		for(size_t n = 0;  n != double_count-1; ++n) {
+		for(size_t n = 0; double_count && n != double_count-1; ++n) {
 			doubles_.push_back(bits->read_double());
 		}
 		size_t string_count = bits->read_u30();
 		strings_.reserve(string_count);
 		strings_.push_back("");
-		for(size_t n = 0;  n != string_count-1; ++n) {
-			strings_.push_back(bits->read_string());
+		for(size_t n = 0; string_count && n != string_count-1; ++n) {
+			strings_.push_back(bits->read_avm2_string());
 		}
 
 		size_t namespace_count = bits->read_u30();
 		namespaces_.reserve(namespace_count);
 		namespaces_.push_back(ns_info_ptr());
-		for(size_t n = 0;  n != namespace_count-1; ++n) {
+		for(size_t n = 0; namespace_count && n != namespace_count-1; ++n) {
 			namespaces_.push_back(ns_info::read(bits, *this));
 		}
 		size_t ns_set_count = bits->read_u30();
 		ns_sets_.reserve(ns_set_count);
 		ns_sets_.push_back(ns_set_info_ptr());
-		for(size_t n = 0; n != ns_set_count-1; ++n) {
+		for(size_t n = 0; ns_set_count && n != ns_set_count-1; ++n) {
 			ns_sets_.push_back(ns_set_info::read(bits, *this));
+		}
+		size_t multiname_count = bits->read_u30();
+		multinames_.reserve(multiname_count);
+		multinames_.push_back(multiname_info_ptr());
+		for(size_t n = 0; multiname_count && n != multiname_count-1; ++n) {
+			multinames_.push_back(multiname_info::read(bits, *this));
 		}
 	}
 
@@ -183,35 +189,66 @@ namespace avm2
 
 	multiname_info_ptr multiname_info::read(swf::bit_stream_ptr bits, const constant_pool& cp)
 	{
-		multiname_info mi;
-		mi.kind = multiname_info::MultinameKind(bits->read_unsigned8());
-		switch(mi.kind) {
+		multiname_info* mi = new multiname_info();
+		mi->kind = multiname_info::MultinameKind(bits->read_unsigned8());
+		switch(mi->kind) {
 			case CONSTANT_QName:
 			case CONSTANT_QNameA:
-				mi.ns = cp.find_namespace(bits->read_u30());
-				mi.name = cp.find_string(bits->read_u30());
-				break;
+				mi->ns = cp.find_namespace(bits->read_u30());
+				mi->name = cp.find_string(bits->read_u30());
+				return multiname_info_ptr(mi);
 			case CONSTANT_RTQName:
 			case CONSTANT_RTQNameA:
-				mi.name = cp.find_string(bits->read_u30());
-				break;
+				mi->name = cp.find_string(bits->read_u30());
+				return multiname_info_ptr(mi);
 			case CONSTANT_RTQNameL:
 			case CONSTANT_RTQNameLA:
 				// nothing read.
-				break;
+				return multiname_info_ptr(mi);
 			case CONSTANT_Multiname:
 			case CONSTANT_MultinameA:
-				mi.name = cp.find_string(bits->read_u30());
-				mi.ns_set = cp.find_namespace_set(bits->read_u30());
-				break;
+				mi->name = cp.find_string(bits->read_u30());
+				mi->ns_set = cp.find_namespace_set(bits->read_u30());
+				return multiname_info_ptr(mi);
 			case CONSTANT_MultinameL:
 			case CONSTANT_MultinameLA:
-				mi.ns_set = cp.find_namespace_set(bits->read_u30());
-				break;
+				mi->ns_set = cp.find_namespace_set(bits->read_u30());
+				return multiname_info_ptr(mi);
 			default:
-				ASSERT_LOG(false, "Unexpected constant for multiname_info::MultinameKind: " << mi.kind);
+				ASSERT_LOG(false, "Unexpected constant for multiname_info::MultinameKind: " << mi->kind);
 		}
 		return multiname_info_ptr();
+	}
+
+	option_info::option_info(uint8_t knd, uint32_t val, const constant_pool& cp)
+	{
+		kind = option_info::OptionKind(knd);
+		switch(kind) {
+			case CONSTANT_Int:		i = cp.find_integer(val); break;
+			case CONSTANT_UInt:		ui = cp.find_uinteger(val); break;
+			case CONSTANT_Double:	d = cp.find_double(val); break;
+			case CONSTANT_Utf8:		s = cp.find_string(val); break;
+			case CONSTANT_True:
+			case CONSTANT_False:
+			case CONSTANT_Null:
+			case CONSTANT_Undefined:
+				break;
+			case CONSTANT_Namespace:
+			case CONSTANT_PackageNamespace:
+			case CONSTANT_PackageInternalNs:
+			case CONSTANT_ProtectedNamespace:
+			case CONSTANT_ExplicitNamespace:
+			case CONSTANT_StaticProtectedNs:
+			case CONSTANT_PrivateNs:
+				ns = cp.find_namespace(val);
+				break;
+			default:
+				ASSERT_LOG(false, "Invalid option_info kind: " << kind);
+		}
+	}
+
+	option_info::option_info() : i(0), ui(0), d(0.0), kind(CONSTANT_Undefined)
+	{
 	}
 
 	option_info_ptr option_info::read(swf::bit_stream_ptr bits, const constant_pool& cp)
@@ -300,7 +337,10 @@ namespace avm2
 				slot->attributes = attributes;
 				slot->slot_id = bits->read_u30();
 				slot->type_name = abc.constants().find_multiname(bits->read_u30());
-				slot->voption = option_info::read(bits, abc.constants());
+				uint32_t val = bits->read_u30();
+				if(val) {
+					slot->voption.reset(new option_info(bits->read_unsigned8(), val, abc.constants()));
+				}
 				traits.reset(slot);
 				break;
 			}
@@ -381,15 +421,15 @@ namespace avm2
 		return script_info_ptr(si);
 	}
 
-	exception_info_ptr exception_info::read(swf::bit_stream_ptr bits, const abc_file& abc, const method_body_info& method_body)
+	vm_exception_info_ptr vm_exception_info::read(swf::bit_stream_ptr bits, const abc_file& abc, const method_body_info& method_body)
 	{
-		exception_info* ei = new exception_info();
+		vm_exception_info* ei = new vm_exception_info();
 		ei->from_ = method_body.get_code_iterator(bits->read_u30());
 		ei->to_ = method_body.get_code_iterator(bits->read_u30());
 		ei->target_ = method_body.get_code_iterator(bits->read_u30());
 		ei->type_ = abc.constants().find_string(bits->read_u30());
 		ei->name_ = abc.constants().find_string(bits->read_u30());
-		return exception_info_ptr(ei);
+		return vm_exception_info_ptr(ei);
 	}
 
 	method_body_info_ptr method_body_info::read(swf::bit_stream_ptr bits, const abc_file& abc)
@@ -407,7 +447,7 @@ namespace avm2
 		}
 		uint32_t exception_count = bits->read_u30();
 		for(uint32_t n = 0; n != exception_count; ++n) {
-			body->exceptions_.push_back(exception_info::read(bits, abc, *body));
+			body->exceptions_.push_back(vm_exception_info::read(bits, abc, *body));
 		}
 		uint32_t trait_count = bits->read_u30();
 		for(uint32_t n = 0; n != trait_count; ++n) {

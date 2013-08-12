@@ -34,8 +34,8 @@ namespace avm2
 	typedef std::shared_ptr<instance_info> instance_info_ptr;
 	class script_info;
 	typedef std::shared_ptr<script_info> script_info_ptr;
-	class exception_info;
-	typedef std::shared_ptr<exception_info> exception_info_ptr;
+	class vm_exception_info;
+	typedef std::shared_ptr<vm_exception_info> vm_exception_info_ptr;
 	class method_body_info;
 	typedef std::shared_ptr<method_body_info> method_body_info_ptr;
 	class abc_file;

@@ -243,6 +243,7 @@ namespace swf
 		fixed_point8 read_fixedpoint8();
 		
 		std::string read_string();
+		std::string read_avm2_string();
 
 		int8_t read_signed8();
 		int16_t read_signed16();

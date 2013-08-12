@@ -100,10 +100,20 @@ namespace swf
 	std::string bit_stream::read_string()
 	{
 		std::string s;
-		uint8_t c = read_signed8();
+		int8_t c = read_signed8();
 		while(c != 0) {
 			s += c;
 			c = read_signed8();
+		}
+		return s;
+	}
+
+	std::string bit_stream::read_avm2_string()
+	{
+		std::string s;
+		size_t string_length = read_unsigned8();
+		for(size_t n = 0; n != string_length; ++n) {
+			s += read_signed8();
 		}
 		return s;
 	}

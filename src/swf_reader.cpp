@@ -1,6 +1,7 @@
 #include <map>
 #include <sstream>
 #include "asserts.hpp"
+#include "avm2.hpp"
 #include "decompress.hpp"
 #include "swf_button.hpp"
 #include "swf_reader.hpp"
@@ -679,8 +680,12 @@ namespace swf
 
 	void reader::ProcessSymbolClass(unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'SymbolClass'");
-		eat_bit_stream(length);
+		uint32_t num_syms = uint32_t(bits_->read_unsigned16());
+		for(uint32_t n = 0; n != num_syms; ++n) {
+			uint16_t tag = bits_->read_unsigned16();
+			std::string name = bits_->read_string();
+			obj_.add_symbol_class(tag, name);
+		}
 	}
 
 
@@ -701,8 +706,9 @@ namespace swf
 
 	void reader::ProcessDoABC(unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'DoABC'");
-		eat_bit_stream(length);
+		uint32_t flags = bits_->read_unsigned32();
+		std::string name = bits_->read_string();
+		obj_.add_abc(std::shared_ptr<avm2::abc_file>(new avm2::abc_file(flags, name, bits_)));
 	}
 
 

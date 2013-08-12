@@ -144,6 +144,7 @@ namespace swf
 				if(p->has_moves()) {
 					if(in_shape) {
 						// XXX
+						// test whether the last vertices forms an enclosed space.
 					}
 					current_x_ = p->get_delta().delta_x;
 					current_y_ = p->get_delta().delta_y;

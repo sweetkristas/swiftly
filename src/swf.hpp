@@ -2,9 +2,9 @@
 
 #include <map>
 
+#include "avm2_fwd.hpp"
 #include "asserts.hpp"
 #include "bit_reader.hpp"
-#include "graphics.hpp"
 #include "ref_counted_ptr.hpp"
 
 namespace swf
@@ -133,6 +133,14 @@ namespace swf
 			return dl_it->second;
 		}
 
+		void add_abc(std::shared_ptr<avm2::abc_file> abc) {
+			abcs_.push_back(abc);
+		}
+
+		void add_symbol_class(uint16_t tag, const std::string& name) {
+			exported_symbols_.push_back(std::make_pair(tag,name));
+		}
+
 		void draw() const;
 	private:
 		int version_;
@@ -158,6 +166,10 @@ namespace swf
 		character_map char_map_;
 
 		display_list display_list_;
+
+		std::vector<avm2::abc_file_ptr> abcs_;
+
+		std::vector<std::pair<uint16_t,std::string> > exported_symbols_;
 
 		swf(const swf&);
 	};
