@@ -780,14 +780,14 @@ namespace swf
 
 	void reader::ProcessDefineFont4(unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'JPEGBits4'");
+		ASSERT_LOG(false, "Unhandled tag 'DefineFont4'");
 		eat_bit_stream(length);
 	}
 
 
 	void reader::ProcessEnableTelemetry(unsigned length)
 	{
-		std::cerr << "Ignoring EnableTelemetry tag" << std::endl;
+		std::cerr << "Ignoring 'EnableTelemetry' tag" << std::endl;
 		eat_bit_stream(length);
 	}
 
