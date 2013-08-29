@@ -123,6 +123,7 @@ int main(int argc, char* argv[])
 
 			running = process_events();
 
+			swf_object.advance();
 
 			wm.swap();
 

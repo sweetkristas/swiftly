@@ -143,8 +143,15 @@ namespace avm2
 		method_info() : flags_(0) {}
 		virtual ~method_info() {}
 
+		void set_method_body(method_body_info_ptr mbi) {
+			method_ = mbi;
+		}
+
+		void call();
+
 		static method_info_ptr read(swf::bit_stream_ptr bits, const constant_pool& cp);
 	private:
+		method_body_info_ptr method_;
 		std::vector<multiname_info_ptr> param_types_;
 		multiname_info_ptr return_type_;
 		std::string name_;
@@ -240,6 +247,8 @@ namespace avm2
 		script_info() {}
 		virtual ~script_info() {}
 
+		void call();
+
 		static script_info_ptr read(swf::bit_stream_ptr bits, const abc_file& abc);
 	private:
 		method_info_ptr sinit_;
@@ -271,9 +280,13 @@ namespace avm2
 
 		code_type_iterator get_code_iterator(uint32_t position) const;
 
+		void call() {
+			std::cerr << "CALL: " << std::endl;
+		}
+
 		static method_body_info_ptr read(swf::bit_stream_ptr bits, const abc_file& abc);
 	private:
-		method_info_ptr method_;
+		uint32_t method_index_;
 		// maximum number of evaluation stack slots used at any point during the execution of this body.
 		uint32_t max_stack_;
 		// index of the highest-numbered local register this method will use, plus one.
@@ -301,6 +314,8 @@ namespace avm2
 		class_info_ptr find_class(uint32_t index) const;
 		script_info_ptr find_script(uint32_t index) const;
 		method_body_info_ptr find_method_body(uint32_t index) const;
+		
+		void call_entry_point();
 	private:
 		enum {
 			ABC_LAZY_INITIALISE = 1

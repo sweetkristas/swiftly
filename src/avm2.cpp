@@ -435,7 +435,7 @@ namespace avm2
 	method_body_info_ptr method_body_info::read(swf::bit_stream_ptr bits, const abc_file& abc)
 	{
 		method_body_info* body = new method_body_info();
-		body->method_ = abc.find_method(bits->read_u30());
+		body->method_index_ = bits->read_u30();
 		body->max_stack_ = bits->read_u30();
 		body->local_count_ = bits->read_u30();
 		body->init_scope_depth_ = bits->read_u30();
@@ -453,12 +453,34 @@ namespace avm2
 		for(uint32_t n = 0; n != trait_count; ++n) {
 			body->traits_.push_back(trait_info::read(bits, abc));
 		}
-		return method_body_info_ptr(body);
+		// set the method_info structure with the correct method body.
+		method_body_info_ptr mbi(body);
+		auto mi = abc.find_method(body->method_index_);
+		mi->set_method_body(mbi);
+		return mbi;
 	}
 
 	code_type_iterator method_body_info::get_code_iterator(uint32_t position) const
 	{
 		ASSERT_LOG(position < code_.size(), "position resides outside of code size:" << position << " >= " << code_.size());
 		return code_.begin() + position;
+	}
+
+	void abc_file::call_entry_point()
+	{
+		scripts_.back()->call();
+	}
+
+	void method_info::call() 
+	{
+		if(method_) {
+			method_->call();
+		}
+	}
+
+	void script_info::call()
+	{
+		ASSERT_LOG(sinit_ != NULL, "sinit_ was NULL.");
+		sinit_->call();
 	}
 }

@@ -1,9 +1,10 @@
 #include "asserts.hpp"
+#include "avm2.hpp"
 #include "swf.hpp"
 
 namespace swf
 {
-	swf::swf()
+	swf::swf() : first_run_(true)
 	{}
 
 	swf::~swf()
@@ -42,6 +43,16 @@ namespace swf
 	{
 		scene_info_ = scene;
 		frame_label_ = frame_label;
+	}
+
+	void swf::advance()
+	{
+		if(first_run_) {
+			first_run_ = false;
+			for(auto abc : abcs_) {
+				abc->call_entry_point();
+			}
+		}
 	}
 
 	void swf::draw() const

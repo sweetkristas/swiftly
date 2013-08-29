@@ -141,6 +141,7 @@ namespace swf
 			exported_symbols_.push_back(std::make_pair(tag,name));
 		}
 
+		void advance();
 		void draw() const;
 	private:
 		int version_;
@@ -152,6 +153,8 @@ namespace swf
 		bool use_gpu_;
 		bool use_as3_;
 		bool use_network_;
+
+		bool first_run_;
 
 		// Special override to make a transparent background.
 		bool transparent_background_;
