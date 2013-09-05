@@ -19,6 +19,9 @@
     <Filter Include="clipper">
       <UniqueIdentifier>{c102ed50-82ef-4510-885d-a61cca439780}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\as3_classes">
+      <UniqueIdentifier>{0a315a06-71cb-46de-af4b-528bfa8d1f57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\test\swiftly.cpp">
@@ -82,6 +85,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\avm2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\as3\as3_math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -181,6 +187,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\avm2_variant.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as3\as3_value.hpp">
+      <Filter>Header Files\as3_classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as3\as3_math.hpp">
+      <Filter>Header Files\as3_classes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
