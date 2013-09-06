@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 
 #include "avm2_fwd.hpp"
 #include "asserts.hpp"
@@ -176,4 +177,6 @@ namespace swf
 
 		swf(const swf&);
 	};
+
+	typedef std::shared_ptr<swf> swf_ptr;
 }
