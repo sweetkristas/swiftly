@@ -24,6 +24,12 @@ namespace avm2
 	class as3_value
 	{
 	public:
+		enum {
+			DO_NOT_ENUM		= 0x01,
+			DO_NOT_DELETE	= 0x02,
+			READ_ONLY		= 0x04
+		};
+
 		as3_value() : type_(UNDEFINED) {
 		}
 		as3_value(bool b) : type_(BOOLEAN), b_(b) {
@@ -38,6 +44,8 @@ namespace avm2
 		}
 		as3_value(as3_object* o) : type_(OBJECT), o_(std::unique_ptr<as3_object>(o)) {
 		}
+
+		void set_flags(uint32_t f) { flags_ = f; }
 
 		virtual ~as3_value() {}
 	private:
@@ -56,5 +64,7 @@ namespace avm2
 		std::string s_;
 		std::unique_ptr<as3_object> o_;
 		std::unique_ptr<as3_property> p_;
+
+		uint32_t flags_;
 	};
 }

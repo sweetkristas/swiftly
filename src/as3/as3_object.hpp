@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 #include "../ref_counted_ptr.hpp"
-#include "../swf.hpp"
 
 namespace avm2
 {
@@ -16,21 +15,17 @@ namespace avm2
 	class as3_object : public reference_counted_ptr
 	{
 	public:
-		explicit as3_object(swf::swf_ptr swf_obj);
+		as3_object();
 		virtual ~as3_object() {}
 
 		virtual const char*	to_string() { return "[object Object]"; }
 		virtual double to_number();
 		virtual bool to_bool() { return true; }
 
-		void builtin(const std::string& name, const as3_value&);
-
-		static as3_object_ptr get_global();
+		void builtin(const std::string& name, const as3_value& value);
 	private:
-		swf::swf_ptr obj_;
 		std::map<std::string, as3_value> members_;
 
-		as3_object();
 		as3_object(const as3_object&);
 	};
 
