@@ -96,6 +96,24 @@
     <ClCompile Include="..\..\src\as3\as3_object.cpp">
       <Filter>Source Files\as3_classes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\swf_environment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_movie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_root.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\as3\as3_function_call.cpp">
+      <Filter>Source Files\as3_classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\as3\as3_value.cpp">
+      <Filter>Source Files\as3_classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp">
@@ -201,6 +219,24 @@
       <Filter>Header Files\as3_classes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\as3\as3_object.hpp">
+      <Filter>Header Files\as3_classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_environment.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_movie.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_player.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_root.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as3\as3_function_call.hpp">
+      <Filter>Header Files\as3_classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as3\as3_function.hpp">
       <Filter>Header Files\as3_classes</Filter>
     </ClInclude>
   </ItemGroup>

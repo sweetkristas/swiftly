@@ -3,7 +3,8 @@
 
 namespace avm2
 {
-	as3_object::as3_object()
+	as3_object::as3_object(swf::player_ptr player)
+		: player_(player)
 	{
 
 	}
