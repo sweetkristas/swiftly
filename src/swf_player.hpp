@@ -3,6 +3,7 @@
 #include "ref_counted_ptr.hpp"
 #include "as3/as3_object.hpp"
 #include "swf_root.hpp"
+#include "swf_player_fwd.hpp"
 
 namespace swf
 {
@@ -17,5 +18,4 @@ namespace swf
 		avm2::as3_object_ptr global_;
 		root_ptr root_;
 	};
-	typedef boost::intrusive_ptr<player> player_ptr;
 }

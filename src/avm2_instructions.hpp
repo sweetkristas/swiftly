@@ -62,8 +62,8 @@ namespace avm2
 		getscopeobject	= 101,
 		getslot			= 108,
 		getsuper		= 4,
-		greaterequals	= 175, // XXX
-		greaterthan		= 175, // XXX
+		greaterequals	= 176,
+		greaterthan		= 175,
 		hasnext			= 31,
 		hasnext2		= 50,
 		ifeq			= 19,

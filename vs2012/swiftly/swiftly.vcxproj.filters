@@ -114,6 +114,12 @@
     <ClCompile Include="..\..\src\as3\as3_value.cpp">
       <Filter>Source Files\as3_classes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\as3\as3_globals.cpp">
+      <Filter>Source Files\as3_classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\avm2_execute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp">
@@ -238,6 +244,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\as3\as3_function.hpp">
       <Filter>Header Files\as3_classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as3\as3_globals.hpp">
+      <Filter>Header Files\as3_classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_player_fwd.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

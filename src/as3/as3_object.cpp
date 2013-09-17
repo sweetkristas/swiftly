@@ -1,5 +1,6 @@
 #include "as3_object.hpp"
 #include "as3_value.hpp"
+#include "../swf_player.hpp"
 
 namespace avm2
 {

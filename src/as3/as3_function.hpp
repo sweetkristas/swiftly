@@ -3,10 +3,13 @@
 #include <sstream>
 
 #include "as3_object.hpp"
-#include "as3_function_call.hpp"
 
 namespace avm2
 {
+	class function_call;
+
+	typedef void(*as_native_function_type)(const function_call& fn);
+
 	class as3_function : public as3_object
 	{
 	public:
@@ -24,6 +27,7 @@ namespace avm2
 		}
 	private:
 	};
+	typedef boost::intrusive_ptr<as3_function> as3_function_ptr;
 
 	class as3_native_function : public as3_function
 	{
@@ -40,4 +44,5 @@ namespace avm2
 	private:
 		as_native_function_type fn_;
 	};
+	typedef boost::intrusive_ptr<as3_native_function> as3_native_function_ptr;
 }

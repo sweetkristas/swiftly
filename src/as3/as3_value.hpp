@@ -3,16 +3,12 @@
 #include <memory>
 #include <string>
 #include "../ref_counted_ptr.hpp"
-#include "as3_function_call.hpp"
 #include "as3_function.hpp"
 
 namespace avm2
 {
 	class as3_value;
-	class as3_object;
-	class as3_function;
-
-	typedef void(*as_native_function_type)(const function_call& fn);
+	class function_call;
 
 	class as3_property : public reference_counted_ptr
 	{
@@ -21,9 +17,10 @@ namespace avm2
 		}
 		virtual ~as3_property() {}
 	private:
-		std::unique_ptr<as3_function> get_;
-		std::unique_ptr<as3_function> set_;
+		as3_function_ptr get_;
+		as3_function_ptr set_;
 	};
+	typedef boost::intrusive_ptr<as3_property> as3_property_ptr;
 
 	class as3_value
 	{
@@ -46,7 +43,7 @@ namespace avm2
 		}
 		as3_value(const std::string& s) : type_(STRING), s_(s) {
 		}
-		as3_value(as3_object* o) : type_(OBJECT), o_(std::unique_ptr<as3_object>(o)) {
+		as3_value(as3_object* o) : type_(OBJECT), o_(as3_object_ptr(o)) {
 		}
 		as3_value(as_native_function_type fn) : type_(OBJECT) {
 			o_.reset(new as3_native_function(NULL, fn));
@@ -78,8 +75,8 @@ namespace avm2
 		bool b_;
 		double d_;
 		std::string s_;
-		std::unique_ptr<as3_object> o_;
-		std::unique_ptr<as3_property> p_;
+		as3_object_ptr o_;
+		as3_property_ptr p_;
 
 		uint32_t flags_;
 	};

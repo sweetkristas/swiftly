@@ -12,10 +12,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\as3\as3_function_call.cpp" />
+    <ClCompile Include="..\..\src\as3\as3_globals.cpp" />
     <ClCompile Include="..\..\src\as3\as3_math.cpp" />
     <ClCompile Include="..\..\src\as3\as3_object.cpp" />
     <ClCompile Include="..\..\src\as3\as3_value.cpp" />
     <ClCompile Include="..\..\src\avm2.cpp" />
+    <ClCompile Include="..\..\src\avm2_execute.cpp" />
     <ClCompile Include="..\..\src\bit_reader.cpp" />
     <ClCompile Include="..\..\src\clipper\clipper.cpp" />
     <ClCompile Include="..\..\src\decompress.cpp" />
@@ -44,6 +46,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\as3\as3_function.hpp" />
     <ClInclude Include="..\..\src\as3\as3_function_call.hpp" />
+    <ClInclude Include="..\..\src\as3\as3_globals.hpp" />
     <ClInclude Include="..\..\src\as3\as3_math.hpp" />
     <ClInclude Include="..\..\src\as3\as3_object.hpp" />
     <ClInclude Include="..\..\src\as3\as3_value.hpp" />
@@ -73,6 +76,7 @@
     <ClInclude Include="..\..\src\swf_font.hpp" />
     <ClInclude Include="..\..\src\swf_movie.hpp" />
     <ClInclude Include="..\..\src\swf_player.hpp" />
+    <ClInclude Include="..\..\src\swf_player_fwd.hpp" />
     <ClInclude Include="..\..\src\swf_reader.hpp" />
     <ClInclude Include="..\..\src\swf_root.hpp" />
     <ClInclude Include="..\..\src\swf_shape.hpp" />
