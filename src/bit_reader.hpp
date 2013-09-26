@@ -255,6 +255,8 @@ namespace swf
 		uint16_t read_unsigned16();
 		uint32_t read_unsigned32();
 
+		uint8_t bit_stream::peek_unsigned8();
+
 		uint32_t read_u30();
 		uint32_t read_u32();
 		int32_t read_s24();

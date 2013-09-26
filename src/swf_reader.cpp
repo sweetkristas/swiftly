@@ -4,6 +4,7 @@
 #include "avm2.hpp"
 #include "decompress.hpp"
 #include "swf_button.hpp"
+#include "swf_image.hpp"
 #include "swf_reader.hpp"
 #include "swf_font.hpp"
 #include "swf_shape.hpp"
@@ -362,15 +363,19 @@ namespace swf
 
 	void reader::ProcessBitsLossless(unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'BitsLossless'");
-		eat_bit_stream(length);
+		image_character* img = new image_character(1, length-2);
+		img->set_id(bits_->read_unsigned16());
+		img->read_lossless(bits_);
+		obj_.add_character(img->id(), img);
 	}
 
 
 	void reader::ProcessDefineBitsJPEG2(unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'DefineBitsJPEG2'");
-		eat_bit_stream(length);
+		image_character* img = new image_character(2, length-2);
+		img->set_id(bits_->read_unsigned16());
+		img->read(bits_);
+		obj_.add_character(img->id(), img);
 	}
 
 
@@ -482,15 +487,19 @@ namespace swf
 
 	void reader::ProcessDefineBitsJPEG3(unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'DefineBitsJPEG3'");
-		eat_bit_stream(length);
+		image_character* img = new image_character(3, length-2);
+		img->set_id(bits_->read_unsigned16());
+		img->read(bits_);
+		obj_.add_character(img->id(), img);
 	}
 
 
 	void reader::ProcessDefineBitsLossless2(unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'DefineBitsLossless2'");
-		eat_bit_stream(length);
+		image_character* img = new image_character(2, length-2);
+		img->set_id(bits_->read_unsigned16());
+		img->read_lossless(bits_);
+		obj_.add_character(img->id(), img);
 	}
 
 
@@ -773,8 +782,10 @@ namespace swf
 
 	void reader::ProcessDefineJPEGBits4(unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'JPEGBits4'");
-		eat_bit_stream(length);
+		image_character* img = new image_character(4, length-2);
+		img->set_id(bits_->read_unsigned16());
+		img->read(bits_);
+		obj_.add_character(img->id(), img);
 	}
 
 

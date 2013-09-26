@@ -30,6 +30,14 @@ namespace avm2
 			DO_NOT_DELETE	= 0x02,
 			READ_ONLY		= 0x04
 		};
+		enum ValueType {
+			UNDEFINED,
+			BOOLEAN,
+			NUMERIC,
+			STRING,
+			OBJECT,
+			PROPERTY,
+		};
 
 		as3_value() : type_(UNDEFINED) {
 		}
@@ -55,6 +63,16 @@ namespace avm2
 		bool is_object() const { return type_ == OBJECT; }
 		bool is_undefined() const { return type_ == UNDEFINED; }
 
+		double to_number();
+		int32_t to_int32();
+		uint32_t to_uint32();
+		bool to_boolean();
+		int to_integer();
+		std::string to_string();
+		as3_object to_object();
+
+		as3_value to_primitive(ValueType hint);
+
 		const char*	to_string() const;
 
 
@@ -62,14 +80,6 @@ namespace avm2
 
 		virtual ~as3_value() {}
 	private:
-		enum ValueType {
-			UNDEFINED,
-			BOOLEAN,
-			NUMERIC,
-			STRING,
-			OBJECT,
-			PROPERTY,
-		};
 		ValueType type_;
 
 		bool b_;

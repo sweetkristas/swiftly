@@ -120,6 +120,9 @@
     <ClCompile Include="..\..\src\avm2_execute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\as3\as3_environment.cpp">
+      <Filter>Source Files\as3_classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp">
@@ -249,6 +252,12 @@
       <Filter>Header Files\as3_classes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\swf_player_fwd.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as3\as3_environment.hpp">
+      <Filter>Header Files\as3_classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_image.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

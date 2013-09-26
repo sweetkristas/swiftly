@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\as3\as3_environment.cpp" />
     <ClCompile Include="..\..\src\as3\as3_function_call.cpp" />
     <ClCompile Include="..\..\src\as3\as3_globals.cpp" />
     <ClCompile Include="..\..\src\as3\as3_math.cpp" />
@@ -44,6 +45,7 @@
     <ClCompile Include="..\..\src\test\wm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\as3\as3_environment.hpp" />
     <ClInclude Include="..\..\src\as3\as3_function.hpp" />
     <ClInclude Include="..\..\src\as3\as3_function_call.hpp" />
     <ClInclude Include="..\..\src\as3\as3_globals.hpp" />
@@ -74,6 +76,7 @@
     <ClInclude Include="..\..\src\swf_environment.hpp" />
     <ClInclude Include="..\..\src\swf_filter.hpp" />
     <ClInclude Include="..\..\src\swf_font.hpp" />
+    <ClInclude Include="..\..\src\swf_image.hpp" />
     <ClInclude Include="..\..\src\swf_movie.hpp" />
     <ClInclude Include="..\..\src\swf_player.hpp" />
     <ClInclude Include="..\..\src\swf_player_fwd.hpp" />
@@ -140,7 +143,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>c:\projects\zlib;C:\Projects\glm-0.9.4.3;C:\Projects\glee\DATA\output;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\SDL_image;C:\Projects\SDL\include;C:\Projects\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Projects\SDL_image\VisualC\external\include;c:\projects\zlib;C:\Projects\glm-0.9.4.3;C:\Projects\glee\DATA\output;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\SDL_image;C:\Projects\SDL\include;C:\Projects\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

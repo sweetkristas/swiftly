@@ -221,6 +221,12 @@ namespace swf
 		used_bits_.push_back(result);
 		return result;
 	}
+	
+	uint8_t bit_stream::peek_unsigned8()
+	{
+		ASSERT_LOG(bitstream_.size() != 0, "Tried to read bytes when none available.");
+		return bitstream_.front();
+	}
 
 	uint16_t bit_stream::read_unsigned16()
 	{
