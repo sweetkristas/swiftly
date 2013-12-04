@@ -1,7 +1,10 @@
 #include <cstdio>
+#include <limits>
 
 #include <sstream>
 #include <iomanip>
+
+#include <boost/lexical_cast.hpp>
 
 #include "../asserts.hpp"
 #include "as3_value.hpp"
@@ -15,7 +18,8 @@ namespace avm2
 			case UNDEFINED: return "undefined";
 			case BOOLEAN: return b_ ? "true" : "false";
 			case NUMERIC: {
-				if(_isnan(d_)) { 
+				if(d_ == std::numeric_limits<double>::quiet_NaN()
+					|| d_ == std::numeric_limits<double>::signaling_NaN()) { 
 					return "NaN";
 				} else {
 					std::stringstream ss_fixed;
@@ -39,5 +43,65 @@ namespace avm2
 			default: ASSERT_LOG(false, "to_string() bad type: " << type_);
 		}
 		return "undefined";
+	}
+
+	std::string as3_value::to_std_string()
+	{
+		return to_string();
+	}
+
+	as3_value operator+(const as3_value& v1, const as3_value& v2)
+	{
+		auto p1 = v1.to_primitive();
+		auto p2 = v2.to_primitive();
+		if(p1.type_ == as3_value::STRING || p2.type_ == as3_value::STRING) {
+			return as3_value(p1.to_string() + p2.to_std_string());
+		}
+		return as3_value(p1.to_number() + p2.to_number());
+	}
+
+	as3_value as3_value::to_primitive(HintType hint) const
+	{
+		if(type_ == OBJECT && o_ != NULL) {
+			return o_->default_value(hint);
+		} else if(type_ == PROPERTY) {
+			ASSERT_LOG(false, "XXX todo PROPERTY::to_primitive");
+		} 
+		return *this;
+	}
+
+	int32_t as3_value::to_int32()
+	{
+		double num = to_number();
+		if(num == std::numeric_limits<double>::quiet_NaN() 
+			|| num == std::numeric_limits<double>::signaling_NaN() 
+			|| abs(num) == 0 
+			|| abs(num) == std::numeric_limits<double>::infinity()) {
+			return 0;
+		}
+		double pos_int = (num > 0 ? 1 : -1) * floor(abs(num));
+		return int32_t(fmod(pos_int, 4294967296));
+	}
+
+	double as3_value::to_number()
+	{
+		switch(type_) {
+			case UNDEFINED:		return std::numeric_limits<double>::infinity();
+			case BOOLEAN:		return b_ ? 1 : 0;
+			case NUMERIC:		return d_;
+			case OBJECT:		return o_ == NULL ? 0 : o_->to_number();
+			case PROPERTY: {
+				ASSERT_LOG(false, "XXX todo PROPERTY::to_number");
+			}
+		}
+		ASSERT_LOG(type_ != STRING, "FATAL: unknown type_ value: " << type_);
+		// String case -- we do thing the lazy way, not the compliant way.
+		double num = std::numeric_limits<double>::infinity();
+		try {
+			num = boost::lexical_cast<double>(s_);
+		} catch(boost::bad_lexical_cast&) {
+			std::cerr << "Caught a bad floating point cast from " << s_ << " assuming infinity" << std::endl;
+		}
+		return num;
 	}
 }

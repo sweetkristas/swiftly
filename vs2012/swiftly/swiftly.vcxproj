@@ -49,6 +49,7 @@
     <ClInclude Include="..\..\src\as3\as3_function.hpp" />
     <ClInclude Include="..\..\src\as3\as3_function_call.hpp" />
     <ClInclude Include="..\..\src\as3\as3_globals.hpp" />
+    <ClInclude Include="..\..\src\as3\as3_hint.hpp" />
     <ClInclude Include="..\..\src\as3\as3_math.hpp" />
     <ClInclude Include="..\..\src\as3\as3_object.hpp" />
     <ClInclude Include="..\..\src\as3\as3_value.hpp" />
@@ -143,7 +144,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Projects\SDL_image\VisualC\external\include;c:\projects\zlib;C:\Projects\glm-0.9.4.3;C:\Projects\glee\DATA\output;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\SDL_image;C:\Projects\SDL\include;C:\Projects\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\projects\zlib;C:\Projects\SDL_image\VisualC\external\include;C:\Projects\glm-0.9.4.3;C:\Projects\glee\DATA\output;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\SDL_image;C:\Projects\SDL\include;C:\Projects\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

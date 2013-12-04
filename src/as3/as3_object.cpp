@@ -1,3 +1,4 @@
+#include "../asserts.hpp"
 #include "as3_object.hpp"
 #include "as3_value.hpp"
 #include "../swf_player.hpp"
@@ -27,5 +28,15 @@ namespace avm2
 		}
 		members_[name] = value;
 		members_[name].set_flags(as3_value::DO_NOT_ENUM);
+	}
+
+	as3_value as3_object::default_value(HintType hint)
+	{
+		if(hint == NO_HINT || hint == HINT_NUMBER) {
+			return as3_value(to_number());
+		}
+		ASSERT_LOG(hint != HINT_STRING, "FATAL: hint value is unknown: " << hint);
+		// string hint
+		return as3_value(to_string());
 	}
 }

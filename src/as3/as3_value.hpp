@@ -4,6 +4,7 @@
 #include <string>
 #include "../ref_counted_ptr.hpp"
 #include "as3_function.hpp"
+#include "as3_hint.hpp"
 
 namespace avm2
 {
@@ -41,21 +42,24 @@ namespace avm2
 
 		as3_value() : type_(UNDEFINED) {
 		}
-		as3_value(bool b) : type_(BOOLEAN), b_(b) {
+		explicit as3_value(bool b) : type_(BOOLEAN), b_(b) {
 		}
-		as3_value(float f) : type_(NUMERIC), d_(f) {
+		explicit as3_value(float f) : type_(NUMERIC), d_(f) {
 		}
-		as3_value(double d) : type_(NUMERIC), d_(d) {
+		explicit as3_value(double d) : type_(NUMERIC), d_(d) {
 		}
-		as3_value(int d) : type_(NUMERIC), d_(d) {
+		explicit as3_value(int d) : type_(NUMERIC), d_(d) {
 		}
-		as3_value(const std::string& s) : type_(STRING), s_(s) {
+		explicit as3_value(const std::string& s) : type_(STRING), s_(s) {
 		}
-		as3_value(as3_object* o) : type_(OBJECT), o_(as3_object_ptr(o)) {
+		explicit as3_value(const char* s) : type_(STRING), s_(s) {
 		}
-		as3_value(as_native_function_type fn) : type_(OBJECT) {
+		explicit as3_value(as3_object* o) : type_(OBJECT), o_(as3_object_ptr(o)) {
+		}
+		explicit as3_value(as_native_function_type fn) : type_(OBJECT) {
 			o_.reset(new as3_native_function(NULL, fn));
 		}
+		virtual ~as3_value() {}
 
 		bool is_bool() const { return type_ == BOOLEAN; }
 		bool is_numeric() const { return type_ == NUMERIC; }
@@ -68,17 +72,16 @@ namespace avm2
 		uint32_t to_uint32();
 		bool to_boolean();
 		int to_integer();
-		std::string to_string();
+		std::string to_std_string();
 		as3_object to_object();
 
-		as3_value to_primitive(ValueType hint);
+		as3_value to_primitive(HintType hint=NO_HINT) const;
 
 		const char*	to_string() const;
-
-
+		
 		void set_flags(uint32_t f) { flags_ = f; }
 
-		virtual ~as3_value() {}
+		friend as3_value operator+(const as3_value& v1, const as3_value& v2);
 	private:
 		ValueType type_;
 
@@ -90,5 +93,5 @@ namespace avm2
 
 		uint32_t flags_;
 	};
-	typedef std::shared_ptr<as3_value> as3_value_ptr;
+	typedef std::shared_ptr<as3_value> as3_value_ptr;	
 }

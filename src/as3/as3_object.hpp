@@ -5,6 +5,7 @@
 #include <string>
 #include "../ref_counted_ptr.hpp"
 #include "../swf_player_fwd.hpp"
+#include "as3_hint.hpp"
 
 namespace avm2
 {
@@ -19,6 +20,7 @@ namespace avm2
 		virtual const char*	to_string() { return "[object Object]"; }
 		virtual double to_number();
 		virtual bool to_bool() { return true; }
+		virtual as3_value default_value(HintType hint=NO_HINT);
 
 		void builtin(const std::string& name, const as3_value& value);
 	private:

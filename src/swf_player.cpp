@@ -19,7 +19,7 @@ namespace swf
 	void player::init()
 	{
 		ASSERT_LOG(global_ != NULL, "player::init(): global_ is NULL");
-		global_->builtin("trace", avm2::as3_trace_function);
+		global_->builtin("trace", avm2::as3_value(avm2::as3_trace_function));
 		//global_->builtin("Object");
 		//global_->builtin("Sound");
 	}

@@ -166,8 +166,8 @@ namespace geometry
 		bool have_triangles = processComplex(triangles_out, b2, poly_list);
 		ASSERT_LOG(have_triangles, "No triangles in output.");
 		for(auto t : triangles_out) {
-			triangles.push_back(t.x);
-			triangles.push_back(t.y);
+			triangles.push_back(float(t.x));
+			triangles.push_back(float(t.y));
 		}
 	}
 }

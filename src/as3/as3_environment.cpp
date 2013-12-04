@@ -1,5 +1,6 @@
 #include "as3_environment.hpp"
 #include "../avm2_instructions.hpp"
+#include "../swf_player.hpp"
 
 namespace avm2
 {

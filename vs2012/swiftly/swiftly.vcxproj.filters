@@ -260,6 +260,9 @@
     <ClInclude Include="..\..\src\swf_image.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\as3\as3_hint.hpp">
+      <Filter>Header Files\as3_classes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\glee\DATA\output\GLee.lib" />
