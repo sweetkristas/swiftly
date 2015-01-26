@@ -4,7 +4,9 @@
 
 namespace swf
 {
-	swf::swf() : first_run_(true)
+	swf::swf() 
+		: movie(0),
+		  first_run_(true)
 	{}
 
 	swf::~swf()
@@ -60,6 +62,21 @@ namespace swf
 		for(auto d : display_list_) {
 			d.second->draw();
 		}
+	}
+
+	void swf::next_frame()
+	{
+		++current_frame_;
+	}
+
+	void swf::prev_frame()
+	{
+		--current_frame_;
+	}
+
+	rgb swf::get_background_color()
+	{
+		return background_color_;
 	}
 
 	displayable::displayable(character_ptr cp)

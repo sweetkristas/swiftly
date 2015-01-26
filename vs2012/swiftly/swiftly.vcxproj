@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\src\poly2tri\sweep\sweep_context.cc" />
     <ClCompile Include="..\..\src\polygon.cpp" />
     <ClCompile Include="..\..\src\swf.cpp" />
+    <ClCompile Include="..\..\src\swf_action.cpp" />
     <ClCompile Include="..\..\src\swf_button.cpp" />
     <ClCompile Include="..\..\src\swf_environment.cpp" />
     <ClCompile Include="..\..\src\swf_filter.cpp" />
@@ -39,6 +40,8 @@
     <ClCompile Include="..\..\src\swf_reader.cpp" />
     <ClCompile Include="..\..\src\swf_root.cpp" />
     <ClCompile Include="..\..\src\swf_shape.cpp" />
+    <ClCompile Include="..\..\src\swf_sprite.cpp" />
+    <ClCompile Include="..\..\src\swf_tags.cpp" />
     <ClCompile Include="..\..\src\swf_text.cpp" />
     <ClCompile Include="..\..\src\test\shaders.cpp" />
     <ClCompile Include="..\..\src\test\swiftly.cpp" />
@@ -54,6 +57,8 @@
     <ClInclude Include="..\..\src\as3\as3_object.hpp" />
     <ClInclude Include="..\..\src\as3\as3_value.hpp" />
     <ClInclude Include="..\..\src\asserts.hpp" />
+    <ClInclude Include="..\..\src\as_character.hpp" />
+    <ClInclude Include="..\..\src\as_object.hpp" />
     <ClInclude Include="..\..\src\avm2.hpp" />
     <ClInclude Include="..\..\src\avm2_fwd.hpp" />
     <ClInclude Include="..\..\src\avm2_instructions.hpp" />
@@ -73,6 +78,7 @@
     <ClInclude Include="..\..\src\polygon.hpp" />
     <ClInclude Include="..\..\src\ref_counted_ptr.hpp" />
     <ClInclude Include="..\..\src\swf.hpp" />
+    <ClInclude Include="..\..\src\swf_action.hpp" />
     <ClInclude Include="..\..\src\swf_button.hpp" />
     <ClInclude Include="..\..\src\swf_environment.hpp" />
     <ClInclude Include="..\..\src\swf_filter.hpp" />
@@ -84,8 +90,9 @@
     <ClInclude Include="..\..\src\swf_reader.hpp" />
     <ClInclude Include="..\..\src\swf_root.hpp" />
     <ClInclude Include="..\..\src\swf_shape.hpp" />
+    <ClInclude Include="..\..\src\swf_sprite.hpp" />
+    <ClInclude Include="..\..\src\swf_tags.hpp" />
     <ClInclude Include="..\..\src\swf_text.hpp" />
-    <ClInclude Include="..\..\src\test\asserts.hpp" />
     <ClInclude Include="..\..\src\test\graphics.hpp" />
     <ClInclude Include="..\..\src\test\profile_timer.hpp" />
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp" />
@@ -94,11 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\glee\DATA\output\GLee.lib" />
-    <Library Include="..\..\..\SDL\VisualC\SDLmain\Win32\Release\SDL2main.lib" />
-    <Library Include="..\..\..\SDL\VisualC\SDL\Win32\Release\SDL2.lib" />
-    <Library Include="..\..\..\SDL_image\VisualC\Win32\Release\SDL2_image.lib" />
-    <Library Include="..\..\..\SDL_mixer\VisualC\Release\SDL2_mixer.lib" />
-    <Library Include="..\..\..\SDL_ttf\VisualC\Win32\Release\SDL2_ttf.lib" />
     <Library Include="..\..\..\zlib\zlib.lib" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -149,7 +151,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Projects\glee\DATA\output;C:\Projects\SDL\VisualC\SDLmain\Win32\Debug;C:\Projects\SDL\VisualC\SDL\Win32\Debug;C:\Projects\boost\stage32-debug-static\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Projects\glee\DATA\output;C:\Projects\SDL_image\VisualC\Win32\Debug;C:\Projects\SDL\VisualC\Win32\Debug;C:\Projects\boost\stage32-debug-static\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

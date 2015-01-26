@@ -7,6 +7,7 @@
 #include "asserts.hpp"
 #include "bit_reader.hpp"
 #include "ref_counted_ptr.hpp"
+#include "swf_movie.hpp"
 
 namespace swf
 {
@@ -77,7 +78,7 @@ namespace swf
 	typedef std::vector<std::pair<unsigned,std::string> > scene_info;
 	typedef std::vector<std::pair<unsigned,std::string> > frame_label_info;
 
-	class swf
+	class swf : public movie
 	{
 	public:
 		swf();
@@ -144,6 +145,19 @@ namespace swf
 
 		void advance();
 		void draw() const;
+
+		bool use_as3() const { return use_as3_; }
+		bool use_direct_blit() const { return use_direct_blit_; }
+		bool use_gpu() const { return use_gpu_; }
+		bool use_network() const { return use_network_; }
+
+		void next_frame();
+		void prev_frame();
+
+		rgb get_background_color();
+
+		// The default movie implementation allows all tags
+		bool is_tag_allowable(Tag tag) override { return true; }
 	private:
 		int version_;
 		geometry::rect frame_size_;
@@ -166,6 +180,7 @@ namespace swf
 		frame_label_info frame_label_;
 
 		std::vector<frame_ptr> frames_;
+		std::vector<frame_ptr>::iterator current_frame_;
 
 		character_map char_map_;
 

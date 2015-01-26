@@ -37,6 +37,15 @@ namespace swf
 		uint8_t b;
 	};
 
+	inline std::ostream& operator<<(std::ostream& os, const rgb& value)
+	{
+		os << "rgb(" 
+			<< static_cast<int>(value.r) << "," 
+			<< static_cast<int>(value.g) << "," 
+			<< static_cast<int>(value.b) << ")";
+		return os;
+	}
+
 	struct rgba
 	{
 		rgba();
@@ -45,6 +54,16 @@ namespace swf
 		uint8_t b;
 		uint8_t a;
 	};
+
+	inline std::ostream& operator<<(std::ostream& os, const rgba& value)
+	{
+		os << "rgba(" 
+			<< static_cast<int>(value.r) << "," 
+			<< static_cast<int>(value.g) << "," 
+			<< static_cast<int>(value.b) << "," 
+			<< static_cast<int>(value.a) << ")";
+		return os;
+	}
 
 	struct matrix2x3
 	{
