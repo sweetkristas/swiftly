@@ -3,15 +3,14 @@
 #include <map>
 #include <memory>
 #include <string>
-#include "../ref_counted_ptr.hpp"
-#include "../swf_player_fwd.hpp"
+#include "../swf_fwd.hpp"
 #include "as3_hint.hpp"
 
 namespace avm2
 {
 	class as3_value;
 
-	class as3_object : public reference_counted_ptr
+	class as3_object
 	{
 	public:
 		as3_object(swf::player_ptr player);
@@ -29,5 +28,5 @@ namespace avm2
 
 		as3_object(const as3_object&);
 	};
-	typedef boost::intrusive_ptr<as3_object> as3_object_ptr;
+	typedef std::shared_ptr<as3_object> as3_object_ptr;
 }

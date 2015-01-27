@@ -8,8 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "sdl_wrapper.hpp"
-#include "../swf.hpp"
-#include "../swf_reader.hpp"
+#include "../swf_player.hpp"
+#include "profile_timer.hpp"
 #include "wm.hpp"
 
 #pragma comment(lib, "SDL2")
@@ -86,16 +86,17 @@ int main(int argc, char* argv[])
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
-	swf::swf swf_object;
-	swf_object.set_transparent_background();
+	auto player = swf::player::create();
+	player->load_file("data\\clip_as_button.swf");
+	player->set_transparent_background();
 	//swf::reader swf_reader("data\\test-menu.swf", swf_object);
 	//swf::reader swf_reader("data\\swf-test2.swf", swf_object);
 	//swf::reader swf_reader("data\\as3_test1.swf", swf_object);
-	swf::reader swf_reader("data\\clip_as_button.swf", swf_object);
+	auto root = player->get_root_movie();
 	if(width == -1 || height == -1) {
-		const geometry::rect& r = swf_object.frame_size();
-		width = (r.x2 - r.x1)/swf_object.twip();
-		height = (r.y2 - r.y1)/swf_object.twip();
+		const rect& r = root->get_frame_size();
+		width = r.w()/root->twip();
+		height = r.h()/root->twip();
 	}
 
 	try {
@@ -122,6 +123,7 @@ int main(int argc, char* argv[])
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
+		profile::timer delta_time;
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();
 
@@ -130,7 +132,10 @@ int main(int argc, char* argv[])
 
 			running = process_events();
 
-			swf_object.advance();
+			root->advance(delta_time.get_time());
+			delta_time.reset();
+
+			root->display();
 
 			wm.swap();
 

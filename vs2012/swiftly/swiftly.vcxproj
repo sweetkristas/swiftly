@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -32,6 +32,8 @@
     <ClCompile Include="..\..\src\swf.cpp" />
     <ClCompile Include="..\..\src\swf_action.cpp" />
     <ClCompile Include="..\..\src\swf_button.cpp" />
+    <ClCompile Include="..\..\src\swf_character.cpp" />
+    <ClCompile Include="..\..\src\swf_command.cpp" />
     <ClCompile Include="..\..\src\swf_environment.cpp" />
     <ClCompile Include="..\..\src\swf_filter.cpp" />
     <ClCompile Include="..\..\src\swf_font.cpp" />
@@ -57,7 +59,7 @@
     <ClInclude Include="..\..\src\as3\as3_object.hpp" />
     <ClInclude Include="..\..\src\as3\as3_value.hpp" />
     <ClInclude Include="..\..\src\asserts.hpp" />
-    <ClInclude Include="..\..\src\as_character.hpp" />
+    <ClInclude Include="..\..\src\swf_character.hpp" />
     <ClInclude Include="..\..\src\as_object.hpp" />
     <ClInclude Include="..\..\src\avm2.hpp" />
     <ClInclude Include="..\..\src\avm2_fwd.hpp" />
@@ -80,19 +82,21 @@
     <ClInclude Include="..\..\src\swf.hpp" />
     <ClInclude Include="..\..\src\swf_action.hpp" />
     <ClInclude Include="..\..\src\swf_button.hpp" />
+    <ClInclude Include="..\..\src\swf_command.hpp" />
     <ClInclude Include="..\..\src\swf_environment.hpp" />
     <ClInclude Include="..\..\src\swf_filter.hpp" />
     <ClInclude Include="..\..\src\swf_font.hpp" />
     <ClInclude Include="..\..\src\swf_image.hpp" />
     <ClInclude Include="..\..\src\swf_movie.hpp" />
     <ClInclude Include="..\..\src\swf_player.hpp" />
-    <ClInclude Include="..\..\src\swf_player_fwd.hpp" />
+    <ClInclude Include="..\..\src\swf_fwd.hpp" />
     <ClInclude Include="..\..\src\swf_reader.hpp" />
     <ClInclude Include="..\..\src\swf_root.hpp" />
     <ClInclude Include="..\..\src\swf_shape.hpp" />
     <ClInclude Include="..\..\src\swf_sprite.hpp" />
     <ClInclude Include="..\..\src\swf_tags.hpp" />
     <ClInclude Include="..\..\src\swf_text.hpp" />
+    <ClInclude Include="..\..\src\swf_types.hpp" />
     <ClInclude Include="..\..\src\test\graphics.hpp" />
     <ClInclude Include="..\..\src\test\profile_timer.hpp" />
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp" />
@@ -112,13 +116,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -146,7 +150,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>c:\projects\zlib;C:\Projects\SDL_image\VisualC\external\include;C:\Projects\glm-0.9.4.3;C:\Projects\glee\DATA\output;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\SDL_image;C:\Projects\SDL\include;C:\Projects\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\projects\zlib;c:\projects\swiftly\external\include;C:\Projects\SDL_image\VisualC\external\include;C:\Projects\glm-0.9.4.3;C:\Projects\glee\DATA\output;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\SDL_image;C:\Projects\SDL\include;C:\Projects\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

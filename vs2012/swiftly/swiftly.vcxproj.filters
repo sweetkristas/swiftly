@@ -132,6 +132,12 @@
     <ClCompile Include="..\..\src\swf_tags.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\swf_character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\swf_command.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp">
@@ -257,9 +263,6 @@
     <ClInclude Include="..\..\src\as3\as3_globals.hpp">
       <Filter>Header Files\as3_classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\swf_player_fwd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\as3\as3_environment.hpp">
       <Filter>Header Files\as3_classes</Filter>
     </ClInclude>
@@ -281,7 +284,16 @@
     <ClInclude Include="..\..\src\as_object.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\as_character.hpp">
+    <ClInclude Include="..\..\src\swf_fwd.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_character.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_command.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\swf_types.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

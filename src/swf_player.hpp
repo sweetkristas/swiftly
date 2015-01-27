@@ -1,21 +1,33 @@
 #pragma once
 
-#include "ref_counted_ptr.hpp"
-#include "as3/as3_object.hpp"
+#include "as_object.hpp"
 #include "swf_root.hpp"
-#include "swf_player_fwd.hpp"
+#include "swf_fwd.hpp"
 
 namespace swf
 {
-	class player : public reference_counted_ptr
+	class player : public std::enable_shared_from_this<player>
 	{
 	public:
-		player();
-		virtual ~player();
+		MAKE_FACTORY(player);
+
+		root_ptr load_file(const std::string& filename);
+
+		void set_transparent_background(bool en=true) { transparent_background_ = en; }
+		void force_realtime_framerate(bool en=true) { realtime_framerate_ = en; }
+		const root_ptr& get_root_movie() const { return root_; }
+
+		void set_version(int version) { version_ = version; }
+		int get_version() const { return version_; }
 	private:
+		player();
 		void init();
 
-		avm2::as3_object_ptr global_;
+		as_object_ptr global_;
 		root_ptr root_;
+
+		bool transparent_background_;
+		bool realtime_framerate_;
+		int version_;
 	};
 }

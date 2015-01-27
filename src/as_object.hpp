@@ -1,6 +1,7 @@
 #pragma once
 
-#include "swf_player_fwd.hpp"
+#include "swf_fwd.hpp"
+#include "swf_types.hpp"
 
 namespace swf
 {
@@ -21,25 +22,36 @@ namespace swf
         COLOR,
         SOUND,
         FONT,
+		SHAPE_DEF,
+		SHAPE,
         // etc
     };
 
     struct as_object_def
     {
 		virtual ~as_object_def() {}
-        virtual bool is(ASClass id) = 0;
+        virtual bool is_a(ASClass id) = 0;
+		virtual void init() {}
     };
 
 	class as_object : public as_object_def
 	{
 	public:
-		as_object(player_ptr player) : player_(player) {}
+		MAKE_FACTORY(as_object);
 		virtual ~as_object() {}
 
-		virtual bool is(ASClass id) override  {
+		virtual bool is_a(ASClass id) override  {
 			return id == ASClass::OBJECT;
 		}		
+
+		player_ptr get_player() { 
+			auto player = player_.lock();
+			ASSERT_LOG(player != nullptr, "Player went away in call to as_object::get_player()");
+			return player;
+		}
+	protected:
+		explicit as_object(player_ptr player) : player_(player) {}
 	private:
-		player_ptr player_;
+		weak_player_ptr player_;
 	};
 }

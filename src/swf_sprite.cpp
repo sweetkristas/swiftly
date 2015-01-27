@@ -2,9 +2,9 @@
 
 namespace swf
 {
-	sprite::sprite(int id, int frame_cnt)
-		: movie(frame_cnt),
-		  id_(id)
+	sprite::sprite(player_ptr player, weak_character_ptr parent, int id, movie_def_ptr def)
+		: character(player, parent, id),
+		  def_(def)
 	{
 	}
 

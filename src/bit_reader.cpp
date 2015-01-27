@@ -19,6 +19,11 @@ namespace swf
 		return double(high) + double(low/65536.0);
 	}
 
+	float fixed_point::to_float()
+	{
+		return static_cast<float>(to_double());
+	}
+
 	fixed_point8::fixed_point8() : high(0), low(0)
 	{}
 
@@ -32,9 +37,6 @@ namespace swf
 
 	color_transform::color_transform(bool has_alpha)
 		: transform_alpha(has_alpha)
-	{}
-
-	rgba::rgba() : r(0), g(0), b(0), a(255)
 	{}
 
 	bit_stream::bit_stream(const std::vector<uint8_t>& data)
@@ -362,16 +364,15 @@ namespace swf
 		return color;
 	}
 
-	geometry::rect bit_stream::read_rect()
+	rect bit_stream::read_rect()
 	{
 		force_byte_align();
 		uint32_t nbits = read_unsigned_bits(5);
-		geometry::rect r;
-		r.x1 = read_signed_bits(nbits);
-		r.x2 = read_signed_bits(nbits);
-		r.y1 = read_signed_bits(nbits);
-		r.y2 = read_signed_bits(nbits);
-		return r;
+		int x1 = read_signed_bits(nbits);
+		int x2 = read_signed_bits(nbits);
+		int y1 = read_signed_bits(nbits);
+		int y2 = read_signed_bits(nbits);
+		return rect::from_coordinates(x1, y1, x2, y2);
 	}
 
 	matrix2x3 bit_stream::read_matrix()

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "swf.hpp"
+#include "bit_reader.hpp"
+#include "swf_character.hpp"
 
 namespace swf 
 {
@@ -104,11 +105,15 @@ namespace swf
 	std::vector<shape_record_ptr> read_shape_records(bit_stream_ptr bits, int version, unsigned fill_bits, unsigned line_bits);
 	shape_record_ptr shape_record_factory(bit_stream_ptr bits, int version, unsigned& fill_bits, unsigned& line_bits);
 
-	class shape : public character
+	class shape_def : public character_def
 	{
 	public:
-		shape();
-		virtual ~shape();
+		MAKE_FACTORY(shape_def);
+
+		shape_def();
+		virtual ~shape_def();
+
+		virtual bool is_a(ASClass id) override { return id == ASClass::SHAPE_DEF ? true : character_def::is_a(id); }
 
 		void read(bit_stream_ptr bits);
 		void read(int version, bit_stream_ptr bits);
@@ -171,7 +176,7 @@ namespace swf
 		void draw() const;
 	private:
 		styles style_;
-		geometry::rect bounds_;
+		rect bounds_;
 		std::vector<shape_record_ptr> shape_records_;
 
 		mutable int current_fill_style0_;
@@ -184,13 +189,14 @@ namespace swf
 		mutable int32_t current_y_;
 
 		// Stuff for DefineShape4
-		geometry::rect edge_bounds_;
+		rect edge_bounds_;
 		bool uses_fill_winding_rule_;
 		bool has_non_scaling_strokes_;
 		bool has_scaling_strokes_;
 
-		shape(const shape&);
+		shape_def(const shape_def&) = delete;
+		void operator=(const shape_def&) = delete;
 	};
 
-	typedef boost::intrusive_ptr<shape> shape_ptr;
+	typedef std::shared_ptr<shape_def> shape_def_ptr;
 }

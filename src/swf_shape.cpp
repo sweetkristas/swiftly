@@ -2,11 +2,11 @@
 
 namespace swf 
 {
-	shape::shape()
+	shape_def::shape_def()
 	{
 	}
 
-	shape::~shape()
+	shape_def::~shape_def()
 	{
 	}
 
@@ -96,7 +96,7 @@ namespace swf
 		return sr;
 	}
 
-	void shape::read(bit_stream_ptr bits)
+	void shape_def::read(bit_stream_ptr bits)
 	{
 		// plain shape, no styles
 		style_.fill_bits_ = bits->read_unsigned_bits(4);
@@ -104,7 +104,7 @@ namespace swf
 		shape_records_ = read_shape_records(bits, 0, style_.fill_bits_, style_.line_bits_);
 	}
 
-	void shape::read(int version, bit_stream_ptr bits)
+	void shape_def::read(int version, bit_stream_ptr bits)
 	{
 		bounds_ = bits->read_rect();
 		if(version == 4) {
@@ -122,11 +122,11 @@ namespace swf
 	}
 			
 
-	void shape::draw() const
+	void shape_def::draw() const
 	{
 	}
 
-	void shape::prepare_for_draw()
+	void shape_def::prepare_for_draw()
 	{
 		bool in_shape = false;
 		for(auto sr : shape_records_) {

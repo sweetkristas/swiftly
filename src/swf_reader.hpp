@@ -3,16 +3,16 @@
 #include <stack>
 #include <string>
 #include <zlib.h>
+
 #include "bit_reader.hpp"
-#include "swf.hpp"
-#include "swf_movie.hpp"
+#include "swf_fwd.hpp"
 
 namespace swf
 {
 	class reader
 	{
 	public:
-		explicit reader(const std::string& fname, movie& obj);
+		explicit reader(const std::string& fname, const player_ptr& play);
 
 		void push_indent(int n);
 		void pop_indent();
@@ -23,71 +23,71 @@ namespace swf
 		int indent_;
 		std::shared_ptr<bit_stream> bits_;
 
-		void ProcessShowFrame(movie& obj, unsigned length);
-		void ProcessDefineShape(movie& obj, unsigned length);
-		void ProcessPlaceObject(movie& obj, unsigned length);
-		void ProcessRemoveObject(movie& obj, unsigned length);
-		void ProcessDefineBits(movie& obj, unsigned length);
-		void ProcessDefineButton(movie& obj, unsigned length);
-		void ProcessJPEGTables(movie& obj, unsigned length);
-		void ProcessSetBackgroundColor(movie& obj, unsigned length);
-		void ProcessDefineFont(movie& obj, unsigned length);
-		void ProcessDefineText(movie& obj, unsigned length);
-		void ProcessDoAction(movie& obj, unsigned length);
-		void ProcessDefineFontInfo(movie& obj, unsigned length);
-		void ProcessDefineSound(movie& obj, unsigned length);
-		void ProcessStartSound(movie& obj, unsigned length);
-		void ProcessDefineButtonSound(movie& obj, unsigned length);
-		void ProcessSoundStreamHead(movie& obj, unsigned length);
-		void ProcessSoundStreamBlock(movie& obj, unsigned length);
-		void ProcessBitsLossless(movie& obj, unsigned length);
-		void ProcessDefineBitsJPEG2(movie& obj, unsigned length);
-		void ProcessDefineShape2(movie& obj, unsigned length);
-		void ProcessDefineButtonCxform(movie& obj, unsigned length);
-		void ProcessProtect(movie& obj, unsigned length);
-		void ProcessPlaceObject2(movie& obj, unsigned length);
-		void ProcessRemoveObject2(movie& obj, unsigned length);
-		void ProcessDefineShape3(movie& obj, unsigned length);
-		void ProcessDefineText2(movie& obj, unsigned length);
-		void ProcessDefineButton2(movie& obj, unsigned length);
-		void ProcessDefineBitsJPEG3(movie& obj, unsigned length);
-		void ProcessDefineBitsLossless2(movie& obj, unsigned length);
-		void ProcessDefineEditText(movie& obj, unsigned length);
-		void ProcessDefineSprite(movie& obj, unsigned length);
-		void ProcessFrameLabel(movie& obj, unsigned length);
-		void ProcessSoundStreamHead2(movie& obj, unsigned length);
-		void ProcessDefineMorphShape(movie& obj, unsigned length);
-		void ProcessDefineFont2(movie& obj, unsigned length);
-		void ProcessExportAssets(movie& obj, unsigned length);
-		void ProcessImportAssets(movie& obj, unsigned length);
-		void ProcessEnableDebugger(movie& obj, unsigned length);
-		void ProcessDoInitAction(movie& obj, unsigned length);
-		void ProcessDefineVideoStream(movie& obj, unsigned length);
-		void ProcessDefineFontInfo2(movie& obj, unsigned length);
-		void ProcessEnableDebugger2(movie& obj, unsigned length);
-		void ProcessScriptLimits(movie& obj, unsigned length);
-		void ProcessSetTabIndex(movie& obj, unsigned length);
-		void ProcessFileAttributes(movie& obj, unsigned length);
-		void ProcessPlaceObject3(movie& obj, unsigned length);
-		void ProcessImportAssets2(movie& obj, unsigned length);
-		void ProcessDefineFontAlignZones(movie& obj, unsigned length);
-		void ProcessDefineCSMTextSettings(movie& obj, unsigned length);
-		void ProcessDefineFont3(movie& obj, unsigned length);
-		void ProcessSymbolClass(movie& obj, unsigned length);
-		void ProcessMetadata(movie& obj, unsigned length);
-		void ProcessDefineScalingGrid(movie& obj, unsigned length);
-		void ProcessDoABC(movie& obj, unsigned length);
-		void ProcessDefineShape4(movie& obj, unsigned length);
-		void ProcessDefineMorphShape2(movie& obj, unsigned length);
-		void ProcessDefineSceneAndFrameLabelData(movie& obj, unsigned length);
-		void ProcessDefineBinaryData(movie& obj, unsigned length);
-		void ProcessDefineFontName(movie& obj, unsigned length);
-		void ProcessStartSound2(movie& obj, unsigned length);
-		void ProcessDefineJPEGBits4(movie& obj, unsigned length);
-		void ProcessDefineFont4(movie& obj, unsigned length);
-		void ProcessEnableTelemetry(movie& obj, unsigned length);
+		void ProcessShowFrame(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineShape(const movie_def_ptr& obj, unsigned length);
+		void ProcessPlaceObject(const movie_def_ptr& obj, unsigned length);
+		void ProcessRemoveObject(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineBits(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineButton(const movie_def_ptr& obj, unsigned length);
+		void ProcessJPEGTables(const movie_def_ptr& obj, unsigned length);
+		void ProcessSetBackgroundColor(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineFont(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineText(const movie_def_ptr& obj, unsigned length);
+		void ProcessDoAction(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineFontInfo(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineSound(const movie_def_ptr& obj, unsigned length);
+		void ProcessStartSound(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineButtonSound(const movie_def_ptr& obj, unsigned length);
+		void ProcessSoundStreamHead(const movie_def_ptr& obj, unsigned length);
+		void ProcessSoundStreamBlock(const movie_def_ptr& obj, unsigned length);
+		void ProcessBitsLossless(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineBitsJPEG2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineShape2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineButtonCxform(const movie_def_ptr& obj, unsigned length);
+		void ProcessProtect(const movie_def_ptr& obj, unsigned length);
+		void ProcessPlaceObject2(const movie_def_ptr& obj, unsigned length);
+		void ProcessRemoveObject2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineShape3(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineText2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineButton2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineBitsJPEG3(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineBitsLossless2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineEditText(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineSprite(const movie_def_ptr& obj, unsigned length);
+		void ProcessFrameLabel(const movie_def_ptr& obj, unsigned length);
+		void ProcessSoundStreamHead2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineMorphShape(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineFont2(const movie_def_ptr& obj, unsigned length);
+		void ProcessExportAssets(const movie_def_ptr& obj, unsigned length);
+		void ProcessImportAssets(const movie_def_ptr& obj, unsigned length);
+		void ProcessEnableDebugger(const movie_def_ptr& obj, unsigned length);
+		void ProcessDoInitAction(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineVideoStream(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineFontInfo2(const movie_def_ptr& obj, unsigned length);
+		void ProcessEnableDebugger2(const movie_def_ptr& obj, unsigned length);
+		void ProcessScriptLimits(const movie_def_ptr& obj, unsigned length);
+		void ProcessSetTabIndex(const movie_def_ptr& obj, unsigned length);
+		void ProcessFileAttributes(const movie_def_ptr& obj, unsigned length);
+		void ProcessPlaceObject3(const movie_def_ptr& obj, unsigned length);
+		void ProcessImportAssets2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineFontAlignZones(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineCSMTextSettings(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineFont3(const movie_def_ptr& obj, unsigned length);
+		void ProcessSymbolClass(const movie_def_ptr& obj, unsigned length);
+		void ProcessMetadata(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineScalingGrid(const movie_def_ptr& obj, unsigned length);
+		void ProcessDoABC(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineShape4(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineMorphShape2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineSceneAndFrameLabelData(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineBinaryData(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineFontName(const movie_def_ptr& obj, unsigned length);
+		void ProcessStartSound2(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineJPEGBits4(const movie_def_ptr& obj, unsigned length);
+		void ProcessDefineFont4(const movie_def_ptr& obj, unsigned length);
+		void ProcessEnableTelemetry(const movie_def_ptr& obj, unsigned length);
 
-		void read_tags(movie& obj);
+		void read_tags(const movie_def_ptr& obj);
 		void eat_bit_stream(unsigned length);
 
 		reader();
