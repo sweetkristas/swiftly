@@ -21,9 +21,14 @@ namespace swf
         VIDEO_DEF,
         COLOR,
         SOUND,
+		FONT_DEF,
         FONT,
 		SHAPE_DEF,
 		SHAPE,
+		BUTTON_DEF,
+		BUTTON,
+		TEXT,
+		TEXT_DEF,
         // etc
     };
 
@@ -50,7 +55,7 @@ namespace swf
 			return player;
 		}
 	protected:
-		explicit as_object(player_ptr player) : player_(player) {}
+		explicit as_object(weak_player_ptr player) : player_(player) {}
 	private:
 		weak_player_ptr player_;
 	};

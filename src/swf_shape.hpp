@@ -170,10 +170,6 @@ namespace swf
 		}
 
 		const std::vector<shape_record_ptr>& get_shape_records() const { return shape_records_; }
-
-		void prepare_for_draw();
-
-		void draw() const;
 	private:
 		styles style_;
 		rect bounds_;
@@ -199,4 +195,12 @@ namespace swf
 	};
 
 	typedef std::shared_ptr<shape_def> shape_def_ptr;
+
+	class shape : public character
+	{
+	public:
+		shape(player_ptr player, const character_ptr& parent, int id, const shape_def_ptr& def);
+		virtual bool is_a(ASClass id) override  { return id == ASClass::SHAPE ? true : character::is_a(id); }
+	private:
+	};
 }

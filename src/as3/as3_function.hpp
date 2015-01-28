@@ -27,7 +27,7 @@ namespace avm2
 		}
 	private:
 	};
-	typedef boost::intrusive_ptr<as3_function> as3_function_ptr;
+	typedef std::shared_ptr<as3_function> as3_function_ptr;
 
 	class as3_native_function : public as3_function
 	{
@@ -44,5 +44,5 @@ namespace avm2
 	private:
 		as_native_function_type fn_;
 	};
-	typedef boost::intrusive_ptr<as3_native_function> as3_native_function_ptr;
+	typedef std::shared_ptr<as3_native_function> as3_native_function_ptr;
 }

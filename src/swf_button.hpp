@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bit_reader.hpp"
-#include "swf.hpp"
+#include "swf_character.hpp"
 #include "swf_filter.hpp"
 
 namespace swf 
@@ -22,20 +22,32 @@ namespace swf
 
 	std::vector<button_record> read_button_records(int version, bit_stream_ptr bits);
 
-	class button : public character
+	class button_def : public character_def
 	{
 	public:
-		button();
-		virtual ~button();
+		MAKE_FACTORY(button_def);
+
+		virtual bool is_a(ASClass id) override  { return id == ASClass::BUTTON_DEF ? true : character_def::is_a(id); }
 
 		void read2(bit_stream_ptr bits);
-
-		void draw() const;
 	private:
+		button_def();
 		// true to track as a menu button, false to track as a menu button
 		bool track_as_menu_button_;	
 		std::vector<button_record> button_records_;;
 
-		button(const button&);
+		button_def(const button_def&) = delete;
+		void operator=(const button_def&) = delete;
+	};
+
+	typedef std::shared_ptr<button_def> button_def_ptr;
+
+	class button : public character
+	{
+	public:
+		button(player_ptr player, const character_ptr& parent, int id, const button_def_ptr& def);
+		virtual bool is_a(ASClass id) override  { return id == ASClass::BUTTON ? true : character::is_a(id); }		
+	private:
+		button_def_ptr def_;
 	};
 }

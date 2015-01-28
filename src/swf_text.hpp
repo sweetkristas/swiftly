@@ -1,15 +1,17 @@
 #pragma once
 
 #include "bit_reader.hpp"
-#include "swf.hpp"
+#include "swf_character.hpp"
+#include "swf_types.hpp"
+#include "swf_player.hpp"
 
 namespace swf
 {
-	class text : public character
+	class text_def : public character_def
 	{
 	public:
-		text();
-		virtual ~text();
+		MAKE_FACTORY(text_def);
+		virtual ~text_def();
 
 		void read(bit_stream_ptr bits);
 
@@ -18,9 +20,10 @@ namespace swf
 		void set_thickness(float thickness) { thickness_ = thickness; }
 		void set_sharpness(float sharpness) { sharpness_ = sharpness; }
 
-		void draw() const;
+		virtual bool is_a(ASClass id) override  { return id == ASClass::TEXT_DEF ? true : character_def::is_a(id); }
 	private:
-		geometry::rect text_bounds_;
+		text_def();
+		rect text_bounds_;
 		matrix2x3 text_matrix_;
 
 		uint16_t font_id_;
@@ -37,8 +40,17 @@ namespace swf
 		std::vector<unsigned> glyph_indices_;
 		std::vector<int> glyph_advance_;
 
-		text(const text&);
+		text_def(const text_def&) = delete;
+		void operator=(const text_def&) = delete;
 	};
 
-	typedef boost::intrusive_ptr<text> text_ptr;
+	typedef std::shared_ptr<text_def> text_def_ptr;
+
+	class text : public character
+	{
+	public:
+		text(player_ptr player, const character_ptr& parent, int id, const text_def_ptr& def);
+		virtual bool is_a(ASClass id) override  { return id == ASClass::TEXT ? true : character::is_a(id); }
+	private:
+	};
 }

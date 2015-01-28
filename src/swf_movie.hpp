@@ -14,13 +14,13 @@ namespace swf
 
 	typedef std::map<int, character_def_ptr> character_id_map;
 
-	class movie_def : public as_object_def
+	class movie_def : public character_def
 	{
 	public:
 		MAKE_FACTORY(movie_def);
 		virtual ~movie_def();
 
-		bool is_a(ASClass id) override { return id == ASClass::MOVIE_DEF; }
+		bool is_a(ASClass id) override { return id == ASClass::MOVIE_DEF ? true : character_def::is_a(id); }
 
 		void set_frame_count(int frame_count);
 
@@ -33,12 +33,18 @@ namespace swf
 		float get_frame_rate() const { return frame_rate_; }
 		void set_frame_rate(float fr);
 
-		virtual bool is_tag_allowable(Tag tag) { return true; }
+		void show_frame() override;
 
-		void show_frame();
+		void add_character(int id, const character_def_ptr& ch) override;
+		void add_command(const command_ptr& cmd) override;
 
-		void add_character(int id, const character_def_ptr& ch);
-		void add_command(const command_ptr& cmd);
+		character_def_ptr get_character_def_from_id(int id);
+		void set_frame_label(const std::string& label) override;
+		
+		void add_frame_label(unsigned frame, const std::string& label) override;
+		void add_scene_info(unsigned frame, const std::string& label) override;
+
+		//character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id) override;
 	private:
 		explicit movie_def();
 
@@ -51,13 +57,23 @@ namespace swf
 
 		std::vector<character_id_map> characters_;
 		std::vector<std::vector<command_ptr>> commands_;
+		std::map<unsigned, std::string> frame_label_;
+		std::map<unsigned, std::string> scene_info_;
 	};
 
 	class movie : public character
 	{
 	public:
 		MAKE_FACTORY(movie);
+
+		bool is_a(ASClass id) override { return id == ASClass::MOVIE ? true : character::is_a(id); }
+
+		void next_frame();
+		void prev_frame();
+
+		void draw() const override;
 	private:
-		explicit movie(weak_player_ptr player, movie_def_ptr def);
+		explicit movie(weak_player_ptr player, const character_ptr& parent, int id, movie_def_ptr def);
+		int current_frame_;
 	};
 }

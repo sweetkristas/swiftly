@@ -2,17 +2,16 @@
 
 namespace swf
 {
-	font::font() : character()
+	font_def::font_def()
 	{
 	}
 
-	font::~font()
+	font_def::~font_def()
 	{
 	}
 
-	void font::read3(bit_stream_ptr bits)
+	void font_def::read3(bit_stream_ptr bits)
 	{
-		set_id(bits->read_unsigned16());
 		bool has_layout = bits->read_unsigned_bits(1) ? true : false;
 		bool shift_jis = bits->read_unsigned_bits(1) ? true : false;
 		bool small_text = bits->read_unsigned_bits(1) ? true : false;
@@ -40,8 +39,7 @@ namespace swf
 		// Read glyph shapes.
 		glyphs_.clear();
 		for(unsigned n = 0; n != glyph_count; ++n) {
-			shape* shp = new shape();
-			shp->set_id(0);
+			auto shp = shape_def::create();
 			shp->read(bits);
 			glyphs_.push_back(shp);
 		}
@@ -72,7 +70,8 @@ namespace swf
 		}
 	}
 
-	void font::draw() const
+	font::font(player_ptr player, const character_ptr& parent, int id, const font_def_ptr& def)
+		: character(player, parent, id, def)
 	{
 	}
 }

@@ -1,11 +1,10 @@
 #pragma once
 
 #include "bit_reader.hpp"
-#include "ref_counted_ptr.hpp"
 
 namespace swf
 {
-	class filter : public reference_counted_ptr
+	class filter
 	{
 	public:
 		filter() {}
@@ -15,7 +14,7 @@ namespace swf
 		filter(const filter&);
 	};
 
-	typedef boost::intrusive_ptr<filter> filter_ptr;
+	typedef std::shared_ptr<filter> filter_ptr;
 
 	class convolution_filter : public filter
 	{
@@ -38,7 +37,7 @@ namespace swf
 		convolution_filter(const convolution_filter&);
 	};
 
-	typedef boost::intrusive_ptr<convolution_filter> convolution_filter_ptr;
+	typedef std::shared_ptr<convolution_filter> convolution_filter_ptr;
 
 	class color_matrix_filter : public filter
 	{
@@ -54,7 +53,7 @@ namespace swf
 		color_matrix_filter(const color_matrix_filter&);
 	};
 
-	typedef boost::intrusive_ptr<color_matrix_filter> color_matrix_filter_ptr;
+	typedef std::shared_ptr<color_matrix_filter> color_matrix_filter_ptr;
 
 	class drop_shadow_filter : public filter
 	{
@@ -78,7 +77,7 @@ namespace swf
 		drop_shadow_filter(const drop_shadow_filter&);
 	};
 
-	typedef boost::intrusive_ptr<drop_shadow_filter> drop_shadow_filter_ptr;
+	typedef std::shared_ptr<drop_shadow_filter> drop_shadow_filter_ptr;
 
 	class blur_filter : public filter
 	{
@@ -96,7 +95,7 @@ namespace swf
 		blur_filter(const blur_filter&);
 	};
 
-	typedef boost::intrusive_ptr<blur_filter> blur_filter_ptr;
+	typedef std::shared_ptr<blur_filter> blur_filter_ptr;
 
 	class glow_filter : public filter
 	{
@@ -118,7 +117,7 @@ namespace swf
 		glow_filter(const glow_filter&);
 	};
 
-	typedef boost::intrusive_ptr<glow_filter> glow_filter_ptr;
+	typedef std::shared_ptr<glow_filter> glow_filter_ptr;
 
 	class bevel_filter : public filter
 	{
@@ -144,7 +143,7 @@ namespace swf
 		bevel_filter(const bevel_filter&);
 	};
 
-	typedef boost::intrusive_ptr<bevel_filter> bevel_filter_ptr;
+	typedef std::shared_ptr<bevel_filter> bevel_filter_ptr;
 
 	class gradient_glow_filter : public filter
 	{
@@ -170,7 +169,7 @@ namespace swf
 		gradient_glow_filter(const gradient_glow_filter&);
 	};
 
-	typedef boost::intrusive_ptr<gradient_glow_filter> gradient_glow_filter_ptr;
+	typedef std::shared_ptr<gradient_glow_filter> gradient_glow_filter_ptr;
 
 	class gradient_bevel_filter : public filter
 	{
@@ -196,7 +195,7 @@ namespace swf
 		gradient_bevel_filter(const gradient_bevel_filter&);
 	};
 
-	typedef boost::intrusive_ptr<gradient_bevel_filter> gradient_bevel_filter_ptr;
+	typedef std::shared_ptr<gradient_bevel_filter> gradient_bevel_filter_ptr;
 
 	filter_ptr filter_factory(bit_stream_ptr bits);
 

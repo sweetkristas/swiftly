@@ -1,4 +1,5 @@
 #include "swf_button.hpp"
+#include "swf_character.hpp"
 
 namespace swf
 {
@@ -32,26 +33,27 @@ namespace swf
 		}
 	}
 
-	button::button() : character(), track_as_menu_button_(false)
+	button_def::button_def() 
+		: track_as_menu_button_(false)
 	{
 	}
 
-	button::~button()
-	{
-	}
-
-	void button::read2(bit_stream_ptr bits)
+	void button_def::read2(bit_stream_ptr bits)
 	{
 		bits->read_unsigned_bits(7); // reserved
 		track_as_menu_button_ = bits->read_unsigned_bits(1) ? true : false;
 		uint16_t action_offset = bits->read_unsigned16();
-		ASSERT_LOG(action_offset == 0, "button::read2 Actions aren't supported because we only support AS3.");
 		button_records_ = read_button_records(2, bits);
 		// Would read buttoncondactions here if action_offset != 0
+		if(action_offset != 0) {
+			ASSERT_LOG(false, "XXX write code to read button actions.");
+		}
 	}
 
-	void button::draw() const
+
+	button::button(player_ptr player, const character_ptr& parent, int id, const button_def_ptr& def)
+		: character(player, parent, id, def),
+		  def_(def)
 	{
-		std::cerr << "I drew a button!" << std::endl;
 	}
 }

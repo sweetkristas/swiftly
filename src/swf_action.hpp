@@ -122,7 +122,7 @@ namespace swf
 		explicit action(int id, const std::shared_ptr<bit_stream>& bits);
 		virtual ~action();
 
-		void execute(swf& obj);
+		void execute(const character_ptr& ch);
 	private:
 		int id_;
 		std::vector<uint8_t> codestream_;

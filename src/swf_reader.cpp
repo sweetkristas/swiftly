@@ -12,6 +12,7 @@
 #include "swf_player.hpp"
 #include "swf_reader.hpp"
 #include "swf_shape.hpp"
+#include "swf_sprite.hpp"
 #include "swf_tags.hpp"
 #include "swf_text.hpp"
 
@@ -37,7 +38,9 @@ namespace swf
 		}
 	}
 
-	reader::reader(const std::string& fname, const player_ptr& play) : indent_(0)
+	reader::reader(const std::string& fname, const player_ptr& play) 
+		: player_(play), 
+		  indent_(0)
 	{
 		std::vector<uint8_t> bits = read_file(fname);
 		bits_.reset(new bit_stream(bits));
@@ -66,11 +69,12 @@ namespace swf
 		fixed_point frame_rate = bits_->read_fixedpoint_bits(16);
 		uint16_t frame_count = bits_->read_unsigned16();
 
-		std::cerr << "Frame Size: " << frame_size.x1/20.0 << "," << frame_size.y1/20.0 << "," << frame_size.x2/20.0 << "," << frame_size.y2/20.0 << std::endl;
+		std::cerr << "Frame Size: " << frame_size.x1()/20.0 << "," << frame_size.y1()/20.0 << "," << frame_size.x2()/20.0 << "," << frame_size.y2()/20.0 << std::endl;
 		std::cerr << "Frame Rate: " << frame_rate.to_double() << ", Frame Count: " << frame_count << std::endl;
 
-		play->set_version(swf_version);
-		auto root = play->get_root_movie();
+		player_->set_version(swf_version);
+		auto root = player_->get_root_movie();
+		ASSERT_LOG(root != nullptr, "No root movie defined.");
 		root->set_frame_size(frame_size);
 		root->set_frame_rate(frame_rate.to_float());
 		root->set_frame_count(frame_count);
@@ -92,7 +96,7 @@ namespace swf
 		indent_stack_.pop();
 	}
 
-	void reader::read_tags(const movie_def_ptr& obj)
+	void reader::read_tags(const character_def_ptr& obj)
 	{
 		// Read tagged blocks until we get the end block.
 		bool finished = false;
@@ -106,6 +110,10 @@ namespace swf
 				length = bits_->read_unsigned32();
 			}
 			LOG_DEBUG(get_indent_value() << "---------------tag type = " << code << ", tag length = " << length << " (" << get_tag_as_string(tag_code) << ")");
+			if(!obj->is_tag_allowable(tag_code)) {
+				LOG_ERROR("Tag: " << get_tag_as_string(tag_code) << " isn't allowable as part of definiton. Skipping.");
+				continue;
+			}
 			switch(tag_code) {
 			case Tag::END: finished = true; break;
 			case Tag::SHOW_FRAME:                        ProcessShowFrame(obj, length); break;
@@ -115,7 +123,7 @@ namespace swf
 			case Tag::DEFINE_BITS:                       ProcessDefineBits(obj, length); break;
 			case Tag::DEFINE_BUTTON:                     ProcessDefineButton(obj, length); break;
 			case Tag::JPEG_TABLES:                       ProcessJPEGTables(obj, length); break;
-			case Tag::SET_BACKGROUND_COLOR:              ProcessSetBackgroundColor(obj, length); break;
+			case Tag::SET_BACKGROUND_COLOR_RGB:          ProcessSetBackgroundColor(obj, length); break;
 			case Tag::DEFINE_FONT:                       ProcessDefineFont(obj, length); break;
 			case Tag::DEFINE_TEXT:                       ProcessDefineText(obj, length); break;
 			case Tag::DO_ACTION:                         ProcessDoAction(obj, length); break;
@@ -183,162 +191,164 @@ namespace swf
 		}
 	}
 
-	void reader::ProcessShowFrame(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessShowFrame(const character_def_ptr& obj, unsigned length)
 	{
-		//obj.draw();
 		obj->show_frame();
 	}
 
 
-	void reader::ProcessDefineShape(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineShape(const character_def_ptr& obj, unsigned length)
 	{
-		shape_def* s = new shape_def();
+		auto s = shape_def::create();
 		auto id = bits_->read_unsigned16();
 		s->read(1, bits_);
-		obj->add_character(id, shape_def_ptr(s));
+		obj->add_character(id, s);
 		LOG_DEBUG("\tAdded shape with ID(" << id << ")");
 	}
 
 
-	void reader::ProcessPlaceObject(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessPlaceObject(const character_def_ptr& obj, unsigned length)
 	{
 		int bits_read = bits_->get_bits_read();
 		uint16_t id = bits_->read_unsigned16();
 		uint16_t depth = bits_->read_unsigned16();
 		matrix2x3 trf = bits_->read_matrix();
+		bool has_color_transform = false;
 		color_transform ctrf;
 		bits_read = (bits_->get_bits_read() - bits_read) / 8;
-		if(length > bits_read) {
+		if(static_cast<int>(length) > bits_read) {
 			ctrf = bits_->read_cxform();
+			has_color_transform = true;
 		}
-		auto placeobj = place_object::create(id, depth, trf, ctrf);
+		auto placeobj = place_object::create(id, depth, trf, has_color_transform, ctrf);
 		obj->add_command(placeobj);
 	}
 
 
-	void reader::ProcessRemoveObject(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessRemoveObject(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'RemoveObject'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineBits(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineBits(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineBits'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineButton(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineButton(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineButton'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessJPEGTables(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessJPEGTables(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'JPEGTables'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessSetBackgroundColor(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessSetBackgroundColor(const character_def_ptr& obj, unsigned length)
 	{
 		auto bkgcolor = set_background_color::create(bits_->read_rgb());
 		obj->add_command(bkgcolor);
 	}
 
 
-	void reader::ProcessDefineFont(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineFont(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineFont'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineText(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineText(const character_def_ptr& obj, unsigned length)
 	{
-		auto t = text_def::create(bits_);
-		// Add text to character list.
-		obj->add_character(t->id(), t);
+		auto t = text_def::create();
+		int id = bits_->read_unsigned16();
+		t->read(bits_);
+		obj->add_character(id, t);
 	}
 
 
-	void reader::ProcessDoAction(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDoAction(const character_def_ptr& obj, unsigned length)
 	{
-		if(obj->use_as3() && obj->version() >= 9) {
+		if(player_->use_as3() && bits_->swf_version() >= 9) {
 			std::cerr << "Ignoring DoAction tag -- use_as3 bit set.\n";
 			eat_bit_stream(length);
 		} else {
-			
+			LOG_DEBUG("DoAction : needs implementing");
 			eat_bit_stream(length);
 		}
 	}
 
 
-	void reader::ProcessDefineFontInfo(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineFontInfo(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineFontInfo'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineSound(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineSound(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineSound'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessStartSound(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessStartSound(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'StartSound'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineButtonSound(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineButtonSound(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineButtonSound'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessSoundStreamHead(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessSoundStreamHead(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'SoundStreamHead'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessSoundStreamBlock(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessSoundStreamBlock(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'SoundStreamBlock'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessBitsLossless(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessBitsLossless(const character_def_ptr& obj, unsigned length)
 	{
-		image_character* img = new image_character(1, length-2);
-		img->set_id(bits_->read_unsigned16());
+		auto img = image_character_def::create(1, length-2);
+		int id = bits_->read_unsigned16();
 		img->read_lossless(bits_);
-		obj.add_character(img->id(), img);
+		obj->add_character(id, img);
 	}
 
 
-	void reader::ProcessDefineBitsJPEG2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineBitsJPEG2(const character_def_ptr& obj, unsigned length)
 	{
-		image_character* img = new image_character(2, length-2);
-		img->set_id(bits_->read_unsigned16());
+		auto img = image_character_def::create(2, length-2);
+		int id = bits_->read_unsigned16();
 		img->read(bits_);
-		obj.add_character(img->id(), img);
+		obj->add_character(id, img);
 	}
 
 
-	void reader::ProcessDefineShape2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineShape2(const character_def_ptr& obj, unsigned length)
 	{
 		auto s = shape_def::create();
 		auto id = bits_->read_unsigned16();
@@ -348,21 +358,21 @@ namespace swf
 	}
 
 
-	void reader::ProcessDefineButtonCxform(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineButtonCxform(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineButtonCxform'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessProtect(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessProtect(const character_def_ptr& obj, unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'Protect'");
+		LOG_DEBUG("'Protect' tag ignored for player.");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessPlaceObject2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessPlaceObject2(const character_def_ptr& obj, unsigned length)
 	{
 		bool has_clip_actions = bits_->read_unsigned_bits(1) ? true : false;
 		bool has_clip_depth = bits_->read_unsigned_bits(1) ? true : false;
@@ -371,210 +381,218 @@ namespace swf
 		bool has_color_transform = bits_->read_unsigned_bits(1) ? true : false;
 		bool has_matrix = bits_->read_unsigned_bits(1) ? true : false;
 		bool has_character = bits_->read_unsigned_bits(1) ? true : false;
-		bool move = bits_->read_unsigned_bits(1) ? true : false;
+		bool has_move = bits_->read_unsigned_bits(1) ? true : false;
 		uint16_t depth = bits_->read_unsigned16();
 
-		displayable_ptr display_instance;
+		placement_params pp(depth);
+		place_object2::Operation op = place_object2::Operation::MOVE;
 
 		if(has_character) {
-			display_instance = std::make_shared<displayable>(obj.find_character(bits_->read_unsigned16())));
+			if(has_move) {
+				op = place_object2::Operation::REPLACE;
+			} else {
+				op = place_object2::Operation::PLACE;
+			}
 		} else {
-			display_instance = obj.find_displayable(depth);
+			if(has_move) {
+				op = place_object2::Operation::MOVE;
+			} else {
+				// case isn't well defined.
+			}
 		}
 
 		if(has_matrix) {
-			display_instance->set_transform(bits_->read_matrix());
+			pp.set_matrix_transform(bits_->read_matrix());
 		}
 		if(has_color_transform) {
-			display_instance->set_cxtransform(bits_->read_cxform_with_alpha());
+			pp.set_color_transform(bits_->read_cxform_with_alpha());
 		}
 		if(has_ratio) {
-			display_instance->set_ratio(bits_->read_unsigned16());
+			pp.set_morph_ratio(bits_->read_unsigned16());
 		}
 		if(has_name) {
-			display_instance->set_name(bits_->read_string());
+			pp.set_name(bits_->read_string());
 		}
 		if(has_clip_depth) {
-			display_instance->set_clip_depth(bits_->read_unsigned16());
+			pp.set_clip_depth(bits_->read_unsigned16());
 		}
 		if(has_clip_actions) {
-			// XXX
-			bits_->read_clip_actions();
-			ASSERT_LOG(false, "clip actions not supported.");
+			pp.set_clip_actions(bits_->read_clip_actions());
 		}
 
-		if(has_character) {
-			if(move) {
-				obj.remove_character_from_display_list(depth);
-			}
-			obj.add_character_to_display_list(depth, display_instance);
-		}
+		auto placeobj = place_object2::create(op, pp);
+		obj->add_command(placeobj);
 	}
 
 
-	void reader::ProcessRemoveObject2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessRemoveObject2(const character_def_ptr& obj, unsigned length)
 	{
 		uint16_t depth = bits_->read_unsigned16();
-		obj.remove_character_from_display_list(depth);
+		auto ro = remove_object2::create(depth);
+		obj->add_command(ro);
 	}
 
 
-	void reader::ProcessDefineShape3(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineShape3(const character_def_ptr& obj, unsigned length)
 	{
-		shape* s = new shape;
-		s->set_id(bits_->read_unsigned16());
+		auto s = shape_def::create();
+		auto id = bits_->read_unsigned16();
 		s->read(3, bits_);
-		obj.add_character(s->id(), s);
-		LOG_DEBUG(get_indent_value() << "shape ID(" << s->id() << ")");
+		obj->add_character(id, s);
+		LOG_DEBUG(get_indent_value() << "shape2 id: " << id);
 	}
 
 
-	void reader::ProcessDefineText2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineText2(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineText2'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineButton2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineButton2(const character_def_ptr& obj, unsigned length)
 	{
-		button* b = new button;
-		b->set_id(bits_->read_unsigned16());
+		auto b = button_def::create();
+		int id = bits_->read_unsigned16();
 		b->read2(bits_);
-		// Add text to character list.
-		obj.add_character(b->id(), b);		
+		// Add button to character list.
+		obj->add_character(id, b);
 	}
 
 
-	void reader::ProcessDefineBitsJPEG3(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineBitsJPEG3(const character_def_ptr& obj, unsigned length)
 	{
-		image_character* img = new image_character(3, length-2);
-		img->set_id(bits_->read_unsigned16());
+		auto img = image_character_def::create(3, length-2);
+		int id = bits_->read_unsigned16();
 		img->read(bits_);
-		obj.add_character(img->id(), img);
+		obj->add_character(id, img);
 	}
 
 
-	void reader::ProcessDefineBitsLossless2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineBitsLossless2(const character_def_ptr& obj, unsigned length)
 	{
-		image_character* img = new image_character(2, length-2);
-		img->set_id(bits_->read_unsigned16());
+		auto img = image_character_def::create(2, length-2);
+		int id = bits_->read_unsigned16();
 		img->read_lossless(bits_);
-		obj.add_character(img->id(), img);
+		obj->add_character(id, img);
 	}
 
 
-	void reader::ProcessDefineEditText(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineEditText(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineEditText'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineSprite(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineSprite(const character_def_ptr& obj, unsigned length)
 	{
-		uint16_t sprite_id = bits_->read_unsigned16();
-		uint16_t sprite_frame_count = bits_->read_unsigned16();
-		LOG_DEBUG(get_indent_value() << "sprite id: " << sprite_id);
-		LOG_DEBUG(get_indent_value() << "frame count: " << sprite_frame_count);
+		uint16_t id = bits_->read_unsigned16();
+		uint16_t frame_count = bits_->read_unsigned16();
+		auto spr = sprite_def::create(id, frame_count);
+		LOG_DEBUG(get_indent_value() << "sprite id: " << id);
+		LOG_DEBUG(get_indent_value() << "frame count: " << frame_count);
 		push_indent(get_indent() + 2);
-		read_tags(obj/* XXX this should be the sprite!*/);
-		pop_indent();
+		read_tags(spr);
+		pop_indent();		
 	}
 
 
-	void reader::ProcessFrameLabel(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessFrameLabel(const character_def_ptr& obj, unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'FrameLabel'");
-		eat_bit_stream(length);
+		const std::string label = bits_->read_string();
+		if(bits_->swf_version() >= 6 && label.size()+1 < length) {
+			int name_anchor = bits_->read_unsigned8();
+		}
+		obj->set_frame_label(label);
 	}
 
 
-	void reader::ProcessSoundStreamHead2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessSoundStreamHead2(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'SoundStreamHead2'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineMorphShape(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineMorphShape(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineMorphShape'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineFont2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineFont2(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineFont2'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessExportAssets(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessExportAssets(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'ExportAssets'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessImportAssets(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessImportAssets(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'ImportAssets'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessEnableDebugger(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessEnableDebugger(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'EnableDebugger'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDoInitAction(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDoInitAction(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DoInitAction'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineVideoStream(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineVideoStream(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineVideoStream'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineFontInfo2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineFontInfo2(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineFontInfo2'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessEnableDebugger2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessEnableDebugger2(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'EnableDebugger2'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessScriptLimits(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessScriptLimits(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'ScriptLimits'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessSetTabIndex(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessSetTabIndex(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'SetTabIndex'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessFileAttributes(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessFileAttributes(const character_def_ptr& obj, unsigned length)
 	{
 		bits_->read_unsigned_bits(1); // reserved
 		bool use_direct_blit = bits_->read_unsigned_bits(1) ? true : false;
@@ -584,27 +602,29 @@ namespace swf
 		bits_->read_unsigned_bits(2); // reserved
 		bool use_network = bits_->read_unsigned_bits(1) ? true : false;
 		bits_->read_unsigned_bits(24); // reserved
-		obj.set_attributes(use_direct_blit, use_gpu, use_as3, use_network);
+		player_->set_attributes(use_direct_blit, use_gpu, use_as3, use_network);
 	}
 
 
-	void reader::ProcessPlaceObject3(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessPlaceObject3(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'PlaceObject3'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessImportAssets2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessImportAssets2(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'ImportAssets2'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineFontAlignZones(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineFontAlignZones(const character_def_ptr& obj, unsigned length)
 	{
-		uint16_t font_id = bits_->read_unsigned16();
+		ASSERT_LOG(false, "Unhandled tag 'ProcessDefineFontAlignZones'");
+		eat_bit_stream(length);
+		/*uint16_t font_id = bits_->read_unsigned16();
 		unsigned csm_table_hint = bits_->read_unsigned_bits(2);
 		bits_->read_unsigned_bits(6); // reserved
 
@@ -625,12 +645,13 @@ namespace swf
 			zr.zone_mask_y = bits_->read_unsigned_bits(1) ? true : false;
 			zrs.push_back(zr);
 		}
-		f->set_zone_records(&zrs);
+		f->set_zone_records(&zrs);*/
 	}
 
 
-	void reader::ProcessDefineCSMTextSettings(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineCSMTextSettings(const character_def_ptr& obj, unsigned length)
 	{
+		/*
 		uint16_t text_id = bits_->read_unsigned16();
 		text_ptr t = boost::dynamic_pointer_cast<text>(obj.find_character(text_id));
 		ASSERT_LOG(t != NULL, "Couldn't convert character with id: " << text_id << " to a text entity");
@@ -640,129 +661,131 @@ namespace swf
 		t->set_thickness(bits_->read_float());
 		t->set_sharpness(bits_->read_float());
 		bits_->read_unsigned8(); // reserved
+		*/
+		ASSERT_LOG(false, "Unhandled tag 'DefineCSMTextSettings'");
+		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineFont3(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineFont3(const character_def_ptr& obj, unsigned length)
 	{
-		font* f = new font;
+		auto f = font_def::create();
+		int id = bits_->read_unsigned16();
 		f->read3(bits_);
-		// Add front to character list.
-		obj.add_character(f->id(), f);
+		obj->add_character(id, f);
 	}
 
 
-	void reader::ProcessSymbolClass(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessSymbolClass(const character_def_ptr& obj, unsigned length)
 	{
 		uint32_t num_syms = uint32_t(bits_->read_unsigned16());
 		for(uint32_t n = 0; n != num_syms; ++n) {
 			uint16_t tag = bits_->read_unsigned16();
 			std::string name = bits_->read_string();
-			obj.add_symbol_class(tag, name);
+			obj->add_symbol_class(tag, name);
 		}
 	}
 
 
-	void reader::ProcessMetadata(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessMetadata(const character_def_ptr& obj, unsigned length)
 	{
 		// deliberately ignore the metadata tag.
-		std::cerr << "Ignoring metadata tag" << std::endl;
+		LOG_INFO("Ignoring metadata tag");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineScalingGrid(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineScalingGrid(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineScalingGrid'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDoABC(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDoABC(const character_def_ptr& obj, unsigned length)
 	{
-		uint32_t flags = bits_->read_unsigned32();
+		/*uint32_t flags = bits_->read_unsigned32();
 		std::string name = bits_->read_string();
 		obj.add_abc(std::shared_ptr<avm2::abc_file>(new avm2::abc_file(flags, name, bits_)));
+		*/
+		ASSERT_LOG(false, "Unhandled tag 'DoABC'");
+		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineShape4(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineShape4(const character_def_ptr& obj, unsigned length)
 	{
-		shape* s = new shape;
-		s->set_id(bits_->read_unsigned16());
+		auto s = shape_def::create();
+		auto id = bits_->read_unsigned16();
 		s->read(4, bits_);
-		obj.add_character(s->id(), s);
-		LOG_DEBUG("\tAdded shape with ID(" << s->id() << ")");
+		obj->add_character(id, s);
+		LOG_DEBUG(get_indent_value() << "shape4 id: " << id);
 	}
 
 
-	void reader::ProcessDefineMorphShape2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineMorphShape2(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineMorphShape2'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineSceneAndFrameLabelData(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineSceneAndFrameLabelData(const character_def_ptr& obj, unsigned length)
 	{
 		uint32_t num_scenes = bits_->read_unsigned32_encoded();
-		scene_info scene;
 		for(int n = 0; n != num_scenes; ++n) {
 			uint32_t scene_frame_offset = bits_->read_unsigned32_encoded();
 			std::string scene_name = bits_->read_string();
-			scene.push_back(std::make_pair(scene_frame_offset, scene_name));
+			obj->add_scene_info(scene_frame_offset, scene_name);
 		}
 
 		uint32_t num_frame_labels = bits_->read_unsigned32_encoded();
-		frame_label_info frame_label;
 		for(int n = 0; n != num_frame_labels; ++n) {
 			uint32_t frame_num = bits_->read_unsigned32_encoded();
 			std::string frame_label_str = bits_->read_string();
-			frame_label.push_back(std::make_pair(frame_num, frame_label_str));
+			obj->add_frame_label(frame_num, frame_label_str);
 		}
-
-		obj.set_scene_and_frame_info(scene, frame_label);
 	}
 
 
-	void reader::ProcessDefineBinaryData(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineBinaryData(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineBinaryData'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineFontName(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineFontName(const character_def_ptr& obj, unsigned length)
 	{
 		std::cerr << "Ignoring DefineFontName tag" << std::endl;
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessStartSound2(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessStartSound2(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'StartSound2'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessDefineJPEGBits4(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineJPEGBits4(const character_def_ptr& obj, unsigned length)
 	{
-		image_character* img = new image_character(4, length-2);
-		img->set_id(bits_->read_unsigned16());
+		auto img = image_character_def::create(4, length-2);
+		int id = bits_->read_unsigned16();
 		img->read(bits_);
-		obj.add_character(img->id(), img);
+		obj->add_character(id, img);
 	}
 
 
-	void reader::ProcessDefineFont4(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessDefineFont4(const character_def_ptr& obj, unsigned length)
 	{
 		ASSERT_LOG(false, "Unhandled tag 'DefineFont4'");
 		eat_bit_stream(length);
 	}
 
 
-	void reader::ProcessEnableTelemetry(const movie_def_ptr& obj, unsigned length)
+	void reader::ProcessEnableTelemetry(const character_def_ptr& obj, unsigned length)
 	{
 		std::cerr << "Ignoring 'EnableTelemetry' tag" << std::endl;
 		eat_bit_stream(length);

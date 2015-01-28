@@ -7,14 +7,14 @@ namespace swf
 	{
 		unsigned filter_type = bits->read_unsigned8();
 		switch(filter_type) {
-			case 0: return new drop_shadow_filter(bits);
-			case 1: return new blur_filter(bits);
-			case 2: return new glow_filter(bits);
-			case 3: return new bevel_filter(bits);
-			case 4: return new gradient_glow_filter(bits);
-			case 5: return new convolution_filter(bits);
-			case 6: return new color_matrix_filter(bits);
-			case 7: return new gradient_bevel_filter(bits);
+			case 0: return std::make_shared<drop_shadow_filter>(bits);
+			case 1: return std::make_shared<blur_filter>(bits);
+			case 2: return std::make_shared<glow_filter>(bits);
+			case 3: return std::make_shared<bevel_filter>(bits);
+			case 4: return std::make_shared<gradient_glow_filter>(bits);
+			case 5: return std::make_shared<convolution_filter>(bits);
+			case 6: return std::make_shared<color_matrix_filter>(bits);
+			case 7: return std::make_shared<gradient_bevel_filter>(bits);
 			default:
 				ASSERT_LOG(false, "Unrecognised filter type: " << filter_type);
 		}

@@ -2,17 +2,26 @@
 
 namespace swf 
 {
-	text::text() : character()
+	text_def::text_def()
+		: text_bounds_(),
+		  text_matrix_(),
+		  x_offset_(0),
+		  y_offset_(0),
+		  color_(),
+		  text_height_(0),
+		  render_type_(0),
+		  grid_fit_(0),
+		  thickness_(0),
+		  sharpness_(0)
 	{
 	}
 
-	text::~text()
+	text_def::~text_def()
 	{
 	}
 
-	void text::read(bit_stream_ptr bits)
+	void text_def::read(bit_stream_ptr bits)
 	{
-		set_id(bits->read_unsigned16());
 		text_bounds_ = bits->read_rect();
 		text_matrix_ = bits->read_matrix();
 		unsigned glyph_bits = bits->read_unsigned8();
@@ -60,7 +69,8 @@ namespace swf
 		}
 	}
 
-	void text::draw() const
+	text::text(player_ptr player, const character_ptr& parent, int id, const text_def_ptr& def)
+		: character(player, parent, id, def)
 	{
 	}
 }

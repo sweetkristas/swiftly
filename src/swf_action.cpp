@@ -155,7 +155,7 @@ namespace swf
 	{
 	}
 
-	void action::execute(swf& obj)
+	void action::execute(const character_ptr& ch)
 	{
 		std::vector<uint8_t>::const_iterator ip = codestream_.begin();
 		while(ip != codestream_.end()) {
@@ -170,10 +170,10 @@ namespace swf
 			LOG_DEBUG("\t\t" << action_to_string(current_ins));
 			switch(current_ins) {
 			case ActionCode::NextFrame:
-				obj.next_frame();
+				ch->next_frame();
 				break;
 			case ActionCode::PreviousFrame:
-				obj.prev_frame();
+				ch->prev_frame();
 				break;
 			case ActionCode::Play:
 				break;

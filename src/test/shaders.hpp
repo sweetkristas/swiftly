@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 
 #include "graphics.hpp"
@@ -75,6 +76,6 @@ namespace shader
 		actives_map uniforms_;
 	};
 
-	typedef boost::intrusive_ptr<program_object> program_object_ptr;
-	typedef boost::intrusive_ptr<const program_object> const_program_object_ptr;
+	typedef std::shared_ptr<program_object> program_object_ptr;
+	typedef std::shared_ptr<const program_object> const_program_object_ptr;
 }

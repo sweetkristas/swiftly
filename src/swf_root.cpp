@@ -10,10 +10,17 @@ namespace swf
 		  frame_time_(1.0f/d->get_frame_rate()),
 		  current_time_(0.0f)
 	{
+		movie_ = movie::create(p, nullptr, -1, d);
 	}
 
 	void root::init()
 	{
+		// XXX execute init frame 0 tags here.
+	}
+
+	void root::set_frame_size(const rect& r)
+	{
+		frame_size_ = r;
 	}
 
 	int root::get_current_frame() const 
@@ -51,8 +58,13 @@ namespace swf
 		def_->set_frame_count(fc);
 	}
 
-	void root::display()
+	void root::draw() const
 	{
-		ASSERT_LOG(false, "root::display()");
+		movie_->draw();
+	}
+
+	character_ptr root::get_character_from_id(int id)
+	{
+		return def_->get_character_from_id(id);
 	}
 }

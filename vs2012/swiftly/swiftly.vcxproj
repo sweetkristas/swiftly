@@ -29,7 +29,6 @@
     <ClCompile Include="..\..\src\poly2tri\sweep\sweep.cc" />
     <ClCompile Include="..\..\src\poly2tri\sweep\sweep_context.cc" />
     <ClCompile Include="..\..\src\polygon.cpp" />
-    <ClCompile Include="..\..\src\swf.cpp" />
     <ClCompile Include="..\..\src\swf_action.cpp" />
     <ClCompile Include="..\..\src\swf_button.cpp" />
     <ClCompile Include="..\..\src\swf_character.cpp" />
@@ -37,6 +36,7 @@
     <ClCompile Include="..\..\src\swf_environment.cpp" />
     <ClCompile Include="..\..\src\swf_filter.cpp" />
     <ClCompile Include="..\..\src\swf_font.cpp" />
+    <ClCompile Include="..\..\src\swf_image.cpp" />
     <ClCompile Include="..\..\src\swf_movie.cpp" />
     <ClCompile Include="..\..\src\swf_player.cpp" />
     <ClCompile Include="..\..\src\swf_reader.cpp" />
@@ -78,8 +78,6 @@
     <ClInclude Include="..\..\src\poly2tri\sweep\sweep.h" />
     <ClInclude Include="..\..\src\poly2tri\sweep\sweep_context.h" />
     <ClInclude Include="..\..\src\polygon.hpp" />
-    <ClInclude Include="..\..\src\ref_counted_ptr.hpp" />
-    <ClInclude Include="..\..\src\swf.hpp" />
     <ClInclude Include="..\..\src\swf_action.hpp" />
     <ClInclude Include="..\..\src\swf_button.hpp" />
     <ClInclude Include="..\..\src\swf_command.hpp" />
@@ -88,6 +86,7 @@
     <ClInclude Include="..\..\src\swf_font.hpp" />
     <ClInclude Include="..\..\src\swf_image.hpp" />
     <ClInclude Include="..\..\src\swf_movie.hpp" />
+    <ClInclude Include="..\..\src\swf_params.hpp" />
     <ClInclude Include="..\..\src\swf_player.hpp" />
     <ClInclude Include="..\..\src\swf_fwd.hpp" />
     <ClInclude Include="..\..\src\swf_reader.hpp" />

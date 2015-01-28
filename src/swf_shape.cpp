@@ -119,41 +119,10 @@ namespace swf
 		style_.fill_bits_ = bits->read_unsigned_bits(4);
 		style_.line_bits_ = bits->read_unsigned_bits(4);
 		shape_records_ = read_shape_records(bits, version, style_.fill_bits_, style_.line_bits_);
-	}
-			
+	}	
 
-	void shape_def::draw() const
+	shape::shape(player_ptr player, const character_ptr& parent, int id, const shape_def_ptr& def)
+		: character(player, parent, id, def)
 	{
-	}
-
-	void shape_def::prepare_for_draw()
-	{
-		bool in_shape = false;
-		for(auto sr : shape_records_) {
-			if(sr->type() == shape_record::SR_STYLE_CHANGE) {
-				std::shared_ptr<style_change_record> p = std::dynamic_pointer_cast<style_change_record>(sr);
-				if(p->has_newstyles()) {
-					// XXX
-				}
-				if(p->has_fillstyle0_change()) {
-				}
-				if(p->has_fillstyle1_change()) {
-				}
-				if(p->has_linestyle_change()) {
-				}
-				if(p->has_moves()) {
-					if(in_shape) {
-						// XXX
-						// test whether the last vertices forms an enclosed space.
-					}
-					current_x_ = p->get_delta().delta_x;
-					current_y_ = p->get_delta().delta_y;
-				}
-			} else if(sr->type() == shape_record::SR_LINE) {
-				// line from current_x_/current_y_ to sr->get_delta().x/.y
-			} else if(sr->type() == shape_record::SR_CURVE) {
-				// curve from current_x_/current_y_ to sr->anchor().x/y with sr->control().x/y
-			}
-		}
 	}
 }

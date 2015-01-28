@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <string>
-#include "../ref_counted_ptr.hpp"
 #include "as3_function.hpp"
 #include "as3_hint.hpp"
 
@@ -11,7 +10,7 @@ namespace avm2
 	class as3_value;
 	class function_call;
 
-	class as3_property : public reference_counted_ptr
+	class as3_property
 	{
 	public:
 		as3_property(const as3_value& get, const as3_value& set) {
@@ -21,7 +20,7 @@ namespace avm2
 		as3_function_ptr get_;
 		as3_function_ptr set_;
 	};
-	typedef boost::intrusive_ptr<as3_property> as3_property_ptr;
+	typedef std::shared_ptr<as3_property> as3_property_ptr;
 
 	class as3_value
 	{

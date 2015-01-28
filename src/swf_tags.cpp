@@ -19,7 +19,7 @@ namespace swf
 			tags[Tag::DEFINE_BITS] = "DefineBits";
 			tags[Tag::DEFINE_BUTTON] = "DefineButton";
 			tags[Tag::JPEG_TABLES] = "JPEGTables";
-			tags[Tag::SET_BACKGROUND_COLOR] = "SetBackgroundColor";
+			tags[Tag::SET_BACKGROUND_COLOR_RGB] = "SetBackgroundColor";
 			tags[Tag::DEFINE_FONT] = "DefineFont";
 			tags[Tag::DEFINE_TEXT] = "DefineText";
 			tags[Tag::DO_ACTION] = "DoAction";

@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "asserts.hpp"
 #include "polygon.hpp"
 #include "clipper/clipper.hpp"

@@ -20,6 +20,7 @@ namespace swf
 
 	class movie_def;
 	typedef std::shared_ptr<movie_def> movie_def_ptr;
+	//typedef std::shared_ptr<const movie_def> const_movie_def_ptr;
 	class movie;
 	typedef std::shared_ptr<movie> movie_ptr;
 
@@ -28,4 +29,8 @@ namespace swf
 
 	class character;
 	typedef std::shared_ptr<character> character_ptr;
+	typedef std::weak_ptr<character> weak_character_ptr;
+	class character_def;
+	typedef std::shared_ptr<character_def> character_def_ptr;
+	//typedef std::shared_ptr<const character_def> const_character_def_ptr;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "swf_fwd.hpp"
+#include "swf_character.hpp"
 
 namespace swf
 {
@@ -20,17 +21,20 @@ namespace swf
 		int twip() const;
 
 		void advance(float delta_time);
-		void display();
+		void draw() const;
 
 		void set_frame_count(int fc);
 
-		movie_def_ptr get_movie_def() { return def_; }
+		character_def_ptr get_movie_def() { return movie_->get_definition(); }
+
+		character_ptr get_character_from_id(int id);
 	private:
 		explicit root(weak_player_ptr p, movie_def_ptr d);
 		// init() is called automatically when instantiating via swf::root::create(...)
 		void init();
 
 		weak_player_ptr player_;
+		character_ptr movie_;
 		movie_def_ptr def_;
 
 		rect frame_size_;

@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
 			root->advance(delta_time.get_time());
 			delta_time.reset();
 
-			root->display();
+			root->draw();
 
 			wm.swap();
 
