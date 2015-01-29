@@ -7,15 +7,60 @@
 
 namespace swf
 {
+	enum class TextAlign {
+		LEFT,
+		RIGHT,
+		CENTER,
+		JUSTIFY,
+	};
+
 	class edit_text_def : public character_def
 	{
 	public:
-		MAKE_FACTORY(text_def);
+		MAKE_FACTORY(edit_text_def);
 		
 		void read(bit_stream_ptr bits);
 		virtual bool is_a(ASClass id) override  { return id == ASClass::EDIT_TEXT_DEF ? true : character_def::is_a(id); }
 	private:
 		edit_text_def();
+
+		rect bounds_;
+		bool has_text_;
+		bool has_word_wrap_;
+		bool is_multiline_;
+		bool is_password_;
+		bool is_readonly_;
+		bool has_text_color_;
+		bool has_max_length_;
+		bool has_font_;
+		bool has_font_class_;
+		bool is_auto_size_;
+		bool has_layout_;
+		bool allow_select_;
+		bool has_border_;
+		bool is_static_;
+		bool has_html_;
+		bool use_outlines_;
+		int font_id_;
+		std::string font_class_;
+		int font_height_; // in twips
+		rgba font_color_;
+		int max_length_; // max text length
+		TextAlign text_align_;
+		int left_margin_; // in twips
+		int right_margin_; // in twips
+		int indent_; // in twips
+		int leading_; // vertical distance between bottom of descender and top of ascender on next line
+		std::string variable_name_; 
+		std::string initial_text_;
+	};
+
+	class edit_text : public character
+	{
+	public:
+		edit_text(player_ptr player, const character_ptr& parent, int id, const character_def_ptr& def);
+		virtual bool is_a(ASClass id) override  { return id == ASClass::EDIT_TEXT ? true : character::is_a(id); }
+	private:
 	};
 
 	class text_def : public character_def
@@ -60,7 +105,7 @@ namespace swf
 	class text : public character
 	{
 	public:
-		text(player_ptr player, const character_ptr& parent, int id, const text_def_ptr& def);
+		text(player_ptr player, const character_ptr& parent, int id, const character_def_ptr& def);
 		virtual bool is_a(ASClass id) override  { return id == ASClass::TEXT ? true : character::is_a(id); }
 	private:
 	};

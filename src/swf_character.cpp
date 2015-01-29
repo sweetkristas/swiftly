@@ -84,6 +84,13 @@ namespace swf
 		}
 	}
 
+	void character::update_display_list(float delta_time)
+	{
+		for(auto& ch : display_list_) {
+			ch.second->update(delta_time);
+		}
+	}
+
 	character_ptr character_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
 	{
 		return std::make_shared<character>(player, parent, id, shared_from_this());

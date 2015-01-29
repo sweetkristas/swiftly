@@ -1,3 +1,4 @@
+#include "asserts.hpp"
 #include "swf_text.hpp"
 
 namespace swf 
@@ -67,40 +68,97 @@ namespace swf
 				}
 			}
 		}
+		LOG_DEBUG("text_def: bounds: " << text_bounds_ << ", matrix: " << text_matrix_);
 	}
 
-	text::text(player_ptr player, const character_ptr& parent, int id, const text_def_ptr& def)
+	text::text(player_ptr player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: character(player, parent, id, def)
 	{
 	}
 
 	edit_text_def::edit_text_def()
+		: bounds_(),
+		  has_text_(false),
+		  has_word_wrap_(false),
+		  is_multiline_(false),
+		  is_password_(false),
+		  is_readonly_(false),
+		  has_text_color_(false),
+		  has_max_length_(false),
+		  has_font_(false),
+		  has_font_class_(false),
+		  is_auto_size_(false),
+		  has_layout_(false),
+		  allow_select_(false),
+		  has_border_(false),
+		  is_static_(false),
+		  has_html_(false),
+		  use_outlines_(false),
+		  font_id_(0),
+		  font_class_(),
+		  font_height_(0),
+		  font_color_(),
+		  max_length_(0),
+		  text_align_(TextAlign::LEFT),
+		  left_margin_(0),
+		  right_margin_(0),
+		  indent_(0),
+		  leading_(0)	  
 	{
 	}
 
 	void edit_text_def::read(bit_stream_ptr bits)
 	{
-		rect bounds_;
-		bool has_text_;
-		bool has_word_wrap_;
-		bool is_multiline_;
-		bool is_password_;
-		bool is_readonly_;
-		bool has_text_color_;
-		bool has_max_length_;
-		bool has_font_;
-		bool has_font_class_;
-		bool is_auto_size_;
-		bool has_layout_;
-		bool allow_select_;
-		bool has_border_;
-		bool is_static_;
-		bool has_html_;
-		bool use_outlines_;
-		int font_id_;
-		int font_height_;
-
 		bounds_ = bits->read_rect();
-		
+		has_text_ = bits->read_unsigned_bits(1) != 0;
+		has_word_wrap_ = bits->read_unsigned_bits(1) != 0;
+		is_multiline_ = bits->read_unsigned_bits(1) != 0;
+		is_password_ = bits->read_unsigned_bits(1) != 0;
+		is_readonly_ = bits->read_unsigned_bits(1) != 0;
+		has_text_color_ = bits->read_unsigned_bits(1) != 0;
+		has_max_length_ = bits->read_unsigned_bits(1) != 0;
+		has_font_ = bits->read_unsigned_bits(1) != 0;
+		has_font_class_ = bits->read_unsigned_bits(1) != 0;
+		is_auto_size_ = bits->read_unsigned_bits(1) != 0;
+		has_layout_ = bits->read_unsigned_bits(1) != 0;
+		allow_select_ = bits->read_unsigned_bits(1) != 0;
+		has_border_ = bits->read_unsigned_bits(1) != 0;
+		is_static_ = bits->read_unsigned_bits(1) != 0;
+		has_html_ = bits->read_unsigned_bits(1) != 0;
+		use_outlines_ = bits->read_unsigned_bits(1) != 0;
+
+		if(has_font_) {
+			font_id_ = bits->read_unsigned16();
+		}
+		if(has_font_class_) {
+			font_class_ = bits->read_string();
+		}
+		if(has_font_) {
+			font_height_ = bits->read_unsigned16();
+		}
+		if(has_text_color_) {
+			font_color_ = bits->read_rgba();
+		}
+		if(has_max_length_) {
+			max_length_ = bits->read_unsigned16();
+		}
+		if(has_layout_) {
+			text_align_ = static_cast<TextAlign>(bits->read_unsigned8());
+			left_margin_ = bits->read_unsigned16();
+			right_margin_ = bits->read_unsigned16();
+			indent_ = bits->read_unsigned16();
+			leading_ = bits->read_signed16();
+		}
+		variable_name_ = bits->read_string();
+		if(has_text_) {
+			initial_text_ = bits->read_string();
+		}
+
+		LOG_DEBUG("edit_text: variable_name: " << variable_name_);
+	}
+
+	edit_text::edit_text(player_ptr player, const character_ptr& parent, int id, const character_def_ptr& def)
+		: character(player, parent, id, def)
+	{
 	}
 }

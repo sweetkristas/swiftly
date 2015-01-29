@@ -100,6 +100,7 @@ namespace swf
 				eat_bit_stream(length);
 				continue;
 			}
+			int start_pos = bits_->get_bits_read();
 			switch(tag_code) {
 			case Tag::END: finished = true; break;
 			case Tag::SHOW_FRAME:                        ProcessShowFrame(obj, length); break;
@@ -166,6 +167,9 @@ namespace swf
 			case Tag::DEFINE_FONT4:                      ProcessDefineFont4(obj, length); break;
 			case Tag::ENABLE_TELEMETRY:                  ProcessEnableTelemetry(obj, length); break;
 			}
+
+			int bytes_read = (bits_->get_bits_read() - start_pos)/8;
+			ASSERT_LOG(bytes_read == length, "Error in tag: " << get_tag_as_string(tag_code) << " bytes_read: " << bytes_read << " != length: " << length);
 		}
 	}
 
@@ -472,10 +476,11 @@ namespace swf
 
 	void reader::ProcessDefineEditText(const character_def_ptr& obj, unsigned length)
 	{
-		auto txt = edit_text_def::create(2, length-2);
+		auto txt = edit_text_def::create();
 		int id = bits_->read_unsigned16();
 		txt->read(bits_);
 		obj->add_character(id, txt);
+		LOG_DEBUG("edit_text: " << id);
 	}
 
 

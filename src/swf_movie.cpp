@@ -94,6 +94,11 @@ namespace swf
 		LOG_DEBUG("movie drawing frame: " << current_frame_);
 	}
 
+	void movie::execute_actions()
+	{
+
+	}
+
 	void movie::update(float delta_time)
 	{
 		// on_load events, if not done and needed
@@ -103,8 +108,12 @@ namespace swf
 			current_frame_ = 0;
 		}
 
-		if(prev_frame != current_frame_) {
+		//if(prev_frame != current_frame_) {
 			get_definition()->execute_commands(current_frame_, shared_from_this());
-		}
+		//}
+
+		update_display_list(delta_time);
+
+		execute_actions();
 	}
 }

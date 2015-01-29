@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\src\bit_reader.cpp" />
     <ClCompile Include="..\..\src\clipper\clipper.cpp" />
     <ClCompile Include="..\..\src\decompress.cpp" />
+    <ClCompile Include="..\..\src\GLee.c" />
     <ClCompile Include="..\..\src\graphics.cpp" />
     <ClCompile Include="..\..\src\poly2tri\common\shapes.cc" />
     <ClCompile Include="..\..\src\poly2tri\sweep\advancing_front.cc" />
@@ -103,8 +104,7 @@
     <ClInclude Include="..\..\src\test\wm.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\..\glee\DATA\output\GLee.lib" />
-    <Library Include="..\..\..\zlib\zlib.lib" />
+    <Library Include="zlib1.lib" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{58FEECB2-C6A0-4156-A648-6B22AF93731C}</ProjectGuid>

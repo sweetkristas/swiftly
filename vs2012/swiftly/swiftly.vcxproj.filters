@@ -138,6 +138,9 @@
     <ClCompile Include="..\..\src\swf_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\GLee.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp">
@@ -295,7 +298,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\..\glee\DATA\output\GLee.lib" />
-    <Library Include="..\..\..\zlib\zlib.lib" />
+    <Library Include="zlib1.lib">
+      <Filter>Source Files</Filter>
+    </Library>
   </ItemGroup>
 </Project>

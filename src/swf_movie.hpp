@@ -75,6 +75,7 @@ namespace swf
 
 		void update(float delta_time) override;
 		void draw() const override;
+		void execute_actions();
 	protected:
 		explicit movie(weak_player_ptr player, const character_ptr& parent, int id, character_def_ptr def);
 	private:

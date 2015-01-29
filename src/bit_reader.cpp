@@ -373,6 +373,7 @@ namespace swf
 		int x2 = read_signed_bits(nbits);
 		int y1 = read_signed_bits(nbits);
 		int y2 = read_signed_bits(nbits);
+		force_byte_align();
 		return rect::from_coordinates(x1, y1, x2, y2);
 	}
 

@@ -55,6 +55,7 @@ private:
 		void remove_from_display_list(int depth);
 		void modify_display_list(const placement_params& params);
 		void modify_character_params(const character_ptr& ch, const placement_params& params);
+		void update_display_list(float delta_time);
 
 		virtual void next_frame() {}
 		virtual void prev_frame() {}
