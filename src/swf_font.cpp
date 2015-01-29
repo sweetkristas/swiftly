@@ -10,8 +10,27 @@ namespace swf
 	{
 	}
 
-	void font_def::read3(bit_stream_ptr bits)
+	void font_def::read1(bit_stream_ptr bits)
 	{
+		int num_table_entries = static_cast<int>(bits->read_unsigned16()) / 2;
+		// read (and discard) the offset entries.
+		for(int n = 0; n != num_table_entries; ++n) {
+			bits->read_unsigned16();
+		}
+		glyphs_.clear();
+		for(int n = 0; n != num_table_entries; ++n) {
+			auto shp = shape_def::create();
+			shp->read(bits);
+			glyphs_.emplace_back(shp);
+		}
+	}
+
+	void font_def::read(int vers, bit_stream_ptr bits)
+	{
+		if(vers == 1) {
+			// It's different enough to justify a seperate function.
+			return read1(bits);
+		}
 		bool has_layout = bits->read_unsigned_bits(1) ? true : false;
 		bool shift_jis = bits->read_unsigned_bits(1) ? true : false;
 		bool small_text = bits->read_unsigned_bits(1) ? true : false;
@@ -41,12 +60,13 @@ namespace swf
 		for(unsigned n = 0; n != glyph_count; ++n) {
 			auto shp = shape_def::create();
 			shp->read(bits);
-			glyphs_.push_back(shp);
+			glyphs_.emplace_back(shp);
 		}
 		// Read ucs-2 codes table
 		code_points_.clear();
 		for(unsigned n = 0; n != glyph_count; ++n) {
-			code_points_.push_back(bits->read_unsigned16());
+			uint16_t code = wide_codes ? bits->read_unsigned16() : bits->read_unsigned8();
+			code_points_.emplace_back(code);
 		}
 		if(has_layout) {
 			font_ascender_height_ = bits->read_unsigned16();
@@ -54,11 +74,11 @@ namespace swf
 			font_leading_height_ = bits->read_signed16();
 			font_advance_table_.clear();
 			for(unsigned n = 0; n != glyph_count; ++n) {
-				font_advance_table_.push_back(bits->read_signed16());
+				font_advance_table_.emplace_back(bits->read_signed16());
 			}
 			font_bounds_table_.clear();
 			for(unsigned n = 0; n != glyph_count; ++n) {
-				font_bounds_table_.push_back(bits->read_rect());
+				font_bounds_table_.emplace_back(bits->read_rect());
 			}
 			unsigned kerning_count = bits->read_unsigned16();
 			kerning_records_.clear();

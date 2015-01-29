@@ -44,10 +44,12 @@ namespace swf
 		void add_frame_label(unsigned frame, const std::string& label) override;
 		void add_scene_info(unsigned frame, const std::string& label) override;
 
-		//character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id) override;
-	private:
-		explicit movie_def();
+		int get_frame_count() const override { return max_frames_; }
 
+		void execute_commands(int frame, const character_ptr& ch) override;
+	protected:
+		explicit movie_def();
+	private:
 		int current_frame_;
 		int max_frames_;
 		frame_name_map named_frames_;
@@ -71,9 +73,11 @@ namespace swf
 		void next_frame();
 		void prev_frame();
 
+		void update(float delta_time) override;
 		void draw() const override;
+	protected:
+		explicit movie(weak_player_ptr player, const character_ptr& parent, int id, character_def_ptr def);
 	private:
-		explicit movie(weak_player_ptr player, const character_ptr& parent, int id, movie_def_ptr def);
 		int current_frame_;
 	};
 }

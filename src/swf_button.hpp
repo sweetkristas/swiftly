@@ -22,6 +22,27 @@ namespace swf
 
 	std::vector<button_record> read_button_records(int version, bit_stream_ptr bits);
 
+	class button_conditional_action
+	{
+	public:
+		button_conditional_action();
+		// returns false if this is the last record.
+		bool read(bit_stream_ptr bits);
+	private:
+		uint16_t offset_to_next_record;
+		bool cond_idle_to_over_down_;
+		bool cond_out_down_to_idle_;
+		bool cond_out_down_to_over_down_;
+		bool cond_over_down_to_out_down_;
+		bool cond_over_down_to_over_up_;
+		bool cond_over_up_over_down_;
+		bool cond_over_up_to_idle_;
+		bool cond_idle_to_over_up_;
+		bool cond_over_down_to_idle_;
+		uint32_t key_code_;
+		action_ptr actions_;
+	};
+
 	class button_def : public character_def
 	{
 	public:

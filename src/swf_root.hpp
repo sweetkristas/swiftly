@@ -20,12 +20,12 @@ namespace swf
 
 		int twip() const;
 
-		void advance(float delta_time);
+		void update(float delta_time);
 		void draw() const;
 
 		void set_frame_count(int fc);
 
-		character_def_ptr get_movie_def() { return movie_->get_definition(); }
+		character_def_ptr get_movie_def();
 
 		character_ptr get_character_from_id(int id);
 	private:

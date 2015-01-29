@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stack>
 #include <string>
 #include <zlib.h>
 
@@ -13,15 +12,8 @@ namespace swf
 	{
 	public:
 		explicit reader(const std::string& fname, const player_ptr& play);
-
-		void push_indent(int n);
-		void pop_indent();
-		int get_indent() const { return indent_; }
-		std::string get_indent_value() const { return std::string(indent_, ' '); }
 	private:
 		player_ptr player_;
-		std::stack<int> indent_stack_;
-		int indent_;
 		std::shared_ptr<bit_stream> bits_;
 
 		void ProcessShowFrame(const character_def_ptr& obj, unsigned length);

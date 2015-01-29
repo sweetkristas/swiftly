@@ -19,12 +19,15 @@ namespace swf
 		virtual bool is_tag_allowable(Tag tag) { return true; }
 
 		virtual void show_frame() {};
+		virtual int get_frame_count() const { return 0; }
 		virtual void add_character(int id, const character_def_ptr& ch) {};
 		virtual void add_command(const command_ptr& cmd) {};
 		virtual character_ptr get_character_from_id(int id) { return nullptr; };
 		virtual void set_frame_label(const std::string& label) {};
 		virtual void add_frame_label(unsigned frame, const std::string& label) {};
 		virtual void add_scene_info(unsigned frame, const std::string& label) {};
+
+		virtual void execute_commands(int frame, const character_ptr& ch) {};
 
 		virtual character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
 private:
@@ -33,7 +36,7 @@ private:
 
 	typedef std::map<int, character_ptr> display_list;
 
-	class character : public as_object
+	class character : public as_object, public std::enable_shared_from_this<character>
 	{
 	public:
 		explicit character(const weak_player_ptr& player, const character_ptr& parent, int i, const character_def_ptr& def);
@@ -56,6 +59,7 @@ private:
 		virtual void next_frame() {}
 		virtual void prev_frame() {}
 
+		virtual void update(float delta_time) {}
 		virtual void draw() const {}
 	private:		
 		weak_character_ptr parent_;

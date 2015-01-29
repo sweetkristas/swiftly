@@ -7,6 +7,17 @@
 
 namespace swf
 {
+	class edit_text_def : public character_def
+	{
+	public:
+		MAKE_FACTORY(text_def);
+		
+		void read(bit_stream_ptr bits);
+		virtual bool is_a(ASClass id) override  { return id == ASClass::EDIT_TEXT_DEF ? true : character_def::is_a(id); }
+	private:
+		edit_text_def();
+	};
+
 	class text_def : public character_def
 	{
 	public:

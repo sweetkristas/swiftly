@@ -33,4 +33,7 @@ namespace swf
 	class character_def;
 	typedef std::shared_ptr<character_def> character_def_ptr;
 	//typedef std::shared_ptr<const character_def> const_character_def_ptr;
+
+	class action;
+	typedef std::shared_ptr<action> action_ptr;
 }

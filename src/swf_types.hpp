@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include "swf_fwd.hpp"
 
 namespace swf
 {
@@ -8,8 +9,8 @@ namespace swf
 	{
 		fixed_point();
 		explicit fixed_point(int hi, int lo);
-		double to_double();
-		float to_float();
+		double to_double() const;
+		float to_float() const;
 		int16_t high;
 		uint16_t low;
 	};
@@ -18,7 +19,7 @@ namespace swf
 	{
 		fixed_point8();
 		explicit fixed_point8(int hi, int lo);
-		float to_float();
+		float to_float() const;
 		int8_t high;
 		uint8_t low;
 	};
@@ -70,6 +71,17 @@ namespace swf
 		int32_t translate_y;
 	};
 
+	inline std::ostream& operator<<(std::ostream& os, const matrix2x3& mat)
+	{
+		os  << "matrix(tx: " << mat.translate_x
+			<< ", ty: " << mat.translate_y
+			<< ", sx: " << mat.scale_x.to_double()
+			<< ", sy: " << mat.scale_y.to_double()
+			<< ", rx: " << mat.rotate_skew0.to_double()
+			<< ", ry: " << mat.rotate_skew0.to_double();
+		return os;
+	}
+
 	struct color_transform
 	{
 		explicit color_transform(bool has_alpha=false);
@@ -87,6 +99,21 @@ namespace swf
 		} add;
 		bool transform_alpha;
 	};
+	
+	inline std::ostream& operator<<(std::ostream& os, const color_transform& ct)
+	{
+		os  << "color_trx(mult: "
+			<< ct.mult.r.to_float() << ","
+			<< ct.mult.g.to_float() << ","
+			<< ct.mult.b.to_float() << ","
+			<< ct.mult.a.to_float()
+			<< ", add: "
+			<< static_cast<int>(ct.add.r) << ","
+			<< static_cast<int>(ct.add.g) << ","
+			<< static_cast<int>(ct.add.b)
+			<< ")";
+		return os;
+	}
 
 	struct gradient_record
 	{
@@ -170,32 +197,6 @@ namespace swf
 		int32_t delta_y;
 	};
 
-	class action_record
-	{
-	public:
-		enum {
-			ACTION_GOTO_FRAME = 0x81,
-			ACTION_GET_URL = 0x83,
-			ACTION_NEXT_FRAME = 0x04,
-			ACTION_PREVIOUS_FRAME = 0x05,
-			ACTION_PLAY = 0x06,
-			ACTION_STOP = 0x07,
-			ACTION_TOGGLE_QUALITY = 0x08,
-			ACTION_STOP_SOUNDS = 0x09,
-			ACTION_WAIT_FOR_FRAME = 0x8a,
-			ACTION_SET_TARGET = 0x8b,
-			ACTION_GOTO_LABEL = 0x8c,
-		};
-		action_record() {}
-		virtual ~action_record() {}
-		uint8_t code() const { return code_; }
-		void set_code(uint8_t c) { code_ = c; }
-	private:
-		uint8_t code_;
-	};
-
-	typedef std::shared_ptr<action_record> action_record_ptr;
-
 	struct clip_event
 	{
 		bool key_up_;
@@ -225,7 +226,7 @@ namespace swf
 	{
 		clip_event flags;
 		uint8_t key_code;
-		std::vector<action_record_ptr> actions;
+		action_ptr actions;
 	};
 
 	struct clip_actions

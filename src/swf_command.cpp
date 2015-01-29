@@ -52,6 +52,7 @@ namespace swf
 		: op_(op), 
 		  pp_(pp) 
 	{
+		LOG_DEBUG("place_object2 " << pp);
 	}
 
 	void place_object2::execute(const character_ptr& ch) 
@@ -74,10 +75,23 @@ namespace swf
 	remove_object2::remove_object2(int depth) 
 		: depth_(depth) 
 	{
+		LOG_DEBUG("remove_object2 depth:" << depth);
 	}
 
 	void remove_object2::execute(const character_ptr& ch) 
 	{
 		ch->remove_from_display_list(depth_);
+	}
+
+	do_action::do_action(const action_ptr& actions)
+		: actions_(actions)
+	{
+		LOG_DEBUG("do_action");
+	}
+
+	void do_action::execute(const character_ptr& ch)
+	{
+		ASSERT_LOG(actions_ != nullptr, "Actions were empty.");
+		actions_->execute(ch);
 	}
 }

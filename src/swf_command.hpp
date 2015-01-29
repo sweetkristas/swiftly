@@ -1,5 +1,6 @@
 #pragma once
 
+#include "swf_action.hpp"
 #include "swf_fwd.hpp"
 #include "swf_params.hpp"
 
@@ -63,5 +64,14 @@ namespace swf
 		int depth_;
 	};
 
+	class do_action : public command
+	{
+	public:
+		MAKE_FACTORY(do_action);
+		void execute(const character_ptr& ch);
+	private:
+		explicit do_action(const action_ptr& actions);
+		action_ptr actions_;
+	};
 	
 }

@@ -64,7 +64,16 @@ namespace swf
 		scene_info_[frame] = label;
 	}
 
-	movie::movie(weak_player_ptr player, const character_ptr& parent, int id, movie_def_ptr def)
+	void movie_def::execute_commands(int frame, const character_ptr& ch)
+	{
+		ASSERT_LOG(frame < static_cast<int>(commands_.size()), "Tried to execute a frame beyond the maximum number of frames. " << frame << " >= " << commands_.size());
+		ASSERT_LOG(ch != nullptr, "Tried to execute commands on null character.");
+		for(auto& cmd : commands_[frame]) {
+			cmd->execute(ch);
+		}
+	}
+
+	movie::movie(weak_player_ptr player, const character_ptr& parent, int id, character_def_ptr def)
 		: character(player, parent, id, def),
 		  current_frame_(0)
 	{
@@ -83,5 +92,19 @@ namespace swf
 	void movie::draw() const
 	{
 		LOG_DEBUG("movie drawing frame: " << current_frame_);
+	}
+
+	void movie::update(float delta_time)
+	{
+		// on_load events, if not done and needed
+
+		int prev_frame = current_frame_;
+		if(++current_frame_ >= get_definition()->get_frame_count()) {
+			current_frame_ = 0;
+		}
+
+		if(prev_frame != current_frame_) {
+			get_definition()->execute_commands(current_frame_, shared_from_this());
+		}
 	}
 }

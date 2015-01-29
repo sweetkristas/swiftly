@@ -2,6 +2,7 @@
 
 #include "asserts.hpp"
 #include "swf_action.hpp"
+#include "swf_character.hpp"
 
 namespace swf
 {
@@ -129,8 +130,7 @@ namespace swf
 		}
 	}
 
-	action::action(int id, const std::shared_ptr<bit_stream>& bits)
-		: id_(id)
+	action::action(const std::shared_ptr<bit_stream>& bits)
 	{
 		bool done = false;
 		while(!done) {
@@ -143,7 +143,7 @@ namespace swf
 					auto new_code = bits->read_unsigned8(len);
 					codestream_.emplace_back(static_cast<uint8_t>(len & 0xff));
 					codestream_.emplace_back(static_cast<uint8_t>(len >> 8));
-					std::copy(new_code.begin(), new_code.end(), codestream_.end());					
+					codestream_.insert(codestream_.end(), new_code.begin(), new_code.end());
 				} else {
 					codestream_.emplace_back(code);
 				}
@@ -151,7 +151,7 @@ namespace swf
 		}
 	}
 
-	action::~action()
+	void action::init()
 	{
 	}
 

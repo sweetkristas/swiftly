@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
 
 			running = process_events();
 
-			root->advance(delta_time.get_time());
+			root->update(delta_time.get_time());
 			delta_time.reset();
 
 			root->draw();

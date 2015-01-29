@@ -39,8 +39,7 @@ namespace swf
 	}
 
 	reader::reader(const std::string& fname, const player_ptr& play) 
-		: player_(play), 
-		  indent_(0)
+		: player_(play)
 	{
 		std::vector<uint8_t> bits = read_file(fname);
 		bits_.reset(new bit_stream(bits));
@@ -79,21 +78,7 @@ namespace swf
 		root->set_frame_rate(frame_rate.to_float());
 		root->set_frame_count(frame_count);
 
-		push_indent(2);
 		read_tags(root->get_movie_def());
-		pop_indent();
-	}
-
-	void reader::push_indent(int n)
-	{
-		indent_stack_.push(indent_);
-		indent_ = n;
-	}
-
-	void reader::pop_indent()
-	{
-		indent_ = indent_stack_.top();
-		indent_stack_.pop();
 	}
 
 	void reader::read_tags(const character_def_ptr& obj)
@@ -109,9 +94,10 @@ namespace swf
 			if(length == LongRecordHeader) {
 				length = bits_->read_unsigned32();
 			}
-			LOG_DEBUG(get_indent_value() << "---------------tag type = " << code << ", tag length = " << length << " (" << get_tag_as_string(tag_code) << ")");
+			LOG_DEBUG("---------------tag type = " << code << ", tag length = " << length << " (" << get_tag_as_string(tag_code) << ")");
 			if(!obj->is_tag_allowable(tag_code)) {
 				LOG_ERROR("Tag: " << get_tag_as_string(tag_code) << " isn't allowable as part of definiton. Skipping.");
+				eat_bit_stream(length);
 				continue;
 			}
 			switch(tag_code) {
@@ -203,7 +189,7 @@ namespace swf
 		auto id = bits_->read_unsigned16();
 		s->read(1, bits_);
 		obj->add_character(id, s);
-		LOG_DEBUG("\tAdded shape with ID(" << id << ")");
+		LOG_DEBUG("define shape id: " << id);
 	}
 
 
@@ -262,8 +248,10 @@ namespace swf
 
 	void reader::ProcessDefineFont(const character_def_ptr& obj, unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'DefineFont'");
-		eat_bit_stream(length);
+		auto f = font_def::create();
+		int id = bits_->read_unsigned16();
+		f->read(1, bits_);
+		obj->add_character(id, f);
 	}
 
 
@@ -282,8 +270,10 @@ namespace swf
 			std::cerr << "Ignoring DoAction tag -- use_as3 bit set.\n";
 			eat_bit_stream(length);
 		} else {
-			LOG_DEBUG("DoAction : needs implementing");
-			eat_bit_stream(length);
+			auto ap = action::create(bits_);
+			auto act = do_action::create(ap);
+			
+			obj->add_command(act);
 		}
 	}
 
@@ -354,7 +344,7 @@ namespace swf
 		auto id = bits_->read_unsigned16();
 		s->read(2, bits_);
 		obj->add_character(id, s);
-		LOG_DEBUG(get_indent_value() << "shape2 id: " << id);
+		LOG_DEBUG("define shape2 id: " << id);
 	}
 
 
@@ -388,6 +378,7 @@ namespace swf
 		place_object2::Operation op = place_object2::Operation::MOVE;
 
 		if(has_character) {
+			pp.set_id(bits_->read_unsigned16());
 			if(has_move) {
 				op = place_object2::Operation::REPLACE;
 			} else {
@@ -398,6 +389,7 @@ namespace swf
 				op = place_object2::Operation::MOVE;
 			} else {
 				// case isn't well defined.
+				ASSERT_LOG(false, "XXX unhandled case of has_character=0 and has_move=0");
 			}
 		}
 
@@ -439,7 +431,7 @@ namespace swf
 		auto id = bits_->read_unsigned16();
 		s->read(3, bits_);
 		obj->add_character(id, s);
-		LOG_DEBUG(get_indent_value() << "shape2 id: " << id);
+		LOG_DEBUG("define shape3 id: " << id);
 	}
 
 
@@ -480,8 +472,10 @@ namespace swf
 
 	void reader::ProcessDefineEditText(const character_def_ptr& obj, unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'DefineEditText'");
-		eat_bit_stream(length);
+		auto txt = edit_text_def::create(2, length-2);
+		int id = bits_->read_unsigned16();
+		txt->read(bits_);
+		obj->add_character(id, txt);
 	}
 
 
@@ -490,11 +484,9 @@ namespace swf
 		uint16_t id = bits_->read_unsigned16();
 		uint16_t frame_count = bits_->read_unsigned16();
 		auto spr = sprite_def::create(id, frame_count);
-		LOG_DEBUG(get_indent_value() << "sprite id: " << id);
-		LOG_DEBUG(get_indent_value() << "frame count: " << frame_count);
-		push_indent(get_indent() + 2);
+		LOG_DEBUG("sprite definition begins, id: " << id << ", frame_count: " << frame_count);
 		read_tags(spr);
-		pop_indent();		
+		LOG_DEBUG("sprite definition ends");
 	}
 
 
@@ -524,8 +516,10 @@ namespace swf
 
 	void reader::ProcessDefineFont2(const character_def_ptr& obj, unsigned length)
 	{
-		ASSERT_LOG(false, "Unhandled tag 'DefineFont2'");
-		eat_bit_stream(length);
+		auto f = font_def::create();
+		int id = bits_->read_unsigned16();
+		f->read(2, bits_);
+		obj->add_character(id, f);
 	}
 
 
@@ -671,7 +665,7 @@ namespace swf
 	{
 		auto f = font_def::create();
 		int id = bits_->read_unsigned16();
-		f->read3(bits_);
+		f->read(3, bits_);
 		obj->add_character(id, f);
 	}
 
@@ -719,7 +713,7 @@ namespace swf
 		auto id = bits_->read_unsigned16();
 		s->read(4, bits_);
 		obj->add_character(id, s);
-		LOG_DEBUG(get_indent_value() << "shape4 id: " << id);
+		LOG_DEBUG("define shape4 id: " << id);
 	}
 
 

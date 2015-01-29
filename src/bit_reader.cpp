@@ -1,5 +1,6 @@
 #include "asserts.hpp"
 #include "bit_reader.hpp"
+#include "swf_action.hpp"
 
 namespace swf
 {
@@ -14,12 +15,12 @@ namespace swf
 	fixed_point::fixed_point(int hi, int lo) : high(hi), low(lo)
 	{}
 
-	double fixed_point::to_double()
+	double fixed_point::to_double() const
 	{
 		return double(high) + double(low/65536.0);
 	}
 
-	float fixed_point::to_float()
+	float fixed_point::to_float() const
 	{
 		return static_cast<float>(to_double());
 	}
@@ -30,7 +31,7 @@ namespace swf
 	fixed_point8::fixed_point8(int hi, int lo) : high(hi), low(lo)
 	{}
 
-	float fixed_point8::to_float()
+	float fixed_point8::to_float() const
 	{
 		return float(high) + float(low/256.0f);
 	}
@@ -587,69 +588,6 @@ namespace swf
 		return ls;
 	}
 
-	action_record_ptr bit_stream::read_action_record()
-	{
-		uint8_t code = read_unsigned8();
-		if(code == 0) {
-			return std::shared_ptr<action_record>();
-		}
-		std::shared_ptr<action_record> ar = std::shared_ptr<action_record>(new action_record);
-		ar->set_code(code);
-		if(code & 0x80) {
-			int length = read_unsigned16();
-		}
-		switch(code) {
-			case action_record::ACTION_GOTO_FRAME: {
-				uint16_t frame_index = read_unsigned16();
-				break;
-			}
-			case action_record::ACTION_GET_URL: {
-				std::string url = read_string();
-				std::string target = read_string();
-				break;
-			}
-			case action_record::ACTION_WAIT_FOR_FRAME: {
-				uint16_t frame_to_wait = read_unsigned16();
-				uint8_t skip_count = read_unsigned8();
-				break;
-			}
-			case action_record::ACTION_SET_TARGET: {
-				std::string target = read_string();
-				break;
-			}
-			case action_record::ACTION_GOTO_LABEL: {
-				std::string frame_label = read_string();
-				break;
-			}
-			case action_record::ACTION_NEXT_FRAME:
-				// fallthrough
-			case action_record::ACTION_PREVIOUS_FRAME:
-				// fallthrough
-			case action_record::ACTION_PLAY:
-				// fallthrough
-			case action_record::ACTION_STOP:
-				// fallthrough
-			case action_record::ACTION_TOGGLE_QUALITY:
-				// fallthrough
-			case action_record::ACTION_STOP_SOUNDS:
-				break;
-		}
-		return ar;
-	}
-
-	std::vector<action_record_ptr> bit_stream::read_action_records()
-	{
-		std::shared_ptr<action_record> ptr;
-		std::vector<std::shared_ptr<action_record> > ars;
-		do {
-			ptr = read_action_record();
-			if(ptr) {
-				ars.push_back(ptr);
-			}
-		} while(ptr != NULL);
-		return ars;
-	}
-
 	clip_event bit_stream::parse_clip_event_flags(uint32_t flags)
 	{
 		clip_event e;
@@ -689,6 +627,7 @@ namespace swf
 				flags = uint32_t(read_unsigned16()) << 16;
 			}
 			if(flags == 0) { // end?
+				break;
 			}
 			clip_action_record car;
 			car.flags = parse_clip_event_flags(flags);
@@ -696,7 +635,7 @@ namespace swf
 			if(car.flags.key_press_) {
 				car.key_code = read_unsigned8();
 			}
-			car.actions = read_action_records();
+			car.actions = action::create(shared_from_this());
 		}
 		return cars;
 	}

@@ -62,4 +62,31 @@ namespace swf
 		bool has_clip_actions_;
 		clip_actions actions_;
 	};
+
+	inline std::ostream& operator<<(std::ostream& os, const placement_params& pp)
+	{
+		os << "depth: " << pp.get_depth();
+		if(pp.has_id()) {
+			os << ", id: " << pp.get_id();
+		}
+		if(pp.has_matrix_transform()) {
+			os << ", " << pp.get_matrix_transform();
+		}
+		if(pp.has_color_transform()) {
+			os << ", " << pp.get_color_transform();
+		}
+		if(pp.has_morph_ratio()) {
+			os << ", morph_ratio:" << pp.get_morph_ratio();
+		}
+		if(pp.has_clip_depth()) {
+			os << ", clip_depth: " << pp.get_clip_depth();
+		}
+		if(pp.has_name()) {
+			os << ", name: " << pp.get_name();
+		}
+		if(pp.has_clip_actions()) {
+			os << ", clip_actions: <some -- need to decode these>";
+		}
+		return os;
+	}
 }

@@ -15,6 +15,7 @@ namespace swf
 		bool edge_record = bits->read_unsigned_bits(1) ? true : false;
 		unsigned flags = unsigned(bits->read_unsigned_bits(5));
 		if(flags == 0) {
+			bits->force_byte_align();
 			return shape_record_ptr();
 		}
 		if(edge_record) {

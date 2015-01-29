@@ -29,6 +29,8 @@ namespace swf
 		BUTTON,
 		TEXT,
 		TEXT_DEF,
+		EDIT_TEXT,
+		EDIT_TEXT_DEF,
         // etc
     };
 

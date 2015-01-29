@@ -1,7 +1,9 @@
+#pragma once
+
 #include <memory>
 
 #include "bit_reader.hpp"
-#include "swf.hpp"
+#include "swf_fwd.hpp"
 
 namespace swf
 {
@@ -119,13 +121,11 @@ namespace swf
 	class action
 	{
 	public:
-		explicit action(int id, const std::shared_ptr<bit_stream>& bits);
-		virtual ~action();
-
+		MAKE_FACTORY(action);
 		void execute(const character_ptr& ch);
 	private:
-		int id_;
+		explicit action(const bit_stream_ptr& bits);
+		void init();
 		std::vector<uint8_t> codestream_;
 	};
-
 }

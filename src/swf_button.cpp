@@ -1,3 +1,4 @@
+#include "swf_action.hpp"
 #include "swf_button.hpp"
 #include "swf_character.hpp"
 
@@ -45,15 +46,49 @@ namespace swf
 		uint16_t action_offset = bits->read_unsigned16();
 		button_records_ = read_button_records(2, bits);
 		// Would read buttoncondactions here if action_offset != 0
+		std::vector<button_conditional_action> cond_actions_;
 		if(action_offset != 0) {
-			ASSERT_LOG(false, "XXX write code to read button actions.");
+			button_conditional_action ca;
+			while(ca.read(bits)) {
+				cond_actions_.emplace_back(ca);
+			}
 		}
 	}
-
 
 	button::button(player_ptr player, const character_ptr& parent, int id, const button_def_ptr& def)
 		: character(player, parent, id, def),
 		  def_(def)
 	{
+	}
+
+	button_conditional_action::button_conditional_action()
+		: cond_idle_to_over_down_(false),
+		  cond_out_down_to_idle_(false),
+		  cond_out_down_to_over_down_(false),
+		  cond_over_down_to_out_down_(false),
+		  cond_over_down_to_over_up_(false),
+		  cond_over_up_over_down_(false),
+		  cond_over_up_to_idle_(false),
+		  cond_idle_to_over_up_(false),
+		  cond_over_down_to_idle_(false),
+		  key_code_(0)
+	{
+	}
+
+	bool button_conditional_action::read(bit_stream_ptr bits)
+	{
+		uint16_t offset_to_next_record = bits->read_unsigned16();
+		cond_idle_to_over_down_ = bits->read_unsigned_bits(1) != 0;
+		cond_out_down_to_idle_ = bits->read_unsigned_bits(1) != 0;
+		cond_out_down_to_over_down_ = bits->read_unsigned_bits(1) != 0;
+		cond_over_down_to_out_down_ = bits->read_unsigned_bits(1) != 0;
+		cond_over_down_to_over_up_ = bits->read_unsigned_bits(1) != 0;
+		cond_over_up_over_down_ = bits->read_unsigned_bits(1) != 0;
+		cond_over_up_to_idle_ = bits->read_unsigned_bits(1) != 0;
+		cond_idle_to_over_up_ = bits->read_unsigned_bits(1) != 0;
+		key_code_ = bits->read_unsigned_bits(7);
+		cond_over_down_to_idle_ = bits->read_unsigned_bits(1) != 0;
+		actions_ = action::create(bits);
+		return offset_to_next_record != 0;
 	}
 }

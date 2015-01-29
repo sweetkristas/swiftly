@@ -73,4 +73,34 @@ namespace swf
 		: character(player, parent, id, def)
 	{
 	}
+
+	edit_text_def::edit_text_def()
+	{
+	}
+
+	void edit_text_def::read(bit_stream_ptr bits)
+	{
+		rect bounds_;
+		bool has_text_;
+		bool has_word_wrap_;
+		bool is_multiline_;
+		bool is_password_;
+		bool is_readonly_;
+		bool has_text_color_;
+		bool has_max_length_;
+		bool has_font_;
+		bool has_font_class_;
+		bool is_auto_size_;
+		bool has_layout_;
+		bool allow_select_;
+		bool has_border_;
+		bool is_static_;
+		bool has_html_;
+		bool use_outlines_;
+		int font_id_;
+		int font_height_;
+
+		bounds_ = bits->read_rect();
+		
+	}
 }

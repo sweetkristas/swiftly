@@ -27,7 +27,7 @@ namespace swf
 
 		virtual bool is_a(ASClass id) override  { return id == ASClass::FONT_DEF ? true : character_def::is_a(id); }
 
-		void read3(bit_stream_ptr bits);
+		void read(int vers, bit_stream_ptr bits);
 
 		size_t size() const { return glyphs_.size(); }
 
@@ -43,6 +43,8 @@ namespace swf
 		}
 	private:
 		font_def();
+		void read1(bit_stream_ptr bits);
+
 		uint8_t language_code_;
 		std::vector<uint16_t> code_points_;
 		uint16_t font_ascender_height_;

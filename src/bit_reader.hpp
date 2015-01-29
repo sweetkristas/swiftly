@@ -13,7 +13,7 @@
 
 namespace swf
 {
-	class bit_stream
+	class bit_stream : public std::enable_shared_from_this<bit_stream>
 	{
 	public:
 		explicit bit_stream(const std::vector<uint8_t>& data);
@@ -78,9 +78,6 @@ namespace swf
 
 		color_transform read_cxform();
 		color_transform read_cxform_with_alpha();
-
-		action_record_ptr read_action_record();
-		std::vector<action_record_ptr> read_action_records();
 
 		clip_event parse_clip_event_flags(uint32_t flags);
 		std::vector<clip_action_record> read_clip_action_records();

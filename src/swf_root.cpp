@@ -44,11 +44,11 @@ namespace swf
 		return 20;
 	}
 
-	void root::advance(float delta_time)
+	void root::update(float delta_time)
 	{
 		current_time_ += delta_time;
 		if(current_time_ >= frame_time_) {
-			def_->set_current_frame(def_->get_current_frame() + 1);
+			movie_->update(delta_time);
 			current_time_ -= frame_time_;
 		}
 	}
@@ -66,5 +66,10 @@ namespace swf
 	character_ptr root::get_character_from_id(int id)
 	{
 		return def_->get_character_from_id(id);
+	}
+
+	character_def_ptr root::get_movie_def() 
+	{ 
+		return movie_->get_definition(); 
 	}
 }
