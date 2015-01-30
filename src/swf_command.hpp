@@ -12,6 +12,7 @@ namespace swf
 		virtual ~command();
 		virtual void execute(const character_ptr& ch) = 0;
 		virtual void init() {}
+		virtual bool is_action() const { return false; }
 	};
 
 	typedef std::shared_ptr<command> command_ptr;
@@ -69,6 +70,7 @@ namespace swf
 	public:
 		MAKE_FACTORY(do_action);
 		void execute(const character_ptr& ch);
+		bool is_action() const override { return true; }
 	private:
 		explicit do_action(const action_ptr& actions);
 		action_ptr actions_;

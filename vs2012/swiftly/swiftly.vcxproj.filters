@@ -19,9 +19,6 @@
     <Filter Include="clipper">
       <UniqueIdentifier>{c102ed50-82ef-4510-885d-a61cca439780}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\as3_classes">
-      <UniqueIdentifier>{0a315a06-71cb-46de-af4b-528bfa8d1f57}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\as3_classes">
       <UniqueIdentifier>{2b4af054-1bd0-46df-81d7-6b83ac600516}</UniqueIdentifier>
     </Filter>
@@ -87,12 +84,6 @@
     <ClCompile Include="..\..\src\avm2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\as3\as3_math.cpp">
-      <Filter>Source Files\as3_classes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\as3\as3_object.cpp">
-      <Filter>Source Files\as3_classes</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\swf_environment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,20 +96,8 @@
     <ClCompile Include="..\..\src\swf_root.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\as3\as3_function_call.cpp">
-      <Filter>Source Files\as3_classes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\as3\as3_value.cpp">
-      <Filter>Source Files\as3_classes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\as3\as3_globals.cpp">
-      <Filter>Source Files\as3_classes</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\avm2_execute.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\as3\as3_environment.cpp">
-      <Filter>Source Files\as3_classes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\swf_action.cpp">
       <Filter>Source Files</Filter>
@@ -139,6 +118,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\GLee.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\as_value.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\as_function_call.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\as_object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -230,15 +218,6 @@
     <ClInclude Include="..\..\src\avm2_variant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\as3\as3_value.hpp">
-      <Filter>Header Files\as3_classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\as3\as3_math.hpp">
-      <Filter>Header Files\as3_classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\as3\as3_object.hpp">
-      <Filter>Header Files\as3_classes</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\swf_environment.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -251,23 +230,8 @@
     <ClInclude Include="..\..\src\swf_root.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\as3\as3_function_call.hpp">
-      <Filter>Header Files\as3_classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\as3\as3_function.hpp">
-      <Filter>Header Files\as3_classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\as3\as3_globals.hpp">
-      <Filter>Header Files\as3_classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\as3\as3_environment.hpp">
-      <Filter>Header Files\as3_classes</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\swf_image.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\as3\as3_hint.hpp">
-      <Filter>Header Files\as3_classes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\swf_action.hpp">
       <Filter>Header Files</Filter>
@@ -294,6 +258,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\swf_params.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as_value.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as_function.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as_function_call.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as_hint.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\as_fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

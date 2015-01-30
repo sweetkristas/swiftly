@@ -51,6 +51,7 @@ namespace swf
 		virtual bool is_a(ASClass id) override  { return id == ASClass::BUTTON_DEF ? true : character_def::is_a(id); }
 
 		void read2(bit_stream_ptr bits);
+		character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
 	private:
 		button_def();
 		// true to track as a menu button, false to track as a menu button
@@ -66,9 +67,9 @@ namespace swf
 	class button : public character
 	{
 	public:
-		button(player_ptr player, const character_ptr& parent, int id, const button_def_ptr& def);
+		button(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def);
 		virtual bool is_a(ASClass id) override  { return id == ASClass::BUTTON ? true : character::is_a(id); }		
 	private:
-		button_def_ptr def_;
+		void handle_draw() const override;
 	};
 }

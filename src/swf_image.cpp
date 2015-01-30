@@ -2,7 +2,7 @@
 
 namespace swf
 {
-	image_character_def::image_character_def(int version, int block_length) 
+	image_def::image_def(int version, int block_length) 
 		: version_(version), 
 		  block_length_(block_length), 
 		  deblock_(0), 
@@ -13,7 +13,12 @@ namespace swf
 		}
 	}
 
-	void image_character_def::read(bit_stream_ptr bits) {
+	character_ptr image_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
+	{
+		return std::make_shared<image>(player, parent, id, shared_from_this());
+	}
+
+	void image_def::read(bit_stream_ptr bits) {
 		if(version_ == 3 || version_ == 4) {
 			data_size_ = bits->read_unsigned32();
 		}
@@ -31,7 +36,7 @@ namespace swf
 		}
 	}
 
-	void image_character_def::read_lossless(bit_stream_ptr bits) {
+	void image_def::read_lossless(bit_stream_ptr bits) {
 		uint8_t format = bits->read_unsigned8();
 		uint16_t width = bits->read_unsigned16();
 		uint16_t height = bits->read_unsigned16();
@@ -69,5 +74,15 @@ namespace swf
 		} else {
 			ASSERT_LOG(false, "Unexpected lossless format: " << format);;
 		}
+	}
+
+	image::image(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
+		: character(player, parent, id, def)
+	{
+	}
+
+	void image::handle_draw() const
+	{
+		LOG_DEBUG("drawing image: " << get_id());
 	}
 }

@@ -39,6 +39,11 @@ namespace swf
 	{
 	}
 
+	character_ptr button_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
+	{
+		return std::make_shared<button>(player, parent, id, shared_from_this());
+	}
+
 	void button_def::read2(bit_stream_ptr bits)
 	{
 		bits->read_unsigned_bits(7); // reserved
@@ -55,10 +60,14 @@ namespace swf
 		}
 	}
 
-	button::button(player_ptr player, const character_ptr& parent, int id, const button_def_ptr& def)
-		: character(player, parent, id, def),
-		  def_(def)
+	button::button(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
+		: character(player, parent, id, def)
 	{
+	}
+
+	void button::handle_draw() const
+	{
+		LOG_DEBUG("drawing button: " << get_id());
 	}
 
 	button_conditional_action::button_conditional_action()

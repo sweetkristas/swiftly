@@ -11,12 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\as3\as3_environment.cpp" />
-    <ClCompile Include="..\..\src\as3\as3_function_call.cpp" />
-    <ClCompile Include="..\..\src\as3\as3_globals.cpp" />
-    <ClCompile Include="..\..\src\as3\as3_math.cpp" />
-    <ClCompile Include="..\..\src\as3\as3_object.cpp" />
-    <ClCompile Include="..\..\src\as3\as3_value.cpp" />
+    <ClCompile Include="..\..\src\as_function_call.cpp" />
+    <ClCompile Include="..\..\src\as_object.cpp" />
+    <ClCompile Include="..\..\src\as_value.cpp" />
     <ClCompile Include="..\..\src\avm2.cpp" />
     <ClCompile Include="..\..\src\avm2_execute.cpp" />
     <ClCompile Include="..\..\src\bit_reader.cpp" />
@@ -51,15 +48,12 @@
     <ClCompile Include="..\..\src\test\wm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\as3\as3_environment.hpp" />
-    <ClInclude Include="..\..\src\as3\as3_function.hpp" />
-    <ClInclude Include="..\..\src\as3\as3_function_call.hpp" />
-    <ClInclude Include="..\..\src\as3\as3_globals.hpp" />
-    <ClInclude Include="..\..\src\as3\as3_hint.hpp" />
-    <ClInclude Include="..\..\src\as3\as3_math.hpp" />
-    <ClInclude Include="..\..\src\as3\as3_object.hpp" />
-    <ClInclude Include="..\..\src\as3\as3_value.hpp" />
     <ClInclude Include="..\..\src\asserts.hpp" />
+    <ClInclude Include="..\..\src\as_function.hpp" />
+    <ClInclude Include="..\..\src\as_function_call.hpp" />
+    <ClInclude Include="..\..\src\as_fwd.hpp" />
+    <ClInclude Include="..\..\src\as_hint.hpp" />
+    <ClInclude Include="..\..\src\as_value.hpp" />
     <ClInclude Include="..\..\src\swf_character.hpp" />
     <ClInclude Include="..\..\src\as_object.hpp" />
     <ClInclude Include="..\..\src\avm2.hpp" />

@@ -27,7 +27,9 @@ namespace swf
 
 		character_def_ptr get_movie_def();
 
-		character_ptr get_character_from_id(int id);
+		character_ptr get_character_from_id(int frame, int id);
+
+		character_ptr get_named_character(const std::string& name);
 	private:
 		explicit root(weak_player_ptr p, movie_def_ptr d);
 		// init() is called automatically when instantiating via swf::root::create(...)

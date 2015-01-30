@@ -2,9 +2,14 @@
 
 namespace swf
 {
-	sprite::sprite(const weak_player_ptr& player, const character_ptr& parent, int id, character_def_ptr def)
+	sprite::sprite(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: movie(player, parent, id, def)
 	{
+	}
+
+	void sprite::handle_draw() const
+	{
+		LOG_DEBUG("drawing sprite: " << get_id());
 	}
 
 	sprite_def::sprite_def(int id, int frame_count)
@@ -35,6 +40,11 @@ namespace swf
 		default: break;
 		}
 		return false;
+	}
+
+	character_ptr sprite_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
+	{
+		return sprite::create(player, parent, id, shared_from_this());
 	}
 
 	void sprite_def::init()

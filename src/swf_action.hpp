@@ -3,11 +3,13 @@
 #include <memory>
 
 #include "bit_reader.hpp"
+#include "swf_environment.hpp"
 #include "swf_fwd.hpp"
 
 namespace swf
 {
 	enum class ActionCode {
+		End				= 0x00,
 		// SWF 3
 		NextFrame		= 0x04,
 		PreviousFrame	= 0x05,
@@ -118,6 +120,20 @@ namespace swf
 		Throw			= 0x2a,
 	};
 
+	enum class PushType
+	{
+		STRING,
+		FLOATING_POINT,
+		NULL_VALUE,
+		UNDEFINED,
+		REGISTER,
+		BOOLEAN,
+		DOUBLE,
+		INTEGER,
+		CONSTANT8,
+		CONSTANT16,
+	};
+
 	class action
 	{
 	public:
@@ -126,6 +142,15 @@ namespace swf
 	private:
 		explicit action(const bit_stream_ptr& bits);
 		void init();
-		std::vector<uint8_t> codestream_;
+
+		std::string read_string(codestream_iterator& it);
+		int read_u8(codestream_iterator& it);
+		int read_u16(codestream_iterator& it);
+		float read_float(codestream_iterator& it);
+		double read_double(codestream_iterator& it);
+		int read_s32(codestream_iterator& it);
+		bool read_bool(codestream_iterator& it);
+
+		codestream codestream_;
 	};
 }

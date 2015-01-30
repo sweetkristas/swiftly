@@ -71,9 +71,19 @@ namespace swf
 		LOG_DEBUG("text_def: bounds: " << text_bounds_ << ", matrix: " << text_matrix_);
 	}
 
-	text::text(player_ptr player, const character_ptr& parent, int id, const character_def_ptr& def)
+	character_ptr text_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
+	{
+		return std::make_shared<text>(player, parent, id, shared_from_this());
+	}
+
+	text::text(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: character(player, parent, id, def)
 	{
+	}
+
+	void text::handle_draw() const
+	{
+		LOG_DEBUG("drawing text: " << get_id());
 	}
 
 	edit_text_def::edit_text_def()
@@ -157,8 +167,19 @@ namespace swf
 		LOG_DEBUG("edit_text: variable_name: " << variable_name_);
 	}
 
-	edit_text::edit_text(player_ptr player, const character_ptr& parent, int id, const character_def_ptr& def)
+	character_ptr edit_text_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
+	{
+		return std::make_shared<edit_text>(player, parent, id, shared_from_this());
+	}
+
+	edit_text::edit_text(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: character(player, parent, id, def)
 	{
 	}
+
+	void edit_text::handle_draw() const
+	{
+		LOG_DEBUG("drawing edit_text: " << get_id());
+	}
+
 }

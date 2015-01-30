@@ -10,7 +10,7 @@
 
 namespace swf
 {
-	typedef std::map<int, std::string> frame_name_map;
+	typedef std::map<std::string, int> frame_name_map;
 
 	typedef std::map<int, character_def_ptr> character_id_map;
 
@@ -38,15 +38,17 @@ namespace swf
 		void add_character(int id, const character_def_ptr& ch) override;
 		void add_command(const command_ptr& cmd) override;
 
-		character_def_ptr get_character_def_from_id(int id);
+		character_def_ptr get_character_def_from_id(int frame, int id) override;
 		void set_frame_label(const std::string& label) override;
+		int get_frame_from_label(const std::string& label) override;
 		
 		void add_frame_label(unsigned frame, const std::string& label) override;
 		void add_scene_info(unsigned frame, const std::string& label) override;
 
 		int get_frame_count() const override { return max_frames_; }
 
-		void execute_commands(int frame, const character_ptr& ch) override;
+		void execute_commands(int frame, const character_ptr& ch, bool actions_only) override;
+		virtual character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
 	protected:
 		explicit movie_def();
 	private:
@@ -74,11 +76,14 @@ namespace swf
 		void prev_frame();
 
 		void update(float delta_time) override;
-		void draw() const override;
 		void execute_actions();
+
+		int get_current_frame() const override { return current_frame_; }
+		void call_frame_actions(const as_value_ptr& val) override;
 	protected:
-		explicit movie(weak_player_ptr player, const character_ptr& parent, int id, character_def_ptr def);
+		explicit movie(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def);
 	private:
+		void handle_draw() const override;
 		int current_frame_;
 	};
 }

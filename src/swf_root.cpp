@@ -63,13 +63,21 @@ namespace swf
 		movie_->draw();
 	}
 
-	character_ptr root::get_character_from_id(int id)
+	character_ptr root::get_character_from_id(int frame, int id)
 	{
-		return def_->get_character_from_id(id);
+		character_def_ptr def = def_->get_character_def_from_id(movie_->get_current_frame(), id);
+		return def->create_instance(player_, movie_, id);
 	}
 
 	character_def_ptr root::get_movie_def() 
 	{ 
 		return movie_->get_definition(); 
+	}
+
+	character_ptr root::get_named_character(const std::string& name)
+	{
+		auto ch = movie_->get_named_character(name);
+		ASSERT_LOG(ch != nullptr, "Couldn't find character with name: '" << name << "'");
+		return ch;
 	}
 }

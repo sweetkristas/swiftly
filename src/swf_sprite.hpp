@@ -14,6 +14,7 @@ namespace swf
 
 		virtual bool is_a(ASClass id) override { return id == ASClass::SPRITE_DEF ? true : movie_def::is_a(id); }
 		virtual bool sprite_def::is_tag_allowable(Tag tag) override;
+		character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
 	private:
 		sprite_def(int id, int frame_count);
 		void init();
@@ -25,6 +26,8 @@ namespace swf
 		// bool done_init_actions_;
 	};
 
+	typedef std::shared_ptr<sprite_def> sprite_def_ptr;
+
 	class sprite : public movie
 	{
 	public:
@@ -33,8 +36,7 @@ namespace swf
 
 		virtual bool is_a(ASClass id) override { return id == ASClass::SPRITE ? true : movie::is_a(id); }
 	private:
-		sprite(const weak_player_ptr& player, const character_ptr& parent, int i, character_def_ptr def);
+		sprite(const weak_player_ptr& player, const character_ptr& parent, int i, const character_def_ptr& def);
+		void handle_draw() const override;
 	};
-
-	typedef std::shared_ptr<sprite_def> sprite_def_ptr;
 }

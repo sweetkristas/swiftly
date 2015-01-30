@@ -90,8 +90,17 @@ namespace swf
 		}
 	}
 
-	font::font(player_ptr player, const character_ptr& parent, int id, const font_def_ptr& def)
+	character_ptr font_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
+	{
+		return std::make_shared<font>(player, parent, id, shared_from_this());
+	}
+
+	font::font(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: character(player, parent, id, def)
+	{
+	}
+
+	void font::handle_draw() const
 	{
 	}
 }

@@ -326,7 +326,7 @@ namespace swf
 
 	void reader::ProcessBitsLossless(const character_def_ptr& obj, unsigned length)
 	{
-		auto img = image_character_def::create(1, length-2);
+		auto img = image_def::create(1, length-2);
 		int id = bits_->read_unsigned16();
 		img->read_lossless(bits_);
 		obj->add_character(id, img);
@@ -335,7 +335,7 @@ namespace swf
 
 	void reader::ProcessDefineBitsJPEG2(const character_def_ptr& obj, unsigned length)
 	{
-		auto img = image_character_def::create(2, length-2);
+		auto img = image_def::create(2, length-2);
 		int id = bits_->read_unsigned16();
 		img->read(bits_);
 		obj->add_character(id, img);
@@ -458,7 +458,7 @@ namespace swf
 
 	void reader::ProcessDefineBitsJPEG3(const character_def_ptr& obj, unsigned length)
 	{
-		auto img = image_character_def::create(3, length-2);
+		auto img = image_def::create(3, length-2);
 		int id = bits_->read_unsigned16();
 		img->read(bits_);
 		obj->add_character(id, img);
@@ -467,7 +467,7 @@ namespace swf
 
 	void reader::ProcessDefineBitsLossless2(const character_def_ptr& obj, unsigned length)
 	{
-		auto img = image_character_def::create(2, length-2);
+		auto img = image_def::create(2, length-2);
 		int id = bits_->read_unsigned16();
 		img->read_lossless(bits_);
 		obj->add_character(id, img);
@@ -492,6 +492,7 @@ namespace swf
 		LOG_DEBUG("sprite definition begins, id: " << id << ", frame_count: " << frame_count);
 		read_tags(spr);
 		LOG_DEBUG("sprite definition ends");
+		obj->add_character(id, spr);
 	}
 
 
@@ -770,7 +771,7 @@ namespace swf
 
 	void reader::ProcessDefineJPEGBits4(const character_def_ptr& obj, unsigned length)
 	{
-		auto img = image_character_def::create(4, length-2);
+		auto img = image_def::create(4, length-2);
 		int id = bits_->read_unsigned16();
 		img->read(bits_);
 		obj->add_character(id, img);

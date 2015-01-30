@@ -1,4 +1,6 @@
 #include <algorithm>
+
+#include "as_value.hpp"
 #include "swf_movie.hpp"
 
 namespace swf
@@ -42,16 +44,16 @@ namespace swf
 		commands_[get_current_frame()].emplace_back(cmd);
 	}
 
-	character_def_ptr movie_def::get_character_def_from_id(int id)
-	{
-		auto it = characters_[get_current_frame()].find(id);
-		ASSERT_LOG(it != characters_[get_current_frame()].end(), "Character with id: " << id << " not found in current frame: " << get_current_frame());
-		return it->second;
-	}
-
 	void movie_def::set_frame_label(const std::string& label)
 	{
-		named_frames_[get_current_frame()] = label;
+		named_frames_[label] = get_current_frame();
+	}
+
+	int movie_def::get_frame_from_label(const std::string& label) 
+	{
+		auto it = named_frames_.find(label);
+		ASSERT_LOG(it != named_frames_.end(), "Couldn't find frame with label: '" << label << "'");
+		return it->second;
 	}
 
 	void movie_def::add_frame_label(unsigned frame, const std::string& label)
@@ -64,16 +66,32 @@ namespace swf
 		scene_info_[frame] = label;
 	}
 
-	void movie_def::execute_commands(int frame, const character_ptr& ch)
+	void movie_def::execute_commands(int frame, const character_ptr& ch, bool actions_only)
 	{
 		ASSERT_LOG(frame < static_cast<int>(commands_.size()), "Tried to execute a frame beyond the maximum number of frames. " << frame << " >= " << commands_.size());
 		ASSERT_LOG(ch != nullptr, "Tried to execute commands on null character.");
 		for(auto& cmd : commands_[frame]) {
+			if(cmd->is_action() && !actions_only) {
+				continue;
+			}
 			cmd->execute(ch);
 		}
 	}
 
-	movie::movie(weak_player_ptr player, const character_ptr& parent, int id, character_def_ptr def)
+	character_def_ptr movie_def::get_character_def_from_id(int frame, int id)
+	{
+		ASSERT_LOG(frame < static_cast<int>(characters_.size()), "Tried to find a character beyond the maximum number of frames. " << frame << " >= " << characters_.size());
+		auto it = characters_[frame].find(id);
+		ASSERT_LOG(it != characters_[frame].end(), "Unable to find character with id: " << id << " in frame: " << frame);
+		return it->second;
+	}
+
+	character_ptr movie_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
+	{
+		return movie::create(player, parent, id, shared_from_this());
+	}
+
+	movie::movie(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: character(player, parent, id, def),
 		  current_frame_(0)
 	{
@@ -89,7 +107,7 @@ namespace swf
 		--current_frame_;
 	}
 
-	void movie::draw() const
+	void movie::handle_draw() const
 	{
 		LOG_DEBUG("movie drawing frame: " << current_frame_);
 	}
@@ -97,6 +115,21 @@ namespace swf
 	void movie::execute_actions()
 	{
 
+	}
+
+	void movie::call_frame_actions(const as_value_ptr& val)
+	{
+		int frame = -1;
+		if(val->is_numeric()) {
+			// 1-based to 0-based conversion.
+			frame = val->to_integer() - 1;
+		} else if(val->is_string()) {
+			frame = get_definition()->get_frame_from_label(val->to_std_string());
+		}
+		if(frame < 0 || frame >= static_cast<int>(get_definition()->get_frame_count())) {
+			ASSERT_LOG(false, "frame outside limits: " << frame);
+		}
+		get_definition()->execute_commands(frame, shared_from_this(), true);
 	}
 
 	void movie::update(float delta_time)

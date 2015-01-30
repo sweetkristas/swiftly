@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
+#include <vector>
 
 #include "geometry.hpp"
 
@@ -36,4 +38,7 @@ namespace swf
 
 	class action;
 	typedef std::shared_ptr<action> action_ptr;
+
+	typedef std::vector<uint8_t> codestream;
+	typedef codestream::const_iterator codestream_iterator;
 }

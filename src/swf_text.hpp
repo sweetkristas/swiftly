@@ -21,6 +21,7 @@ namespace swf
 		
 		void read(bit_stream_ptr bits);
 		virtual bool is_a(ASClass id) override  { return id == ASClass::EDIT_TEXT_DEF ? true : character_def::is_a(id); }
+		character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
 	private:
 		edit_text_def();
 
@@ -55,12 +56,15 @@ namespace swf
 		std::string initial_text_;
 	};
 
+	typedef std::shared_ptr<edit_text_def> edit_text_def_ptr;
+
 	class edit_text : public character
 	{
 	public:
-		edit_text(player_ptr player, const character_ptr& parent, int id, const character_def_ptr& def);
+		edit_text(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def);
 		virtual bool is_a(ASClass id) override  { return id == ASClass::EDIT_TEXT ? true : character::is_a(id); }
 	private:
+		void handle_draw() const override;
 	};
 
 	class text_def : public character_def
@@ -77,6 +81,7 @@ namespace swf
 		void set_sharpness(float sharpness) { sharpness_ = sharpness; }
 
 		virtual bool is_a(ASClass id) override  { return id == ASClass::TEXT_DEF ? true : character_def::is_a(id); }
+		character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
 	private:
 		text_def();
 		rect text_bounds_;
@@ -105,8 +110,9 @@ namespace swf
 	class text : public character
 	{
 	public:
-		text(player_ptr player, const character_ptr& parent, int id, const character_def_ptr& def);
+		text(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def);
 		virtual bool is_a(ASClass id) override  { return id == ASClass::TEXT ? true : character::is_a(id); }
 	private:
+		void handle_draw() const override;
 	};
 }

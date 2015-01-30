@@ -1,5 +1,6 @@
 #pragma once
 
+#include "as_fwd.hpp"
 #include "swf_fwd.hpp"
 #include "swf_types.hpp"
 
@@ -31,6 +32,8 @@ namespace swf
 		TEXT_DEF,
 		EDIT_TEXT,
 		EDIT_TEXT_DEF,
+		IMAGE,
+		IMAGE_DEF,
         // etc
     };
 
@@ -56,6 +59,12 @@ namespace swf
 			ASSERT_LOG(player != nullptr, "Player went away in call to as_object::get_player()");
 			return player;
 		}
+
+		virtual const char*	to_string() { return "[object Object]"; }
+		virtual double to_number();
+		virtual bool to_bool() { return true; }
+		virtual as_value default_value(HintType hint=HintType::NO_HINT);
+
 	protected:
 		explicit as_object(weak_player_ptr player) : player_(player) {}
 	private:

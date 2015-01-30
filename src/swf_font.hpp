@@ -41,6 +41,7 @@ namespace swf
 			zone_records_.swap(*zone_records); 
 			ASSERT_LOG(zone_records_.size() == glyphs_.size(), "Zone records size != glyphs size : " << zone_records_.size() << " != " << glyphs_.size());
 		}
+		virtual character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
 	private:
 		font_def();
 		void read1(bit_stream_ptr bits);
@@ -67,8 +68,9 @@ namespace swf
 	class font : public character
 	{
 	public:
-		font(player_ptr player, const character_ptr& parent, int id, const font_def_ptr& def);
+		font(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def);
 		virtual bool is_a(ASClass id) override  { return id == ASClass::FONT ? true : character::is_a(id); }
 	private:
+		virtual void handle_draw() const override;
 	};
 }
