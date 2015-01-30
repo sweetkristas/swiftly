@@ -71,10 +71,9 @@ namespace swf
 		ASSERT_LOG(frame < static_cast<int>(commands_.size()), "Tried to execute a frame beyond the maximum number of frames. " << frame << " >= " << commands_.size());
 		ASSERT_LOG(ch != nullptr, "Tried to execute commands on null character.");
 		for(auto& cmd : commands_[frame]) {
-			if(cmd->is_action() && !actions_only) {
-				continue;
+			if((actions_only && cmd->is_action()) || !actions_only) {
+				cmd->execute(ch);
 			}
-			cmd->execute(ch);
 		}
 	}
 

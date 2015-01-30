@@ -1,3 +1,5 @@
+#include <boost/regex.hpp>
+
 #include "swf_environment.hpp"
 
 namespace swf
@@ -20,7 +22,6 @@ namespace swf
 
 	environment::environment()
 		: stack_(),
-		  with_stack_(),
 		  constant_pool_(),
 		  registers_()
 	{
@@ -53,8 +54,29 @@ namespace swf
 		constant_pool_[index] = value;
 	}
 
+	void environment::set_constant_pool(const std::vector<std::string>& values)
+	{
+		constant_pool_ = values;
+	}
+
 	void environment::clear_constants()
 	{
 		constant_pool_.clear();
+	}
+
+	as_value_ptr environment::get_variable(const std::string& name, with_stack& wstack)
+	{
+		// Examples of things we can match
+		// /A/B:FOO
+		// /A/B/:FOO (same as above)
+		// some.path.to.variable
+		boost::regex re1("(/?([[:alnum:]])))+(/?:)?");
+		boost::regex re2("(([[:alnum:]])\.)+");
+		ASSERT_LOG(false, "XXX environment::get_variable");
+	}
+
+	void environment::set_variable(const std::string& name, const as_value_ptr& value, with_stack& wstack)
+	{
+		ASSERT_LOG(false, "XXX environment::set_variable");
 	}
 }

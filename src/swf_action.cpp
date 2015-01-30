@@ -229,6 +229,8 @@ namespace swf
 
 	void action::execute(const character_ptr& target)
 	{
+		with_stack wstack;
+
 		character_ptr ch = target;
 		auto& env = ch->get_environment();
 		int version = ch->get_player()->get_version();
@@ -592,9 +594,12 @@ namespace swf
 				break;
 			}
 			case ActionCode::GetVariable: {
+				env.push(env.get_variable(env.pop()->to_string(), wstack));
 				break;
 			}
 			case ActionCode::SetVariable: {
+				auto value = env.pop();
+				env.set_variable(env.pop()->to_string(), value, wstack);
 				break;
 			}
 			case ActionCode::GetURL2: {
@@ -643,6 +648,13 @@ namespace swf
 				break;
 			}
 			case ActionCode::ConstantPool: {
+				int num_consts = read_u16(args);
+				std::vector<std::string> consts;
+				consts.reserve(num_consts);
+				for(int n = 0; n != num_consts; ++n) {
+					consts.emplace_back(read_string(args));
+				}
+				env.set_constant_pool(consts);
 				break;
 			}
 			case ActionCode::DefineFunction: {

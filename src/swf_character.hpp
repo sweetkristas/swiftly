@@ -32,6 +32,11 @@ namespace swf
 		virtual void execute_commands(int frame, const character_ptr& ch, bool actions_only=false) {};
 
 		virtual character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id) = 0;
+		//template<typename T>
+		//character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id) {
+		//	return typename T::create(player, parent, id, shared_from_this());
+		//}
+
 private:
 		std::map<int, std::string> as3_symbol_map_;
 	};

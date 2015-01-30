@@ -31,9 +31,12 @@ namespace swf
 		void clear_constants();
 		const std::string& get_constant(int index);
 		void set_constant(int index, const std::string& value);
+		void set_constant_pool(const std::vector<std::string>& values);
+
+		as_value_ptr get_variable(const std::string& name, with_stack& wstack);
+		void set_variable(const std::string& name, const as_value_ptr& value, with_stack& wstack);
 	private:
 		stack stack_;
-		with_stack with_stack_;
 		std::vector<std::string> constant_pool_;
 		std::vector<as_value_ptr> registers_;
 	};
