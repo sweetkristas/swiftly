@@ -70,6 +70,9 @@ private:
 		void modify_display_list(const placement_params& params);
 		void modify_character_params(const placement_params& params);
 		void update_display_list(float delta_time);
+		void clone_display_object(const std::string& newname, int depth);
+		virtual void remove_display_object(const as_object_ptr& obj);
+		virtual as_object_ptr get_parent();
 
 		virtual void next_frame() {}
 		virtual void prev_frame() {}

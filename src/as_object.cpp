@@ -21,4 +21,23 @@ namespace swf
 		// string hint
 		return as_value(to_string());
 	}
+
+	as_value_ptr as_object::get_member(const std::string& name)
+	{
+		ASSERT_LOG(false, "XXX as_object::get_member");
+	}
+
+	void as_object::set_member(const std::string& name, const as_value_ptr& value)
+	{
+		ASSERT_LOG(false, "XXX as_object::set_member");
+	}
+
+	as_object_ptr as_object::find_target(const as_value_ptr& value)
+	{
+		if(!value->is_string()) {
+			return value->to_object();
+		}
+
+
+	}
 }

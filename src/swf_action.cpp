@@ -146,6 +146,68 @@ namespace swf
 			std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
 			return convert.to_bytes(str);
 		}
+
+		enum class StandardProperties
+		{
+			X,
+			Y,
+			XSCALE,
+			YSCALE,
+			CURRENT_FRAME,
+			TOTAL_FRAMES,
+			ALPHA,
+			VISIBLE,
+			WIDTH,
+			HEIGHT,
+			ROTATION,
+			TARGET,
+			FRAMES_LOADED,
+			NAME,
+			DROP_TARGET,
+			URL,
+			HIGH_QUALITY,
+			FOCUS_RECT,
+			SOUND_BUF_TIME,
+			QUALITY,
+			XMOUSE,
+			YMOUSE,
+		};
+
+		void std_property_name_map_init(std::map<StandardProperties,std::string>* res)
+		{
+			(*res)[StandardProperties::X] = "_x";
+			(*res)[StandardProperties::Y] = "_y";
+			(*res)[StandardProperties::XSCALE] = "_xscale";
+			(*res)[StandardProperties::YSCALE] = "_yscale";
+			(*res)[StandardProperties::CURRENT_FRAME] = "_currentframe";
+			(*res)[StandardProperties::TOTAL_FRAMES] = "_totalframes";
+			(*res)[StandardProperties::ALPHA] = "_alpha";
+			(*res)[StandardProperties::VISIBLE] = "_visible";
+			(*res)[StandardProperties::WIDTH] = "_width";
+			(*res)[StandardProperties::HEIGHT] = "_height";
+			(*res)[StandardProperties::ROTATION] = "_rotation";
+			(*res)[StandardProperties::TARGET] = "_target";
+			(*res)[StandardProperties::FRAMES_LOADED] = "_framesloaded";
+			(*res)[StandardProperties::NAME] = "_name";
+			(*res)[StandardProperties::DROP_TARGET] = "_droptarget";
+			(*res)[StandardProperties::URL] = "_url";
+			(*res)[StandardProperties::HIGH_QUALITY] = "_highquality";
+			(*res)[StandardProperties::FOCUS_RECT] = "_focusrect";
+			(*res)[StandardProperties::SOUND_BUF_TIME] = "_soundbuftime";
+			(*res)[StandardProperties::QUALITY] = "_quality";
+			(*res)[StandardProperties::XMOUSE] = "_xmouse";
+			(*res)[StandardProperties::YMOUSE] = "_ymouse";
+		}
+
+		const std::string& get_std_property_name(int index) {
+			static std::map<StandardProperties,std::string> res;
+			if(res.empty()) {
+				std_property_name_map_init(&res);
+			}
+			auto it = res.find(static_cast<StandardProperties>(index));
+			ASSERT_LOG(it != res.end(), "Unable to fine standard property with index: " << index);
+			return it->second.
+		}
 	}
 
 	action::action(const std::shared_ptr<bit_stream>& bits)
@@ -603,24 +665,65 @@ namespace swf
 				break;
 			}
 			case ActionCode::GetURL2: {
+				int ub = read_u8(args);
+				auto target = env.pop();
+				auto url = env.pop();
+				ASSERT_LOG(false, "XXX GetURL2: bits: " << static_cast<int>(ub) << " target:" << target << " url: " << url);
 				break;
 			}
 			case ActionCode::GotoFrame2: {
+				int ub = read_u8(args);
+				if(ub & 1) {
+					// scene bias bit set
+					int scene_bias = read_u16(args);
+				}
+				auto frame = env.pop();
+				ASSERT_LOG(false, "XXX: goto_frame2: bits: " << ub << ", frame: " << frame->to_std_string());
 				break;
 			}
 			case ActionCode::SetTarget2: {
+				std::string target_str = env.pop()->to_std_string();
+				if(target_str.empty()) {
+					ch = target;
+				} else {
+					ch = ch->get_player()->get_root_movie()->get_named_character(target_str);
+				}
+				env = ch->get_environment();
 				break;
 			}
 			case ActionCode::GetProperty: {
+				int index = env.pop()->to_integer();
+				auto obj = env.pop()->to_object();
+				as_value_ptr prop = obj->get_member(get_std_property_name(index));
+				env.push(prop);
 				break;
 			}
 			case ActionCode::SetProperty: {
+				as_value_ptr value = env.pop();
+				int index = env.pop()->to_integer();
+				auto obj = env.pop()->to_object();
+				obj->set_member(get_std_property_name(index), value);
 				break;
 			}
 			case ActionCode::CloneSprite: {
+				int depth = env.pop()->to_integer();
+				std::string newname = env.pop()->to_std_string();
+				as_value_ptr obj = env.pop();
+				if(obj->is_object()) {
+					obj->to_object()->clone_display_object(newname, depth);
+				} else if(obj->is_string()) {
+					obj = env.get_variable(obj->to_std_string(), wstack);
+					if(obj) {
+						obj->to_object()->clone_display_object(newname, depth);
+					}
+				}
 				break;
 			}
 			case ActionCode::RemoveSprite: {
+				auto target = env.find_target(env.pop());
+				if(target && target->get_parent()) {
+					target->get_parent()->remove_display_object(target);
+				}
 				break;
 			}
 			case ActionCode::StartDrag: {

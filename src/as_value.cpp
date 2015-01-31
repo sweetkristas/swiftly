@@ -129,4 +129,21 @@ namespace swf
 		// XXX check for correctness.
 		return to_integer() != 0;
 	}
+
+	as_object_ptr as_value::to_object()
+	{
+		switch(type_) {
+			case ValueType::UNDEFINED:
+			case ValueType::BOOLEAN:
+			case ValueType::NUMERIC:
+			case ValueType::NULL_VALUE:
+				break;
+			case ValueType::OBJECT:			return o_;
+			case ValueType::PROPERTY: {
+
+				ASSERT_LOG(false, "XXX todo PROPERTY::to_object");
+			}
+		}
+		return nullptr;
+	}
 }

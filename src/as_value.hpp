@@ -75,7 +75,7 @@ namespace swf
 		bool to_boolean();
 		int to_integer();
 		std::string to_std_string();
-		as_object to_object();
+		as_object_ptr to_object();
 
 		as_value to_primitive(HintType hint=HintType::NO_HINT) const;
 

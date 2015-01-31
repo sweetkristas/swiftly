@@ -79,4 +79,12 @@ namespace swf
 	{
 		ASSERT_LOG(false, "XXX environment::set_variable");
 	}
+
+	as_object_ptr environment::find_target(const as_value_ptr& value)
+	{
+		if(target_) {
+			return target_->find_target(value);
+		}
+		return value->to_object();
+	}
 }

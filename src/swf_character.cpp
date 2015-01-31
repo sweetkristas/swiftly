@@ -143,4 +143,38 @@ namespace swf
 			ch.second->draw();
 		}
 	}
+
+	void character::clone_display_object(const std::string& newname, int depth)
+	{
+		auto new_obj = get_definition()->create_instance(get_player(), parent_.lock(), get_id());
+		placement_params pp(depth);
+		if(!clip_actions_.clip_records.empty()) {
+			pp.set_clip_actions(clip_actions_);
+		}
+		pp.set_name(newname);
+		pp.set_matrix_transform(mat_);
+		pp.set_color_transform(ct_);
+		if(morph_ratio_ != 0) {
+			pp.set_morph_ratio(morph_ratio_);
+		}
+		if(clip_depth_ != 0) {
+			pp.set_clip_depth(clip_depth_);
+		}
+		new_obj->add_to_display_list(pp);
+	}
+
+	void character::remove_display_object(const as_object_ptr& obj)
+	{
+		for(auto& ch : display_list_) {
+			if(obj == ch.second) {
+				remove_from_display_list(ch.first);
+			}
+		}
+		ASSERT_LOG(false, "Couldn't find object on display_list.");
+	}
+
+	as_object_ptr character::get_parent()
+	{
+		return parent_.lock();
+	}
 }

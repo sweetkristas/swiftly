@@ -65,6 +65,14 @@ namespace swf
 		virtual bool to_bool() { return true; }
 		virtual as_value default_value(HintType hint=HintType::NO_HINT);
 
+		virtual as_value_ptr get_member(const std::string& name);
+		virtual void set_member(const std::string& name, const as_value_ptr& value);
+
+		virtual void clone_display_object(const std::string& newname, int depth) {}
+		virtual void remove_display_object(const as_object_ptr& obj) = 0;
+		virtual as_object_ptr get_parent() = 0;
+		as_object_ptr find_target(const as_value_ptr& value);
+
 	protected:
 		explicit as_object(weak_player_ptr player) : player_(player) {}
 	private:

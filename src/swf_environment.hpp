@@ -35,9 +35,13 @@ namespace swf
 
 		as_value_ptr get_variable(const std::string& name, with_stack& wstack);
 		void set_variable(const std::string& name, const as_value_ptr& value, with_stack& wstack);
+
+		as_object_ptr find_target(const as_value_ptr& value);
 	private:
 		stack stack_;
 		std::vector<std::string> constant_pool_;
 		std::vector<as_value_ptr> registers_;
+
+		as_object_ptr target_;
 	};
 }
