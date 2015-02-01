@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <deque>
 #include <memory>
 #include <vector>
 
@@ -16,6 +17,12 @@
 
 namespace swf
 {
+	enum class PlayState
+	{
+		PLAYING,
+		STOPPED,
+	};
+
 	class player;
 	typedef std::shared_ptr<player> player_ptr;
 	typedef std::weak_ptr<player> weak_player_ptr;
@@ -41,4 +48,19 @@ namespace swf
 
 	typedef std::vector<uint8_t> codestream;
 	typedef codestream::const_iterator codestream_iterator;
+
+	class environment;
+	typedef std::shared_ptr<environment> environment_ptr;
+
+	class with_entry
+	{
+	public:
+		with_entry();
+		with_entry(const as_object_ptr& obj, codestream_iterator end);
+	private:
+		as_object_ptr obj_;
+		codestream_iterator end_ip_;
+	};
+
+	typedef std::deque<with_entry> with_stack;
 }

@@ -69,13 +69,29 @@ namespace swf
 		virtual void set_member(const std::string& name, const as_value_ptr& value);
 
 		virtual void clone_display_object(const std::string& newname, int depth) {}
-		virtual void remove_display_object(const as_object_ptr& obj) = 0;
-		virtual as_object_ptr get_parent() = 0;
+		virtual void remove_display_object(const as_object_ptr& obj) {}
+		virtual as_object_ptr get_parent() { return nullptr; }
 		as_object_ptr find_target(const as_value_ptr& value);
+		as_object_ptr find_target(std::vector<std::string>::const_iterator start, std::vector<std::string>::const_iterator end);
+
+		virtual void next_frame() {}
+		virtual void prev_frame() {}
+		virtual int get_current_frame() const { return -1; }
+		virtual void set_current_frame(int frame) {}
+		virtual void stop_sounds() {}
+		virtual bool wait_frame(int frame) { return false; }
+		virtual void set_play_state(PlayState state) {}
+		virtual void toggle_quality() {}
+		character_def_ptr get_definition() { return nullptr; }
+		virtual void call_frame_actions(const as_value_ptr& val) {}
+
+		virtual environment_ptr get_environment() { return nullptr; }
 
 	protected:
 		explicit as_object(weak_player_ptr player) : player_(player) {}
 	private:
 		weak_player_ptr player_;
 	};
+
+	bool path_parse(const std::string& path, std::vector<std::string>* parts);
 }

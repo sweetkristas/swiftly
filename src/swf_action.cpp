@@ -4,6 +4,7 @@
 #include <map>
 
 #include "asserts.hpp"
+#include "as_function.hpp"
 #include "swf_action.hpp"
 #include "swf_character.hpp"
 #include "swf_player.hpp"
@@ -199,15 +200,21 @@ namespace swf
 			(*res)[StandardProperties::YMOUSE] = "_ymouse";
 		}
 
-		const std::string& get_std_property_name(int index) {
+		const std::string& get_std_property_name(int index) 
+		{
 			static std::map<StandardProperties,std::string> res;
 			if(res.empty()) {
 				std_property_name_map_init(&res);
 			}
 			auto it = res.find(static_cast<StandardProperties>(index));
 			ASSERT_LOG(it != res.end(), "Unable to fine standard property with index: " << index);
-			return it->second.
+			return it->second;
 		}
+	}
+
+	action::action(const code_block& codes)
+	{
+		ASSERT_LOG(false, "XXXX");
 	}
 
 	action::action(const std::shared_ptr<bit_stream>& bits)
@@ -289,12 +296,13 @@ namespace swf
 		return read_u8(it) != 0;
 	}
 
-	void action::execute(const character_ptr& target)
+	void action::execute(const as_object_ptr& target)
 	{
 		with_stack wstack;
 
-		character_ptr ch = target;
-		auto& env = ch->get_environment();
+		as_object_ptr ch = target;
+		ASSERT_LOG(ch->get_environment() != nullptr, "environment was null.");
+		auto env = ch->get_environment();
 		int version = ch->get_player()->get_version();
 		std::vector<uint8_t>::const_iterator ip = codestream_.begin();
 		bool running = true;
@@ -373,35 +381,35 @@ namespace swf
 				switch(type)
 				{
 				case PushType::STRING: 
-					env.push(as_value::create(read_string(args))); 
+					env->push(as_value::create(read_string(args))); 
 					break;
 				case PushType::FLOATING_POINT:
-					env.push(as_value::create(read_float(args))); 
+					env->push(as_value::create(read_float(args))); 
 					break;
 				case PushType::NULL_VALUE:
-					env.push(as_value::create(as_object_ptr())); 
+					env->push(as_value::create(as_object_ptr())); 
 					break;
 				case PushType::UNDEFINED:
-					env.push(as_value::create()); 
+					env->push(as_value::create()); 
 					break;
 				case PushType::REGISTER: {
 					int reg = read_u8(args);
-					env.push(as_value::create(reg));
+					env->push(as_value::create(reg));
 				}
 				case PushType::BOOLEAN:
-					env.push(as_value::create(read_bool(args))); 
+					env->push(as_value::create(read_bool(args))); 
 					break;
 				case PushType::DOUBLE:
-					env.push(as_value::create(read_double(args))); 
+					env->push(as_value::create(read_double(args))); 
 					break;
 				case PushType::INTEGER:
-					env.push(as_value::create(read_s32(args))); 
+					env->push(as_value::create(read_s32(args))); 
 					break;
 				case PushType::CONSTANT8:
-					env.push(as_value::create(read_u8(args))); 
+					env->push(as_value::create(read_u8(args))); 
 					break;
 				case PushType::CONSTANT16:
-					env.push(as_value::create(read_u16(args))); 
+					env->push(as_value::create(read_u16(args))); 
 					break;
 				default: 
 					ASSERT_LOG(false, "Unhandled value type for pushing on stack: " << static_cast<int>(type));
@@ -411,226 +419,226 @@ namespace swf
 			}
 			case ActionCode::Pop:
 				// pop from stack and discard value.
-				env.pop();
+				env->pop();
 				break;
 			case ActionCode::Add: {
-				auto a = env.pop()->to_number();
-				auto b = env.pop()->to_number();
-				env.push(as_value::create(a+b));
+				auto a = env->pop()->to_number();
+				auto b = env->pop()->to_number();
+				env->push(as_value::create(a+b));
 				break;
 			}
 			case ActionCode::Subtract: {
-				auto a = env.pop()->to_number();
-				auto b = env.pop()->to_number();
-				env.push(as_value::create(b-a));
+				auto a = env->pop()->to_number();
+				auto b = env->pop()->to_number();
+				env->push(as_value::create(b-a));
 				break;
 			}
 			case ActionCode::Multiply: {
-				auto a = env.pop()->to_number();
-				auto b = env.pop()->to_number();
-				env.push(as_value::create(b*a));
+				auto a = env->pop()->to_number();
+				auto b = env->pop()->to_number();
+				env->push(as_value::create(b*a));
 				break;
 			}
 			case ActionCode::Divide: {
-				auto a = env.pop()->to_number();
-				auto b = env.pop()->to_number();
+				auto a = env->pop()->to_number();
+				auto b = env->pop()->to_number();
 				if(std::abs(a) < DBL_EPSILON) {
 					if(version == 4) {
-						env.push(as_value::create("#ERROR#"));
+						env->push(as_value::create("#ERROR#"));
 					} else {
-						env.push(as_value::create(std::numeric_limits<double>::infinity()));
+						env->push(as_value::create(std::numeric_limits<double>::infinity()));
 					}
 				} else {
-					env.push(as_value::create(b/a));
+					env->push(as_value::create(b/a));
 				}
 				break;
 			}
 			case ActionCode::Equals: {
-				auto a = env.pop()->to_number();
-				auto b = env.pop()->to_number();
+				auto a = env->pop()->to_number();
+				auto b = env->pop()->to_number();
 				if(a == b) {
 					if(version == 4) {
-						env.push(as_value::create(1));
+						env->push(as_value::create(1));
 					} else {
-						env.push(as_value::create(true));
+						env->push(as_value::create(true));
 					}
 				} else {
 					if(version == 4) {
-						env.push(as_value::create(0));
+						env->push(as_value::create(0));
 					} else {
-						env.push(as_value::create(false));
+						env->push(as_value::create(false));
 					}
 				}
 				break;
 			}
 			case ActionCode::Less: {
-				auto a = env.pop()->to_number();
-				auto b = env.pop()->to_number();
+				auto a = env->pop()->to_number();
+				auto b = env->pop()->to_number();
 				if(b < a) {
 					if(version == 4) {
-						env.push(as_value::create(1));
+						env->push(as_value::create(1));
 					} else {
-						env.push(as_value::create(true));
+						env->push(as_value::create(true));
 					}
 				} else {
 					if(version == 4) {
-						env.push(as_value::create(0));
+						env->push(as_value::create(0));
 					} else {
-						env.push(as_value::create(false));
+						env->push(as_value::create(false));
 					}
 				}
 				break;
 			}
 			case ActionCode::And: {
-				auto a = env.pop()->to_number();
-				auto b = env.pop()->to_number();
+				auto a = env->pop()->to_number();
+				auto b = env->pop()->to_number();
 				if(a != 0 && b != 0) {
 					if(version == 4) {
-						env.push(as_value::create(1));
+						env->push(as_value::create(1));
 					} else {
-						env.push(as_value::create(true));
+						env->push(as_value::create(true));
 					}
 				} else {
 					if(version == 4) {
-						env.push(as_value::create(0));
+						env->push(as_value::create(0));
 					} else {
-						env.push(as_value::create(false));
+						env->push(as_value::create(false));
 					}
 				}
 				break;
 			}
 			case ActionCode::Or: {
-				auto a = env.pop()->to_number();
-				auto b = env.pop()->to_number();
+				auto a = env->pop()->to_number();
+				auto b = env->pop()->to_number();
 				if(a != 0 || b != 0) {
 					if(version == 4) {
-						env.push(as_value::create(1));
+						env->push(as_value::create(1));
 					} else {
-						env.push(as_value::create(true));
+						env->push(as_value::create(true));
 					}
 				} else {
 					if(version == 4) {
-						env.push(as_value::create(0));
+						env->push(as_value::create(0));
 					} else {
-						env.push(as_value::create(false));
+						env->push(as_value::create(false));
 					}
 				}
 				break;
 			}
 			case ActionCode::Not: {
-				auto a = env.pop()->to_number();
+				auto a = env->pop()->to_number();
 				if(a != 0) {
 					if(version == 4) {
-						env.push(as_value::create(1));
+						env->push(as_value::create(1));
 					} else {
-						env.push(as_value::create(true));
+						env->push(as_value::create(true));
 					}
 				} else {
 					if(version == 4) {
-						env.push(as_value::create(0));
+						env->push(as_value::create(0));
 					} else {
-						env.push(as_value::create(false));
+						env->push(as_value::create(false));
 					}
 				}				
 				break;
 			}
 			case ActionCode::StringEquals: {
-				auto a = env.pop()->to_std_string();
-				auto b = env.pop()->to_std_string();
+				auto a = env->pop()->to_std_string();
+				auto b = env->pop()->to_std_string();
 				if(a == b) {
 					if(version == 4) {
-						env.push(as_value::create(1));
+						env->push(as_value::create(1));
 					} else {
-						env.push(as_value::create(true));
+						env->push(as_value::create(true));
 					}
 				} else {
 					if(version == 4) {
-						env.push(as_value::create(0));
+						env->push(as_value::create(0));
 					} else {
-						env.push(as_value::create(false));
+						env->push(as_value::create(false));
 					}
 				}
 				break;
 			}
 			case ActionCode::StringLength: {
-				auto a = env.pop()->to_std_string();
-				env.push(as_value::create(static_cast<int>(a.size())));
+				auto a = env->pop()->to_std_string();
+				env->push(as_value::create(static_cast<int>(a.size())));
 				break;
 			}
 			case ActionCode::StringAdd: {
-				auto a = env.pop()->to_std_string();
-				auto b = env.pop()->to_std_string();
-				env.push(as_value::create(b+a));
+				auto a = env->pop()->to_std_string();
+				auto b = env->pop()->to_std_string();
+				env->push(as_value::create(b+a));
 				break;
 			}
 			case ActionCode::StringExtract: {
-				auto count = env.pop()->to_int32();
-				auto start = env.pop()->to_int32();
-				auto str = env.pop()->to_std_string();
+				auto count = env->pop()->to_int32();
+				auto start = env->pop()->to_int32();
+				auto str = env->pop()->to_std_string();
 				if(start < 0 || count < 0 || start >= static_cast<int>(str.size()) || start+count >= static_cast<int>(str.size())) {
-					env.push(as_value::create(""));
+					env->push(as_value::create(""));
 				} else {
-					env.push(as_value::create(str.substr(start, count)));
+					env->push(as_value::create(str.substr(start, count)));
 				}
 				break;
 			}
 			case ActionCode::StringLess: {
-				auto a = env.pop()->to_std_string();
-				auto b = env.pop()->to_std_string();
+				auto a = env->pop()->to_std_string();
+				auto b = env->pop()->to_std_string();
 				if(a < b) {
 					if(version == 4) {
-						env.push(as_value::create(1));
+						env->push(as_value::create(1));
 					} else {
-						env.push(as_value::create(true));
+						env->push(as_value::create(true));
 					}
 				} else {
 					if(version == 4) {
-						env.push(as_value::create(0));
+						env->push(as_value::create(0));
 					} else {
-						env.push(as_value::create(false));
+						env->push(as_value::create(false));
 					}
 				}				
 				break;
 			}
 			case ActionCode::MBStringLength: {
-				auto a = to_wide_string(env.pop()->to_std_string());
-				env.push(as_value::create(static_cast<int>(a.size())));
+				auto a = to_wide_string(env->pop()->to_std_string());
+				env->push(as_value::create(static_cast<int>(a.size())));
 				break;
 			}
 			case ActionCode::MBStringExtract: {
-				auto count = env.pop()->to_int32();
-				auto start = env.pop()->to_int32();
-				auto str = to_wide_string(env.pop()->to_std_string());
+				auto count = env->pop()->to_int32();
+				auto start = env->pop()->to_int32();
+				auto str = to_wide_string(env->pop()->to_std_string());
 				if(start < 0 || count < 0 || start >= static_cast<int>(str.size()) || start+count >= static_cast<int>(str.size())) {
-					env.push(as_value::create(""));
+					env->push(as_value::create(""));
 				} else {
-					env.push(as_value::create(to_narrow_string(str.substr(start, count))));
+					env->push(as_value::create(to_narrow_string(str.substr(start, count))));
 				}
 				break;
 			}
 			case ActionCode::ToInteger: {
-				env.push(as_value::create(env.pop()->to_integer()));
+				env->push(as_value::create(env->pop()->to_integer()));
 				break;
 			}
 			case ActionCode::CharToAscii: {
-				auto str = env.pop()->to_string();
-				env.push(as_value::create(static_cast<int>(str[0])));
+				auto str = env->pop()->to_string();
+				env->push(as_value::create(static_cast<int>(str[0])));
 				break;
 			}
 			case ActionCode::AsciiToChar: {
-				auto n = std::min(255, std::max(0, env.pop()->to_integer()));
-				env.push(as_value::create(std::string({static_cast<char>(n)})));
+				auto n = std::min(255, std::max(0, env->pop()->to_integer()));
+				env->push(as_value::create(std::string({static_cast<char>(n)})));
 				break;
 			}
 			case ActionCode::MBCharToAscii: {
-				auto str = to_wide_string(env.pop()->to_string());
-				env.push(as_value::create(static_cast<int>(str[0])));
+				auto str = to_wide_string(env->pop()->to_string());
+				env->push(as_value::create(static_cast<int>(str[0])));
 				break;
 			}
 			case ActionCode::MBAsciiToChar: {
-				auto n = env.pop()->to_integer();
+				auto n = env->pop()->to_integer();
 				auto str = to_narrow_string(std::wstring{static_cast<wchar_t>(n)});
-				env.push(as_value::create(str));
+				env->push(as_value::create(str));
 				break;
 			}
 			case ActionCode::Jump: {
@@ -641,9 +649,9 @@ namespace swf
 			case ActionCode::If: {
 				bool branch = false;;
 				if(version == 4) {
-					branch = env.pop()->to_integer() != 0;
+					branch = env->pop()->to_integer() != 0;
 				} else {
-					branch = env.pop()->to_boolean();
+					branch = env->pop()->to_boolean();
 				}
 				if(branch) {
 					int distance = static_cast<int16_t>(read_u16(args));
@@ -652,22 +660,22 @@ namespace swf
 				break;
 			}
 			case ActionCode::Call: {
-				ch->call_frame_actions(env.pop());
+				ch->call_frame_actions(env->pop());
 				break;
 			}
 			case ActionCode::GetVariable: {
-				env.push(env.get_variable(env.pop()->to_string(), wstack));
+				env->push(env->get_variable(env->pop()->to_string(), wstack));
 				break;
 			}
 			case ActionCode::SetVariable: {
-				auto value = env.pop();
-				env.set_variable(env.pop()->to_string(), value, wstack);
+				auto value = env->pop();
+				env->set_variable(env->pop()->to_string(), value, wstack);
 				break;
 			}
 			case ActionCode::GetURL2: {
 				int ub = read_u8(args);
-				auto target = env.pop();
-				auto url = env.pop();
+				auto target = env->pop();
+				auto url = env->pop();
 				ASSERT_LOG(false, "XXX GetURL2: bits: " << static_cast<int>(ub) << " target:" << target << " url: " << url);
 				break;
 			}
@@ -677,12 +685,12 @@ namespace swf
 					// scene bias bit set
 					int scene_bias = read_u16(args);
 				}
-				auto frame = env.pop();
+				auto frame = env->pop();
 				ASSERT_LOG(false, "XXX: goto_frame2: bits: " << ub << ", frame: " << frame->to_std_string());
 				break;
 			}
 			case ActionCode::SetTarget2: {
-				std::string target_str = env.pop()->to_std_string();
+				std::string target_str = env->pop()->to_std_string();
 				if(target_str.empty()) {
 					ch = target;
 				} else {
@@ -692,27 +700,27 @@ namespace swf
 				break;
 			}
 			case ActionCode::GetProperty: {
-				int index = env.pop()->to_integer();
-				auto obj = env.pop()->to_object();
+				int index = env->pop()->to_integer();
+				auto obj = env->pop()->to_object();
 				as_value_ptr prop = obj->get_member(get_std_property_name(index));
-				env.push(prop);
+				env->push(prop);
 				break;
 			}
 			case ActionCode::SetProperty: {
-				as_value_ptr value = env.pop();
-				int index = env.pop()->to_integer();
-				auto obj = env.pop()->to_object();
+				as_value_ptr value = env->pop();
+				int index = env->pop()->to_integer();
+				auto obj = env->pop()->to_object();
 				obj->set_member(get_std_property_name(index), value);
 				break;
 			}
 			case ActionCode::CloneSprite: {
-				int depth = env.pop()->to_integer();
-				std::string newname = env.pop()->to_std_string();
-				as_value_ptr obj = env.pop();
+				int depth = env->pop()->to_integer();
+				std::string newname = env->pop()->to_std_string();
+				as_value_ptr obj = env->pop();
 				if(obj->is_object()) {
 					obj->to_object()->clone_display_object(newname, depth);
 				} else if(obj->is_string()) {
-					obj = env.get_variable(obj->to_std_string(), wstack);
+					obj = env->get_variable(obj->to_std_string(), wstack);
 					if(obj) {
 						obj->to_object()->clone_display_object(newname, depth);
 					}
@@ -720,7 +728,7 @@ namespace swf
 				break;
 			}
 			case ActionCode::RemoveSprite: {
-				auto target = env.find_target(env.pop());
+				auto target = env->find_target(env->pop());
 				if(target && target->get_parent()) {
 					target->get_parent()->remove_display_object(target);
 				}
@@ -757,10 +765,17 @@ namespace swf
 				for(int n = 0; n != num_consts; ++n) {
 					consts.emplace_back(read_string(args));
 				}
-				env.set_constant_pool(consts);
+				env->set_constant_pool(consts);
 				break;
 			}
 			case ActionCode::DefineFunction: {
+				std::string name = read_string(args);
+				int num_params = read_u16(args);
+				std::vector<std::string> params;
+				for(int n = 0; n != num_params; ++n) {
+					params.emplace_back(read_string(args));
+				}
+				ASSERT_LOG(false, "XXX DefineFunction");
 				break;
 			}
 			case ActionCode::DefineLocal: {
@@ -875,6 +890,24 @@ namespace swf
 				break;
 			}
 			case ActionCode::DefineFunction2: {
+				std::string name = read_string(args);
+				int num_params = read_u16(args);
+				std::vector<std::pair<int, std::string>> params;
+				int local_registers = read_u8(args);
+				int flags = read_u16(args);
+				for(int n = 0; n != num_params; ++n) {
+					int reg = read_u8(args);
+					std::string param_name = read_string(args);
+					params.emplace_back(reg, param_name);
+				}
+				int code_size = read_u16(args);
+				code_block codes(codestream_, args, args+code_size);
+				as_object_ptr fn = as_function_s2::create(ch->get_player(), local_registers, static_cast<Function2Flags>(flags), params, codes, wstack);
+				auto fn_obj = as_value::create(fn);
+				if(!name.empty()) {
+					env->set_member(name, fn_obj);
+				}
+				env->push(fn_obj);
 				break;
 			}
 			case ActionCode::Extends: {

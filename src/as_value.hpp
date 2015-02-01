@@ -58,9 +58,6 @@ namespace swf
 		}
 		explicit as_value(as_object_ptr o) : type_(o == nullptr ? ValueType::NULL_VALUE : ValueType::OBJECT), o_(o) {
 		}
-		explicit as_value(as_native_function_type fn) : type_(ValueType::OBJECT) {
-			o_.reset(new as_native_function(NULL, fn));
-		}
 		virtual ~as_value() {}
 
 		bool is_bool() const { return type_ == ValueType::BOOLEAN; }

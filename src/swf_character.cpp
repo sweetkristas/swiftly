@@ -31,7 +31,8 @@ namespace swf
 		  ct_(),
 		  morph_ratio_(0),
 		  clip_depth_(0),
-		  name_()
+		  name_(),
+		  environment_(environment::create(player))
 	{
 	}
 

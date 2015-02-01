@@ -9,22 +9,10 @@ namespace swf
 	typedef std::deque<as_value_ptr> stack;
 	typedef std::deque<as_value_ptr>::iterator stack_iterator;
 
-	class with_entry
-	{
-	public:
-		with_entry();
-		with_entry(const as_object_ptr& obj, codestream_iterator end);
-	private:
-		as_object_ptr obj_;
-		codestream_iterator end_ip_;
-	};
-
-	typedef std::deque<with_entry> with_stack;
-
 	class environment
 	{
 	public:
-		environment();
+		MAKE_FACTORY(environment);
 		void push(const as_value_ptr& value);
 		as_value_ptr pop();
 
@@ -36,8 +24,14 @@ namespace swf
 		as_value_ptr get_variable(const std::string& name, with_stack& wstack);
 		void set_variable(const std::string& name, const as_value_ptr& value, with_stack& wstack);
 
+		void set_member(const std::string& name, const as_value_ptr& value);
+		as_value_ptr get_member(const std::string& name);
+
 		as_object_ptr find_target(const as_value_ptr& value);
 	private:
+		explicit environment(const weak_player_ptr& player);
+		void init() {}
+		weak_player_ptr player_;
 		stack stack_;
 		std::vector<std::string> constant_pool_;
 		std::vector<as_value_ptr> registers_;

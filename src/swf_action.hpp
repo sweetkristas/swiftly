@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "bit_reader.hpp"
+#include "swf_code.hpp"
 #include "swf_environment.hpp"
 #include "swf_fwd.hpp"
 
@@ -138,9 +139,10 @@ namespace swf
 	{
 	public:
 		MAKE_FACTORY(action);
-		void execute(const character_ptr& ch);
+		void execute(const as_object_ptr& ch);
 	private:
 		explicit action(const bit_stream_ptr& bits);
+		explicit action(const code_block& codes);
 		void init();
 
 		std::string read_string(codestream_iterator& it);

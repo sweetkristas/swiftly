@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\as_function.cpp" />
     <ClCompile Include="..\..\src\as_function_call.cpp" />
     <ClCompile Include="..\..\src\as_object.cpp" />
     <ClCompile Include="..\..\src\as_value.cpp" />
@@ -75,6 +76,7 @@
     <ClInclude Include="..\..\src\polygon.hpp" />
     <ClInclude Include="..\..\src\swf_action.hpp" />
     <ClInclude Include="..\..\src\swf_button.hpp" />
+    <ClInclude Include="..\..\src\swf_code.hpp" />
     <ClInclude Include="..\..\src\swf_command.hpp" />
     <ClInclude Include="..\..\src\swf_environment.hpp" />
     <ClInclude Include="..\..\src\swf_filter.hpp" />

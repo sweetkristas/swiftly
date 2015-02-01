@@ -43,12 +43,6 @@ private:
 
 	typedef std::map<int, character_ptr> display_list;
 
-	enum class PlayState
-	{
-		PLAYING,
-		STOPPED,
-	};
-
 	class character : public as_object, public std::enable_shared_from_this<character>
 	{
 	public:
@@ -95,7 +89,7 @@ private:
 		character_ptr get_named_character(const std::string& name);
 		virtual void call_frame_actions(const as_value_ptr& val);
 
-		environment& get_environment() { return environment_; }
+		environment_ptr get_environment() { return environment_; }
 	private:
 		virtual void handle_draw() const = 0;
 		weak_character_ptr parent_;
@@ -113,6 +107,6 @@ private:
 		std::string name_;
 		clip_actions clip_actions_;
 
-		environment environment_;
+		environment_ptr environment_;
 	};
 }
