@@ -636,7 +636,7 @@ namespace swf
 			if(car.flags.key_press_) {
 				car.key_code = read_unsigned8();
 			}
-			car.actions = action::create(shared_from_this());
+			car.actions = action::create(code_block::convert_bitstream_to_codestream(shared_from_this()));
 		}
 		return cars;
 	}

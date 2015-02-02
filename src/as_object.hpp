@@ -67,6 +67,8 @@ namespace swf
 
 		virtual as_value_ptr get_member(const std::string& name);
 		virtual void set_member(const std::string& name, const as_value_ptr& value);
+		virtual void set_property(const std::string& name, const as_value_ptr& value);
+		virtual as_value_ptr get_property(const std::string& name);
 
 		virtual void clone_display_object(const std::string& newname, int depth) {}
 		virtual void remove_display_object(const as_object_ptr& obj) {}

@@ -83,4 +83,12 @@ namespace swf
 		auto val = get_member(*start);
 		return val ? val->to_object() : nullptr;
 	}
+
+	void as_object::set_property(const std::string& name, const as_value_ptr& value)
+	{
+	}
+
+	as_value_ptr as_object::get_property(const std::string& name)
+	{
+	}
 }

@@ -212,29 +212,10 @@ namespace swf
 		}
 	}
 
-	action::action(const code_block& codes)
+	action::action(const code_block& codes)	
+		: codestream_(codes)
 	{
-		ASSERT_LOG(false, "XXXX");
-	}
-
-	action::action(const std::shared_ptr<bit_stream>& bits)
-	{
-		bool done = false;
-		while(!done) {
-			uint8_t code = bits->read_unsigned8();
-			codestream_.emplace_back(code);
-			if(code == 0) {
-				done = true;
-			} else {
-				if(code >= 128) {
-					uint16_t len = bits->read_unsigned16();
-					auto new_code = bits->read_unsigned8(len);
-					codestream_.emplace_back(static_cast<uint8_t>(len & 0xff));
-					codestream_.emplace_back(static_cast<uint8_t>(len >> 8));
-					codestream_.insert(codestream_.end(), new_code.begin(), new_code.end());
-				}
-			}
-		}
+		
 	}
 
 	void action::init()
@@ -304,7 +285,7 @@ namespace swf
 		ASSERT_LOG(ch->get_environment() != nullptr, "environment was null.");
 		auto env = ch->get_environment();
 		int version = ch->get_player()->get_version();
-		std::vector<uint8_t>::const_iterator ip = codestream_.begin();
+		auto ip = codestream_.begin();
 		bool running = true;
 		while(running) {
 			if(ip == codestream_.end()) {
@@ -381,36 +362,52 @@ namespace swf
 				switch(type)
 				{
 				case PushType::STRING: 
-					env->push(as_value::create(read_string(args))); 
+					env->push(as_value::create(read_string(args)));
+					LOG_DEBUG("push string");
 					break;
 				case PushType::FLOATING_POINT:
 					env->push(as_value::create(read_float(args))); 
+					LOG_DEBUG("push float");
 					break;
 				case PushType::NULL_VALUE:
 					env->push(as_value::create(as_object_ptr())); 
+					LOG_DEBUG("push null");
 					break;
 				case PushType::UNDEFINED:
 					env->push(as_value::create()); 
+					LOG_DEBUG("push undefined");
 					break;
 				case PushType::REGISTER: {
 					int reg = read_u8(args);
-					env->push(as_value::create(reg));
-				}
+					as_value_ptr value = env->get_register(reg);
+					env->push(value);
+					LOG_DEBUG("push register: " << reg << " : " << value->to_std_string());
+					break;
+					}
 				case PushType::BOOLEAN:
 					env->push(as_value::create(read_bool(args))); 
+					LOG_DEBUG("push bool");
 					break;
 				case PushType::DOUBLE:
 					env->push(as_value::create(read_double(args))); 
+					LOG_DEBUG("push double");
 					break;
 				case PushType::INTEGER:
 					env->push(as_value::create(read_s32(args))); 
+					LOG_DEBUG("push integer");
 					break;
-				case PushType::CONSTANT8:
-					env->push(as_value::create(read_u8(args))); 
+				case PushType::CONSTANT8: {
+					int value = read_u8(args);
+					env->push(as_value::create(env->get_constant(value))); 
+					LOG_DEBUG("push constant8 " << value << " : " << env->get_constant(value));
 					break;
-				case PushType::CONSTANT16:
-					env->push(as_value::create(read_u16(args))); 
+				}
+				case PushType::CONSTANT16: {
+					int value = read_u16(args);
+					env->push(as_value::create(env->get_constant(value))); 
+					LOG_DEBUG("push constant16 " << value << " : " << env->get_constant(value));
 					break;
+				}
 				default: 
 					ASSERT_LOG(false, "Unhandled value type for pushing on stack: " << static_cast<int>(type));
 					break;
@@ -744,6 +741,8 @@ namespace swf
 				break;
 			}
 			case ActionCode::Trace: {
+				auto value = env->pop();
+				LOG_DEBUG("trace: " << value->to_std_string());
 				break;
 			}
 			case ActionCode::GetTime: {
@@ -764,6 +763,7 @@ namespace swf
 				consts.reserve(num_consts);
 				for(int n = 0; n != num_consts; ++n) {
 					consts.emplace_back(read_string(args));
+					LOG_DEBUG("  Constant " << n << " : " << consts.back());
 				}
 				env->set_constant_pool(consts);
 				break;
@@ -775,7 +775,14 @@ namespace swf
 				for(int n = 0; n != num_params; ++n) {
 					params.emplace_back(read_string(args));
 				}
-				ASSERT_LOG(false, "XXX DefineFunction");
+				int len = read_u16(args);
+				as_object_ptr fn_obj = as_function_s1::create(ch->get_player(), params, code_block(args, args+len), wstack);
+				auto fn_value = as_value::create(fn_obj);
+				if(!name.empty()) {
+					env->set_member(name, fn_value);
+				}
+				LOG_DEBUG("Defined function with name " << (name.empty() ? "anonymous" : name));
+				env->push(fn_value);
 				break;
 			}
 			case ActionCode::DefineLocal: {
@@ -812,6 +819,14 @@ namespace swf
 				break;
 			}
 			case ActionCode::SetMember: {
+				as_value_ptr value = env->pop();
+				std::string name = env->pop()->to_std_string();
+				as_object_ptr obj = env->pop()->to_object();
+				if(obj) {
+					obj->set_property(name, value);
+				} else {
+					ASSERT_LOG(false, "value for set_member isn't an object");
+				}
 				break;
 			}
 			case ActionCode::TargetPath: {
@@ -901,12 +916,13 @@ namespace swf
 					params.emplace_back(reg, param_name);
 				}
 				int code_size = read_u16(args);
-				code_block codes(codestream_, args, args+code_size);
+				code_block codes(args, args+code_size);
 				as_object_ptr fn = as_function_s2::create(ch->get_player(), local_registers, static_cast<Function2Flags>(flags), params, codes, wstack);
 				auto fn_obj = as_value::create(fn);
 				if(!name.empty()) {
 					env->set_member(name, fn_obj);
 				}
+				LOG_DEBUG("Defined function2 with name " << (name.empty() ? "anonymous" : name));
 				env->push(fn_obj);
 				break;
 			}

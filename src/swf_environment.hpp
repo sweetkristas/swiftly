@@ -27,6 +27,9 @@ namespace swf
 		void set_member(const std::string& name, const as_value_ptr& value);
 		as_value_ptr get_member(const std::string& name);
 
+		void set_register(int n, const as_value_ptr& value);
+		as_value_ptr get_register(int n);
+
 		as_object_ptr find_target(const as_value_ptr& value);
 	private:
 		explicit environment(const weak_player_ptr& player);

@@ -29,7 +29,7 @@ namespace swf
 		virtual bool is_a(ASClass id) override  {
 			return id == ASClass::FUNCTION ? true : as_object::is_a(id);
 		}		
-
+		virtual bool has_own_registers() const { return false; }
 	private:
 	};
 	typedef std::shared_ptr<as_function> as_function_ptr;
@@ -70,6 +70,24 @@ namespace swf
 		return (static_cast<unsigned>(f1) | static_cast<unsigned>(f2)) != 0;
 	}
 
+	class as_function_s1 : public as_function
+	{
+	public:
+		MAKE_FACTORY(as_function_s1);
+		void operator()(const function_call& fn);
+		virtual bool is_a(ASClass id) override  {
+			return id == ASClass::S_FUNCTION ? true : as_function::is_a(id);
+		}
+	private:
+		explicit as_function_s1(weak_player_ptr player, 
+			const std::vector<std::string>& params, 
+			const code_block& codes,
+			const with_stack& wstack);
+		std::vector<std::string> params_;
+		action_ptr actions_;
+		as_object_ptr target_;
+	};
+
 	class as_function_s2 : public as_function
 	{
 	public:
@@ -78,6 +96,7 @@ namespace swf
 		virtual bool is_a(ASClass id) override  {
 			return id == ASClass::S_FUNCTION ? true : as_function::is_a(id);
 		}
+		bool has_own_registers() const { return true; }
 	private:
 		explicit as_function_s2(weak_player_ptr player, 
 			int num_regs, 
@@ -85,10 +104,10 @@ namespace swf
 			const std::vector<std::pair<int, std::string>>& params, 
 			const code_block& codes, 
 			const with_stack& wstack); 
-		std::vector<std::string> params_;
-		std::vector<as_value_ptr> registers_;
+		std::vector<std::pair<int, std::string>> params_;
+		int num_regs_;
 		Function2Flags flags_;
-		code_block codes_;
+		action_ptr actions_;
 		as_object_ptr target_;
 	};
 }

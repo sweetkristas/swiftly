@@ -15,6 +15,11 @@ namespace swf
 {
 	const char*	as_value::to_string() const
 	{
+		return to_std_string().c_str();
+	}
+
+	std::string as_value::to_std_string() const
+	{
 		switch(type_) {
 			case ValueType::UNDEFINED: return "undefined";
 			case ValueType::BOOLEAN: return b_ ? "true" : "false";
@@ -30,12 +35,12 @@ namespace swf
 					ss_fixed << std::setprecision(14) << std::ios::scientific << d_;
 					std::string s_sci = ss_sci.str();
 					if(s_sci.length() < s_fix.length()) {
-						return s_sci.c_str();
+						return s_sci;
 					} 
-					return s_fix.c_str();
+					return s_fix;
 				}
 			}
-			case ValueType::STRING: return s_.c_str();
+			case ValueType::STRING: return s_;
 			case ValueType::NULL_VALUE: return "null";
 			case ValueType::OBJECT: return o_->to_string();
 			case ValueType::PROPERTY:
@@ -45,14 +50,6 @@ namespace swf
 			default: ASSERT_LOG(false, "to_string() bad type: " << static_cast<int>(type_));
 		}
 		return "undefined";
-	}
-
-	std::string as_value::to_std_string()
-	{
-		if(type_ == ValueType::STRING) {
-			return s_;
-		}
-		return to_string();
 	}
 
 	as_value operator+(const as_value& v1, const as_value& v2)

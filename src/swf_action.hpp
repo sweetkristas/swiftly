@@ -140,8 +140,8 @@ namespace swf
 	public:
 		MAKE_FACTORY(action);
 		void execute(const as_object_ptr& ch);
+	
 	private:
-		explicit action(const bit_stream_ptr& bits);
 		explicit action(const code_block& codes);
 		void init();
 
@@ -153,6 +153,6 @@ namespace swf
 		int read_s32(codestream_iterator& it);
 		bool read_bool(codestream_iterator& it);
 
-		codestream codestream_;
+		code_block codestream_;
 	};
 }

@@ -274,7 +274,8 @@ namespace swf
 			std::cerr << "Ignoring DoAction tag -- use_as3 bit set.\n";
 			eat_bit_stream(length);
 		} else {
-			auto ap = action::create(bits_);
+			code_block cb(bits_->read_unsigned8(length));
+			auto ap = action::create(cb);
 			auto act = do_action::create(ap);
 			
 			obj->add_command(act);

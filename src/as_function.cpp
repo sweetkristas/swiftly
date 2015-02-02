@@ -3,6 +3,22 @@
 
 namespace swf
 {
+	as_function_s1::as_function_s1(weak_player_ptr player, 
+		const std::vector<std::string>& params, 
+		const code_block& codes,
+		const with_stack& wstack) 
+		: as_function(player),
+		  params_(params),
+		  actions_(action::create(codes))
+	{
+	}
+
+	void as_function_s1::operator()(const function_call& fn)
+	{
+		// XXX use fn
+		actions_->execute(target_);
+	}
+
 	as_function_s2::as_function_s2(weak_player_ptr player, 
 		int num_regs, 
 		Function2Flags flags, 
@@ -10,17 +26,16 @@ namespace swf
 		const code_block& codes, 
 		const with_stack& wstack)
 		: as_function(player),
+		  params_(params),
+		  num_regs_(num_regs),
 		  flags_(flags),
-		  //params_(params),
-		  codes_(codes)
+		  actions_(action::create(codes))
 	{
-		ASSERT_LOG(num_regs >= 0 && num_regs < 256, "Number of registers exceeds limits 0 <= " << num_regs << " < 256.");
-		registers_.resize(num_regs);
 	}
 
 	void as_function_s2::operator()(const function_call& fn)
 	{
-		auto a = action::create(codes_);
-		a->execute(target_);
+		// XXX use fn
+		actions_->execute(target_);
 	}
 }

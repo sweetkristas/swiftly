@@ -97,7 +97,7 @@ namespace swf
 		cond_idle_to_over_up_ = bits->read_unsigned_bits(1) != 0;
 		key_code_ = bits->read_unsigned_bits(7);
 		cond_over_down_to_idle_ = bits->read_unsigned_bits(1) != 0;
-		actions_ = action::create(bits);
+		actions_ = action::create(code_block::convert_bitstream_to_codestream(bits));
 		return offset_to_next_record != 0;
 	}
 }
