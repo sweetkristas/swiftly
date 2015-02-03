@@ -7,12 +7,38 @@
 #include <boost/lexical_cast.hpp>
 
 #include "asserts.hpp"
-#include "as_value.hpp"
+#include "as_function_params.hpp"
 #include "as_object.hpp"
+#include "as_value.hpp"
+#include "swf_environment.hpp"
 #include "swf_player.hpp"
 
 namespace swf
 {
+	as_value_ptr as_value::from_bool(bool value)
+	{
+		return std::make_shared<as_value>(value);
+	}
+
+	as_value::as_value(as_value_ptr get, as_value_ptr set)
+		: type_(ValueType::PROPERTY),
+		  b_(false),
+		  d_(0),
+		  o_(nullptr),
+		  p_(std::make_shared<as_property>(get, set)),
+		  flags_(PropertyFlags::NONE)
+	{
+	}
+
+	as_value::as_value(as_native_function_type fn)
+		: type_(ValueType::OBJECT),
+		  b_(false),
+		  d_(0),
+		  flags_(PropertyFlags::NONE)
+	{
+		o_ = as_native_function::create(weak_player_ptr(), fn);
+	}
+
 	const char*	as_value::to_string() const
 	{
 		return to_std_string().c_str();
@@ -56,7 +82,7 @@ namespace swf
 	{
 		auto p1 = v1.to_primitive();
 		auto p2 = v2.to_primitive();
-		if(p1.type_ == as_value::ValueType::STRING || p2.type_ == as_value::ValueType::STRING) {
+		if(p1.type_ == ValueType::STRING || p2.type_ == ValueType::STRING) {
 			return as_value(p1.to_string() + p2.to_std_string());
 		}
 		return as_value(p1.to_number() + p2.to_number());
@@ -134,11 +160,115 @@ namespace swf
 			case ValueType::BOOLEAN:
 			case ValueType::NUMERIC:
 			case ValueType::NULL_VALUE:
+			case ValueType::STRING:
 				break;
 			case ValueType::OBJECT:			return o_;
 			case ValueType::PROPERTY: {
 
 				ASSERT_LOG(false, "XXX todo PROPERTY::to_object");
+			}
+		}
+		return nullptr;
+	}
+
+	as_value_ptr as_value::clone()
+	{
+		return std::make_shared<as_value>(*this);
+	}
+
+	void as_value::set_property(const as_value_ptr& value)
+	{
+		ASSERT_LOG(is_property(), "Attempt to set property value on non-property.");
+		p_->set(o_, value);
+	}
+
+	as_value_ptr as_value::get_property() const
+	{
+		ASSERT_LOG(is_property(), "Attempt to get property value on non-property.");
+		return p_->get(o_);
+	}
+
+	as_value_ptr as_value::get_property(const as_value_ptr& primitive) const
+	{
+		ASSERT_LOG(is_property(), "Attempt to get property value on non-property.");
+		return p_->get(primitive);
+	}
+
+	void as_value::set_property_target(const as_object_ptr& target)
+	{
+		ASSERT_LOG(is_property(), "Attempt to set property target on non-property.");
+		o_ = target;
+	}
+
+	as_property::as_property(const as_value_ptr& get, const as_value_ptr& set)
+	{
+		get_ = std::dynamic_pointer_cast<as_function>(get->to_object());
+		set_ = std::dynamic_pointer_cast<as_function>(set->to_object());
+	}
+
+	void as_property::set(const as_object_ptr& target, const as_value_ptr& value)
+	{
+		if(target) {
+			if(set_) {
+				auto env = environment::create(target->get_player());
+				env->push(value);
+				(*set_)(function_params(as_value::create(target), env, 1, env->get_top_index()));
+			}
+		} else {
+			LOG_WARN("Tried to set property on null target.");
+		}
+	}
+
+	as_value_ptr as_property::get(const as_object_ptr& target)
+	{
+		as_value_ptr value = as_value::create();
+		if(target) {
+			if(get_) {
+				auto env = environment::create(target->get_player());
+				value = (*get_)(function_params(as_value::create(target), env, 0, 0));
+			}
+		} else {
+			LOG_WARN("Tried to set property on null target.");
+		}
+		return value;
+	}
+
+	as_value_ptr as_property::get(const as_value_ptr& primitive)
+	{
+		if(get_) {
+			return (*get_)(function_params(primitive, nullptr, 0, 0));
+		}
+		return nullptr;
+	}
+
+	as_function_ptr as_value::to_function()
+	{
+		if(type_ == ValueType::OBJECT && o_ != nullptr) {
+			// XXX This is a little icky -- maybe as_object should have a virtual operator().
+			return std::dynamic_pointer_cast<as_function>(o_);
+		}
+		LOG_WARN("couldn't convert as_value to function.");
+		return nullptr;
+	}
+
+	as_value_ptr as_value::find_property(const std::string& name)
+	{
+		switch(type_) {
+			case ValueType::UNDEFINED:
+			case ValueType::NULL_VALUE:
+			case ValueType::PROPERTY:
+				break;
+			case ValueType::STRING:
+				return player::get_builtin_string_method(name);
+			case ValueType::BOOLEAN:
+				return player::get_builtin_boolean_method(name);
+			case ValueType::NUMERIC:
+				return player::get_builtin_numeric_method(name);
+			case ValueType::OBJECT: {
+				if(o_) {
+					return o_->get_member(name);
+				}
+				break;
 			}
 		}
 		return nullptr;

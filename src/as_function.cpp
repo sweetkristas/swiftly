@@ -13,10 +13,10 @@ namespace swf
 	{
 	}
 
-	void as_function_s1::operator()(const function_call& fn)
+	as_value_ptr as_function_s1::operator()(const function_params& fn)
 	{
 		// XXX use fn
-		actions_->execute(target_);
+		return actions_->execute(target_);
 	}
 
 	as_function_s2::as_function_s2(weak_player_ptr player, 
@@ -33,9 +33,9 @@ namespace swf
 	{
 	}
 
-	void as_function_s2::operator()(const function_call& fn)
+	as_value_ptr as_function_s2::operator()(const function_params& fn)
 	{
 		// XXX use fn
-		actions_->execute(target_);
+		return actions_->execute(target_);
 	}
 }

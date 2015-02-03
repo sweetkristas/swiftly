@@ -31,6 +31,12 @@ namespace swf
 		as_value_ptr get_register(int n);
 
 		as_object_ptr find_target(const as_value_ptr& value);
+		as_object_ptr get_target() const { return target_; }
+
+		as_value_ptr top(int n);
+		as_value_ptr bottom(int n);
+		int get_top_index() const { return stack_.size() - 1; };
+		int size() const { return stack_.size(); }
 	private:
 		explicit environment(const weak_player_ptr& player);
 		void init() {}
@@ -38,6 +44,7 @@ namespace swf
 		stack stack_;
 		std::vector<std::string> constant_pool_;
 		std::vector<as_value_ptr> registers_;
+		std::vector<as_value_ptr> local_registers_;
 
 		as_object_ptr target_;
 	};

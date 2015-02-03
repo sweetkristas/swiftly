@@ -7,9 +7,9 @@
 
 namespace swf
 {
-	class function_call;
+	class function_params;
 
-	typedef void(*as_native_function_type)(const function_call& fn);
+	typedef as_value_ptr(*as_native_function_type)(const function_params& fn);
 
 	class as_function : public as_object
 	{
@@ -18,7 +18,7 @@ namespace swf
 		}
 		virtual ~as_function() {
 		}
-		virtual void operator()(const function_call& fn) = 0;
+		virtual as_value_ptr operator()(const function_params& params) = 0;
 
 		virtual const char*	type_of() { return "function"; }
 		virtual const char*	to_string() {
@@ -37,19 +37,21 @@ namespace swf
 	class as_native_function : public as_function
 	{
 	public:
-		as_native_function(weak_player_ptr player, as_native_function_type fn) 
-			: as_function(player) 
-		{
-		}
-		void operator()(const function_call& fn) {
+		MAKE_FACTORY(as_native_function);
+		as_value_ptr operator()(const function_params& params) override {
 			if(fn_) {
-				fn_(fn);
+				return fn_(params);
 			}
+			return as_value_ptr();
 		}
 		virtual bool is_a(ASClass id) override  {
 			return id == ASClass::C_FUNCTION ? true : as_function::is_a(id);
 		}		
 	private:
+		as_native_function(weak_player_ptr player, as_native_function_type fn) 
+			: as_function(player) 
+		{
+		}
 		as_native_function_type fn_;
 	};
 	typedef std::shared_ptr<as_native_function> as_native_function_ptr;
@@ -74,7 +76,7 @@ namespace swf
 	{
 	public:
 		MAKE_FACTORY(as_function_s1);
-		void operator()(const function_call& fn);
+		as_value_ptr operator()(const function_params& fn) override;
 		virtual bool is_a(ASClass id) override  {
 			return id == ASClass::S_FUNCTION ? true : as_function::is_a(id);
 		}
@@ -92,7 +94,7 @@ namespace swf
 	{
 	public:
 		MAKE_FACTORY(as_function_s2);
-		void operator()(const function_call& fn);
+		as_value_ptr operator()(const function_params& fn) override;
 		virtual bool is_a(ASClass id) override  {
 			return id == ASClass::S_FUNCTION ? true : as_function::is_a(id);
 		}

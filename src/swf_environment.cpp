@@ -105,4 +105,30 @@ namespace swf
 		}
 		return as_value_ptr();
 	}
+
+	as_value_ptr environment::top(int n)
+	{
+		ASSERT_LOG(n < static_cast<int>(stack_.size()), "Tried to access member element outside stack range.");
+		auto it = stack_.rbegin() + n;
+		return *it;
+	}
+
+	as_value_ptr environment::bottom(int n)
+	{
+		ASSERT_LOG(n < static_cast<int>(stack_.size()), "Tried to access member element outside stack range.");
+		auto it = stack_.begin() + n;
+		return *it;
+	}
+
+	void environment::set_register(int n, const as_value_ptr& value)
+	{
+		ASSERT_LOG(n >= 0 && n < static_cast<int>(local_registers_.size()), "set_register: index out of bounds: " << n);
+		local_registers_[n] = value;
+	}
+
+	as_value_ptr environment::get_register(int n)
+	{
+		ASSERT_LOG(n >= 0 && n < static_cast<int>(local_registers_.size()), "set_register: index out of bounds: " << n);
+		return local_registers_[n];
+	}
 }

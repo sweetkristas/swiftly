@@ -128,7 +128,7 @@ namespace swf
 		if(frame < 0 || frame >= static_cast<int>(get_definition()->get_frame_count())) {
 			ASSERT_LOG(false, "frame outside limits: " << frame);
 		}
-		get_definition()->execute_commands(frame, shared_from_this(), true);
+		get_definition()->execute_commands(frame, get_character_ptr(), true);
 	}
 
 	void movie::update(float delta_time)
@@ -141,7 +141,7 @@ namespace swf
 		}
 
 		//if(prev_frame != current_frame_) {
-			get_definition()->execute_commands(current_frame_, shared_from_this());
+			get_definition()->execute_commands(current_frame_, get_character_ptr());
 		//}
 
 		update_display_list(delta_time);

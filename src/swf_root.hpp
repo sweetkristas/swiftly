@@ -30,6 +30,8 @@ namespace swf
 		character_ptr get_character_from_id(int frame, int id);
 
 		character_ptr get_named_character(const std::string& name);
+
+		void export_resource(const std::string& name, const character_def_ptr& def);
 	private:
 		explicit root(weak_player_ptr p, movie_def_ptr d);
 		// init() is called automatically when instantiating via swf::root::create(...)

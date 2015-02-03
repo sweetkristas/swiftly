@@ -5,6 +5,7 @@
 
 #include "asserts.hpp"
 #include "as_function.hpp"
+#include "as_function_params.hpp"
 #include "swf_action.hpp"
 #include "swf_character.hpp"
 #include "swf_player.hpp"
@@ -277,8 +278,19 @@ namespace swf
 		return read_u8(it) != 0;
 	}
 
-	void action::execute(const as_object_ptr& target)
+	as_value_ptr action::call_method(as_function_ptr fn, environment_ptr env, as_value_ptr that, int nargs, int bottom_index)
 	{
+		if(!fn) {
+			LOG_ERROR("function given in call is null.");
+			return nullptr;
+		}
+		return (*fn)(function_params(that, env, nargs, bottom_index));
+	}
+
+	as_value_ptr action::execute(const as_object_ptr& target)
+	{
+		as_value_ptr return_value;
+
 		with_stack wstack;
 
 		as_object_ptr ch = target;
@@ -752,6 +764,26 @@ namespace swf
 				break;
 			}
 			case ActionCode::CallFunction: {
+				as_value_ptr fn_value = env->pop();
+				as_function_ptr fn;
+				int nargs = env->pop()->to_integer();
+				if(fn_value->is_string()) {
+					auto value = env->get_variable(fn_value->to_std_string(), wstack);
+					if(value->is_object()) {
+						if(value->to_object()) {
+							value = value->to_object()->get_constructor();
+						}
+					}
+					fn = value->to_function();
+					if(fn == nullptr) {
+						LOG_ERROR("Could not find function named: " << fn_value->to_std_string() << " to call");
+					}
+				} else {
+					// Hopefully is a function on stack
+					fn = fn_value->to_function();
+				}
+				auto result = call_method(fn, env, nullptr, nargs, env->get_top_index()-2);
+				env->push(result);
 				break;
 			}
 			case ActionCode::CallMethod: {
@@ -804,6 +836,18 @@ namespace swf
 				break;
 			}
 			case ActionCode::GetMember: {
+				std::string name = env->pop()->to_std_string();
+				as_value_ptr obj_value = env->pop();
+				as_object_ptr obj = obj_value->to_object();
+				if(obj) {
+					auto value = obj->get_member(name);
+					env->push(value);
+				} else {
+					auto value = obj_value->find_property(name);
+					if(value && value->is_property()) {
+						value = value->get_property(obj_value);
+					}
+				}
 				break;
 			}
 			case ActionCode::InitArray: {
@@ -823,7 +867,7 @@ namespace swf
 				std::string name = env->pop()->to_std_string();
 				as_object_ptr obj = env->pop()->to_object();
 				if(obj) {
-					obj->set_property(name, value);
+					obj->set_member(name, value);
 				} else {
 					ASSERT_LOG(false, "value for set_member isn't an object");
 				}
@@ -872,18 +916,33 @@ namespace swf
 				break;
 			}
 			case ActionCode::Decrement: {
+				auto value = env->pop()->to_number();
+				value -= 1.0;
+				env->push(as_value::create(value));
 				break;
 			}
 			case ActionCode::Increment: {
+				auto value = env->pop()->to_number();
+				value += 1.0;
+				env->push(as_value::create(value));
 				break;
 			}
 			case ActionCode::PushDuplicate: {
+				auto v1 = env->pop();
+				env->push(v1);
+				env->push(v1->clone());
 				break;
 			}
 			case ActionCode::Return: {
+				return_value = env->pop();
+				ip = codestream_.end();
 				break;
 			}
 			case ActionCode::StackSwap: {
+				auto v1 = env->pop();
+				auto v2 = env->pop();
+				env->push(v1);
+				env->push(v2);
 				break;
 			}
 			case ActionCode::StoreRegister: {
@@ -945,5 +1004,6 @@ namespace swf
 				break;
 			}
 		}
+		return return_value;
 	}
 }

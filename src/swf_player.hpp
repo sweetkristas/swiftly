@@ -25,6 +25,12 @@ namespace swf
 
 		void set_version(int version) { version_ = version; }
 		int get_version() const { return version_; }
+
+		static as_value_ptr get_builtin_object_method(const std::string& name);
+		static as_value_ptr get_builtin_sprite_method(const std::string& name);
+		static as_value_ptr get_builtin_numeric_method(const std::string& name);
+		static as_value_ptr get_builtin_boolean_method(const std::string& name);
+		static as_value_ptr get_builtin_string_method(const std::string& name);
 	private:
 		player();
 		void init();

@@ -18,6 +18,11 @@ namespace swf
 		as3_symbol_map_[character_id] = class_name;
 	}
 
+	void character_def::set_registered_class_constructor(as_function_ptr fn)
+	{
+		ASSERT_LOG(false, "XXX character_def::set_registered_class_constructor");
+	}
+
 	character::character(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: as_object(player),
 		  parent_(parent),
@@ -115,10 +120,16 @@ namespace swf
 		}
 	}
 
+	character_ptr character::get_character_ptr()
+	{
+		// XXX I really don't like this here. but c'est la vie. 
+		return std::dynamic_pointer_cast<character>(shared_from_this());
+	}
+
 	character_ptr character::get_named_character(const std::string& name)
 	{
 		if(name == name_) {
-			return shared_from_this();
+			return get_character_ptr();
 		}
 		for(auto& ch : display_list_) {
 			if(ch.second->get_name() == name) {

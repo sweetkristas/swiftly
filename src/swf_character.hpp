@@ -32,6 +32,8 @@ namespace swf
 		virtual void execute_commands(int frame, const character_ptr& ch, bool actions_only=false) {};
 
 		virtual character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id) = 0;
+
+		virtual void set_registered_class_constructor(as_function_ptr fn);
 		//template<typename T>
 		//character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id) {
 		//	return typename T::create(player, parent, id, shared_from_this());
@@ -43,7 +45,7 @@ private:
 
 	typedef std::map<int, character_ptr> display_list;
 
-	class character : public as_object, public std::enable_shared_from_this<character>
+	class character : public as_object
 	{
 	public:
 		explicit character(const weak_player_ptr& player, const character_ptr& parent, int i, const character_def_ptr& def);
@@ -90,6 +92,8 @@ private:
 		virtual void call_frame_actions(const as_value_ptr& val);
 
 		environment_ptr get_environment() { return environment_; }
+
+		character_ptr get_character_ptr();
 	private:
 		virtual void handle_draw() const = 0;
 		weak_character_ptr parent_;

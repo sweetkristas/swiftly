@@ -139,11 +139,12 @@ namespace swf
 	{
 	public:
 		MAKE_FACTORY(action);
-		void execute(const as_object_ptr& ch);
+		as_value_ptr execute(const as_object_ptr& ch);
 	
 	private:
 		explicit action(const code_block& codes);
 		void init();
+		as_value_ptr call_method(as_function_ptr fn, environment_ptr env, as_value_ptr that, int nargs, int bottom_index);
 
 		std::string read_string(codestream_iterator& it);
 		int read_u8(codestream_iterator& it);

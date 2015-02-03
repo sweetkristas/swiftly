@@ -80,4 +80,9 @@ namespace swf
 		ASSERT_LOG(ch != nullptr, "Couldn't find character with name: '" << name << "'");
 		return ch;
 	}
+
+	void root::export_resource(const std::string& name, const character_def_ptr& def)
+	{
+		ASSERT_LOG(false, "XXX root::export_resource");
+	}
 }
