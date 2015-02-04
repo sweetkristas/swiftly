@@ -68,6 +68,10 @@ namespace swf
 		PRELOAD_GLOBAL		= 0x0100,
 	};
 
+	inline bool operator&(Function2Flags f1, Function2Flags f2) {
+		return (static_cast<unsigned>(f1) & static_cast<unsigned>(f2)) != 0;
+	}
+
 	inline bool operator|(Function2Flags f1, Function2Flags f2) {
 		return (static_cast<unsigned>(f1) | static_cast<unsigned>(f2)) != 0;
 	}
@@ -87,7 +91,7 @@ namespace swf
 			const with_stack& wstack);
 		std::vector<std::string> params_;
 		action_ptr actions_;
-		as_object_ptr target_;
+		weak_as_object_ptr target_;
 	};
 
 	class as_function_s2 : public as_function
@@ -99,6 +103,7 @@ namespace swf
 			return id == ASClass::S_FUNCTION ? true : as_function::is_a(id);
 		}
 		bool has_own_registers() const { return true; }
+		void set_target(const as_object_ptr& target) { target_ = target; }
 	private:
 		explicit as_function_s2(weak_player_ptr player, 
 			int num_regs, 
@@ -110,6 +115,6 @@ namespace swf
 		int num_regs_;
 		Function2Flags flags_;
 		action_ptr actions_;
-		as_object_ptr target_;
+		weak_as_object_ptr target_;
 	};
 }

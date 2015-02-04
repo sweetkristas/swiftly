@@ -45,6 +45,11 @@ namespace swf
 	{
 	}
 
+	void character::init()
+	{
+		environment_->set_target(shared_from_this());
+	}
+
 	void character::set_background_alpha(int a)
 	{
 		background_color_.a = std::min(255, std::max(0, a));

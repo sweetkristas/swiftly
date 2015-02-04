@@ -200,4 +200,8 @@ namespace swf
 		return it->second;
 	}
 
+	const as_object_ptr& player::get_global() const
+	{
+		return global_;
+	}
 }

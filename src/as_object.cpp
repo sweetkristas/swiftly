@@ -275,4 +275,9 @@ namespace swf
 	{
 		return as_value::create(shared_from_this());
 	}
+
+	const as_object_ptr& as_object::get_global() const
+	{
+		return get_player()->get_global();
+	}
 }

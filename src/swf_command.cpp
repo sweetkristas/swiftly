@@ -92,6 +92,6 @@ namespace swf
 	void do_action::execute(const character_ptr& ch)
 	{
 		ASSERT_LOG(actions_ != nullptr, "Actions were empty.");
-		actions_->execute(ch);
+		actions_->execute(ch, false);
 	}
 }

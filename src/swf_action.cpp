@@ -287,7 +287,7 @@ namespace swf
 		return (*fn)(function_params(that, env, nargs, bottom_index));
 	}
 
-	as_value_ptr action::execute(const as_object_ptr& target)
+	as_value_ptr action::execute(const as_object_ptr& target, bool have_local_registers)
 	{
 		as_value_ptr return_value;
 
@@ -370,59 +370,61 @@ namespace swf
 				break;
 			}
 			case ActionCode::Push: {
-				PushType type = static_cast<PushType>(read_u8(args));
-				switch(type)
-				{
-				case PushType::STRING: 
-					env->push(as_value::create(read_string(args)));
-					LOG_DEBUG("push string");
-					break;
-				case PushType::FLOATING_POINT:
-					env->push(as_value::create(read_float(args))); 
-					LOG_DEBUG("push float");
-					break;
-				case PushType::NULL_VALUE:
-					env->push(as_value::create(as_object_ptr())); 
-					LOG_DEBUG("push null");
-					break;
-				case PushType::UNDEFINED:
-					env->push(as_value::create()); 
-					LOG_DEBUG("push undefined");
-					break;
-				case PushType::REGISTER: {
-					int reg = read_u8(args);
-					as_value_ptr value = env->get_register(reg);
-					env->push(value);
-					LOG_DEBUG("push register: " << reg << " : " << value->to_std_string());
-					break;
+				while(args != ip) {
+					PushType type = static_cast<PushType>(read_u8(args));
+					switch(type)
+					{
+					case PushType::STRING: 
+						env->push(as_value::create(read_string(args)));
+						LOG_DEBUG("push string");
+						break;
+					case PushType::FLOATING_POINT:
+						env->push(as_value::create(read_float(args))); 
+						LOG_DEBUG("push float");
+						break;
+					case PushType::NULL_VALUE:
+						env->push(as_value::create(as_object_ptr())); 
+						LOG_DEBUG("push null");
+						break;
+					case PushType::UNDEFINED:
+						env->push(as_value::create()); 
+						LOG_DEBUG("push undefined");
+						break;
+					case PushType::REGISTER: {
+						int reg = read_u8(args);
+						as_value_ptr value = env->get_register(reg, have_local_registers);
+						env->push(value);
+						LOG_DEBUG("push register: " << reg << " : " << (value ? value->to_std_string() : "nullptr"));
+						break;
+						}
+					case PushType::BOOLEAN:
+						env->push(as_value::create(read_bool(args))); 
+						LOG_DEBUG("push bool");
+						break;
+					case PushType::DOUBLE:
+						env->push(as_value::create(read_double(args))); 
+						LOG_DEBUG("push double");
+						break;
+					case PushType::INTEGER:
+						env->push(as_value::create(read_s32(args))); 
+						LOG_DEBUG("push integer");
+						break;
+					case PushType::CONSTANT8: {
+						int value = read_u8(args);
+						env->push(as_value::create(env->get_constant(value))); 
+						LOG_DEBUG("push constant8 " << value << " : " << env->get_constant(value));
+						break;
 					}
-				case PushType::BOOLEAN:
-					env->push(as_value::create(read_bool(args))); 
-					LOG_DEBUG("push bool");
-					break;
-				case PushType::DOUBLE:
-					env->push(as_value::create(read_double(args))); 
-					LOG_DEBUG("push double");
-					break;
-				case PushType::INTEGER:
-					env->push(as_value::create(read_s32(args))); 
-					LOG_DEBUG("push integer");
-					break;
-				case PushType::CONSTANT8: {
-					int value = read_u8(args);
-					env->push(as_value::create(env->get_constant(value))); 
-					LOG_DEBUG("push constant8 " << value << " : " << env->get_constant(value));
-					break;
-				}
-				case PushType::CONSTANT16: {
-					int value = read_u16(args);
-					env->push(as_value::create(env->get_constant(value))); 
-					LOG_DEBUG("push constant16 " << value << " : " << env->get_constant(value));
-					break;
-				}
-				default: 
-					ASSERT_LOG(false, "Unhandled value type for pushing on stack: " << static_cast<int>(type));
-					break;
+					case PushType::CONSTANT16: {
+						int value = read_u16(args);
+						env->push(as_value::create(env->get_constant(value))); 
+						LOG_DEBUG("push constant16 " << value << " : " << env->get_constant(value));
+						break;
+					}
+					default: 
+						ASSERT_LOG(false, "Unhandled value type for pushing on stack: " << static_cast<int>(type));
+						break;
+					}
 				}
 				break;
 			}
@@ -976,8 +978,9 @@ namespace swf
 				}
 				int code_size = read_u16(args);
 				code_block codes(args, args+code_size);
-				as_object_ptr fn = as_function_s2::create(ch->get_player(), local_registers, static_cast<Function2Flags>(flags), params, codes, wstack);
-				auto fn_obj = as_value::create(fn);
+				auto fn = as_function_s2::create(ch->get_player(), local_registers, static_cast<Function2Flags>(flags), params, codes, wstack);
+				fn->set_target(env->get_target());
+				auto fn_obj = as_value::create(std::static_pointer_cast<as_object>(fn));
 				if(!name.empty()) {
 					env->set_member(name, fn_obj);
 				}

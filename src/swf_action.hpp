@@ -139,7 +139,7 @@ namespace swf
 	{
 	public:
 		MAKE_FACTORY(action);
-		as_value_ptr execute(const as_object_ptr& ch);
+		as_value_ptr execute(const as_object_ptr& ch, bool have_local_registers);
 	
 	private:
 		explicit action(const code_block& codes);

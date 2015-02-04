@@ -7,7 +7,7 @@ namespace swf
 {
 	namespace
 	{
-		const int max_global_registers = 256;
+		const int max_global_registers = 4;
 	}
 
 	with_entry::with_entry()
@@ -24,10 +24,9 @@ namespace swf
 	environment::environment(const weak_player_ptr& player)
 		: player_(player),
 		  stack_(),
-		  constant_pool_(),
-		  registers_()
+		  constant_pool_()
 	{
-		registers_.resize(max_global_registers);
+		global_registers_.resize(max_global_registers);
 	}
 
 	void environment::push(const as_value_ptr& value)
@@ -120,15 +119,40 @@ namespace swf
 		return *it;
 	}
 
-	void environment::set_register(int n, const as_value_ptr& value)
+	void environment::set_register(int n, const as_value_ptr& value, bool have_local_registers)
 	{
-		ASSERT_LOG(n >= 0 && n < static_cast<int>(local_registers_.size()), "set_register: index out of bounds: " << n);
-		local_registers_[n] = value;
+		if(have_local_registers) {
+			ASSERT_LOG(n >= 0 && n < static_cast<int>(local_registers_.size()), "set_register: index out of bounds: " << n);
+			local_registers_[n] = value;
+		} else {
+			ASSERT_LOG(n >= 0 && n < static_cast<int>(global_registers_.size()), "set_register: index out of bounds: " << n);
+			global_registers_[n] = value;
+		}
 	}
 
-	as_value_ptr environment::get_register(int n)
+	as_value_ptr environment::get_register(int n, bool have_local_registers)
 	{
-		ASSERT_LOG(n >= 0 && n < static_cast<int>(local_registers_.size()), "set_register: index out of bounds: " << n);
-		return local_registers_[n];
+		if(have_local_registers) {
+			ASSERT_LOG(n >= 0 && n < static_cast<int>(local_registers_.size()), "set_register: index out of bounds: " << n);
+			return local_registers_[n];
+		}
+		ASSERT_LOG(n >= 0 && n < static_cast<int>(global_registers_.size()), "set_register: index out of bounds: " << n);
+		return global_registers_[n];
+	}
+
+	void environment::create_local_registers(int n)
+	{
+		local_registers_.resize(n);
+	}
+
+	void environment::set_local(const std::string& name, const as_value_ptr& value)
+	{
+		ASSERT_LOG(!frames_.empty(), "No local frames have been created for the parameter.");
+		auto it = frames_.back().find(name);
+		if(it != frames_.back().end()) {
+			it->second = value->clone();
+		} else {
+			frames_.back()[name] = value->clone();
+		}
 	}
 }

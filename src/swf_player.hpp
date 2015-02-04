@@ -23,6 +23,8 @@ namespace swf
 		void force_realtime_framerate(bool en=true) { realtime_framerate_ = en; }
 		const root_ptr& get_root_movie() const { return root_; }
 
+		const as_object_ptr& get_global() const;
+
 		void set_version(int version) { version_ = version; }
 		int get_version() const { return version_; }
 

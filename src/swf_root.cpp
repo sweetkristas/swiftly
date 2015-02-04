@@ -85,4 +85,9 @@ namespace swf
 	{
 		ASSERT_LOG(false, "XXX root::export_resource");
 	}
+
+	environment_ptr root::get_environment()
+	{
+		return movie_->get_environment();
+	}
 }

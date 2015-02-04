@@ -34,6 +34,7 @@ namespace swf
 		EDIT_TEXT_DEF,
 		IMAGE,
 		IMAGE_DEF,
+		ARRAY,
         // etc
     };
 
@@ -63,11 +64,13 @@ namespace swf
 			return id == ASClass::OBJECT;
 		}		
 
-		player_ptr get_player() { 
+		player_ptr get_player() const { 
 			auto player = player_.lock();
 			ASSERT_LOG(player != nullptr, "Player went away in call to as_object::get_player()");
 			return player;
 		}
+
+		const as_object_ptr& get_global() const;
 
 		virtual const char*	to_string() { return "[object Object]"; }
 		virtual double to_number();

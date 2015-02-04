@@ -38,5 +38,6 @@ namespace swf
 	private:
 		sprite(const weak_player_ptr& player, const character_ptr& parent, int i, const character_def_ptr& def);
 		void handle_draw() const override;
+		void init() {}
 	};
 }

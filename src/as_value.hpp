@@ -58,7 +58,7 @@ namespace swf
 		}
 		explicit as_value(const char* s) : type_(ValueType::STRING), s_(s) {
 		}
-		explicit as_value(as_object_ptr o) : type_(o == nullptr ? ValueType::NULL_VALUE : ValueType::OBJECT), o_(o) {
+		explicit as_value(const as_object_ptr& o) : type_(o == nullptr ? ValueType::NULL_VALUE : ValueType::OBJECT), o_(o) {
 		}
 		explicit as_value(as_value_ptr get, as_value_ptr set);
 		explicit as_value(as_native_function_type fn);

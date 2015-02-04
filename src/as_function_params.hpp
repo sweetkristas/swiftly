@@ -9,7 +9,7 @@ namespace swf
 	{
 	public:
 		function_params(const as_value_ptr& that, const environment_ptr& env, int nargs, int first_in);
-		size_t arg_count() const { return arg_count_; }
+		int arg_count() const { return arg_count_; }
 		as_value_ptr arg(int n) const;
 		const as_object_ptr& that() const { return this_; }
 		environment_ptr get_environment() const { return env_; }

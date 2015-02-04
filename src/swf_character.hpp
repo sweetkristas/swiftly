@@ -49,6 +49,7 @@ private:
 	{
 	public:
 		explicit character(const weak_player_ptr& player, const character_ptr& parent, int i, const character_def_ptr& def);
+		virtual void init();
 		virtual ~character();
 
 		virtual bool is_a(ASClass id) override { return id == ASClass::CHARACTER; }
