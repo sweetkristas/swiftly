@@ -98,16 +98,13 @@ int main(int argc, char* argv[])
 		SceneGraphPtr scene = SceneGraph::create("main");
 		SceneNodePtr root = scene->getRootNode();
 		root->setNodeName("root_node");
-		// we should register the cameraobject class with scenegraph. Then use magic to get an instance of one.
+
 		auto scenecam = Camera::createInstance("cam0", 0, width, 0, height);
 		scenecam->createFrustum();
 		root->attachCamera(scenecam);
 
-		// XXX simplify this. The render manager can be created when we create the scene graph, since it's a singleton anway.
-		// Adding a queue should just be RenderManager::getInstance()->addQueue("opaques"); and it returns the render queue
-		// pointer if that's needed.
-		auto rman = std::make_shared<RenderManager>();
-		rman->addQueue(0, std::make_shared<RenderQueue>("opaques"));
+		auto rman = RenderManager::getInstance();
+		rman->addQueue(0, "opaques");
 
 
 		bool running = true;
