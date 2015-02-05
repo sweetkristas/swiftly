@@ -23,6 +23,65 @@
     <ClCompile Include="..\..\src\decompress.cpp" />
     <ClCompile Include="..\..\src\GLee.c" />
     <ClCompile Include="..\..\src\graphics.cpp" />
+    <ClCompile Include="..\..\src\kre\AttributeSet.cpp" />
+    <ClCompile Include="..\..\src\kre\AttributeSetOGL.cpp" />
+    <ClCompile Include="..\..\src\kre\Blend.cpp" />
+    <ClCompile Include="..\..\src\kre\BlendOGL.cpp" />
+    <ClCompile Include="..\..\src\kre\Blittable.cpp" />
+    <ClCompile Include="..\..\src\kre\CameraObject.cpp" />
+    <ClCompile Include="..\..\src\kre\Canvas.cpp" />
+    <ClCompile Include="..\..\src\kre\CanvasOGL.cpp" />
+    <ClCompile Include="..\..\src\kre\ClipScope.cpp" />
+    <ClCompile Include="..\..\src\kre\ClipScopeOGL.cpp" />
+    <ClCompile Include="..\..\src\kre\Color.cpp" />
+    <ClCompile Include="..\..\src\kre\DisplayDevice.cpp" />
+    <ClCompile Include="..\..\src\kre\DisplayDeviceOpenGL.cpp" />
+    <ClCompile Include="..\..\src\kre\DisplayDeviceOpenGLFixed.cpp" />
+    <ClCompile Include="..\..\src\kre\DisplayDeviceSDL.cpp" />
+    <ClCompile Include="..\..\src\kre\EffectsOpenGL.cpp" />
+    <ClCompile Include="..\..\src\kre\FboOpenGL.cpp" />
+    <ClCompile Include="..\..\src\kre\filesystem.cpp" />
+    <ClCompile Include="..\..\src\kre\Font.cpp" />
+    <ClCompile Include="..\..\src\kre\FontSDL.cpp" />
+    <ClCompile Include="..\..\src\kre\Frustum.cpp" />
+    <ClCompile Include="..\..\src\kre\LightObject.cpp" />
+    <ClCompile Include="..\..\src\kre\Material.cpp" />
+    <ClCompile Include="..\..\src\kre\MaterialOpenGL.cpp" />
+    <ClCompile Include="..\..\src\kre\PaletteMap.cpp" />
+    <ClCompile Include="..\..\src\kre\PaletteMapOpenGL.cpp" />
+    <ClCompile Include="..\..\src\kre\ParticleSystem.cpp" />
+    <ClCompile Include="..\..\src\kre\ParticleSystemAffectors.cpp" />
+    <ClCompile Include="..\..\src\kre\ParticleSystemEmitters.cpp" />
+    <ClCompile Include="..\..\src\kre\ParticleSystemObservers.cpp" />
+    <ClCompile Include="..\..\src\kre\ParticleSystemParameters.cpp" />
+    <ClCompile Include="..\..\src\kre\Renderable.cpp" />
+    <ClCompile Include="..\..\src\kre\RenderManager.cpp" />
+    <ClCompile Include="..\..\src\kre\RenderQueue.cpp" />
+    <ClCompile Include="..\..\src\kre\RenderTarget.cpp" />
+    <ClCompile Include="..\..\src\kre\SceneGraph.cpp" />
+    <ClCompile Include="..\..\src\kre\SceneNode.cpp" />
+    <ClCompile Include="..\..\src\kre\SceneObject.cpp" />
+    <ClCompile Include="..\..\src\kre\SceneParameters.cpp" />
+    <ClCompile Include="..\..\src\kre\Scissor.cpp" />
+    <ClCompile Include="..\..\src\kre\ScissorOGL.cpp" />
+    <ClCompile Include="..\..\src\kre\Shaders.cpp" />
+    <ClCompile Include="..\..\src\kre\ShadersOpenGL.cpp" />
+    <ClCompile Include="..\..\src\kre\StencilScope.cpp" />
+    <ClCompile Include="..\..\src\kre\StencilScopeOGL.cpp" />
+    <ClCompile Include="..\..\src\kre\Surface.cpp" />
+    <ClCompile Include="..\..\src\kre\SurfaceSDL.cpp" />
+    <ClCompile Include="..\..\src\kre\Texture.cpp" />
+    <ClCompile Include="..\..\src\kre\TextureOpenGL.cpp" />
+    <ClCompile Include="..\..\src\kre\TextureSDL.cpp" />
+    <ClCompile Include="..\..\src\kre\UniformBuffer.cpp" />
+    <ClCompile Include="..\..\src\kre\UniformBufferOGL.cpp" />
+    <ClCompile Include="..\..\src\kre\variant.cpp" />
+    <ClCompile Include="..\..\src\kre\variant_utils.cpp" />
+    <ClCompile Include="..\..\src\kre\VGraph.cpp" />
+    <ClCompile Include="..\..\src\kre\VGraphCairo.cpp" />
+    <ClCompile Include="..\..\src\kre\VGraphOpenGL.cpp" />
+    <ClCompile Include="..\..\src\kre\VGraphOpenGLFixed.cpp" />
+    <ClCompile Include="..\..\src\kre\WindowManager.cpp" />
     <ClCompile Include="..\..\src\poly2tri\common\shapes.cc" />
     <ClCompile Include="..\..\src\poly2tri\sweep\advancing_front.cc" />
     <ClCompile Include="..\..\src\poly2tri\sweep\cdt.cc" />
@@ -45,7 +104,6 @@
     <ClCompile Include="..\..\src\swf_sprite.cpp" />
     <ClCompile Include="..\..\src\swf_tags.cpp" />
     <ClCompile Include="..\..\src\swf_text.cpp" />
-    <ClCompile Include="..\..\src\test\shaders.cpp" />
     <ClCompile Include="..\..\src\test\swiftly.cpp" />
     <ClCompile Include="..\..\src\test\wm.cpp" />
   </ItemGroup>
@@ -57,6 +115,80 @@
     <ClInclude Include="..\..\src\as_fwd.hpp" />
     <ClInclude Include="..\..\src\as_hint.hpp" />
     <ClInclude Include="..\..\src\as_value.hpp" />
+    <ClInclude Include="..\..\src\kre\AttributeSet.hpp" />
+    <ClInclude Include="..\..\src\kre\AttributeSetOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\Blend.hpp" />
+    <ClInclude Include="..\..\src\kre\BlendOGL.hpp" />
+    <ClInclude Include="..\..\src\kre\Blittable.hpp" />
+    <ClInclude Include="..\..\src\kre\CameraObject.hpp" />
+    <ClInclude Include="..\..\src\kre\Canvas.hpp" />
+    <ClInclude Include="..\..\src\kre\CanvasOGL.hpp" />
+    <ClInclude Include="..\..\src\kre\ClipScope.hpp" />
+    <ClInclude Include="..\..\src\kre\ClipScopeOGL.hpp" />
+    <ClInclude Include="..\..\src\kre\Color.hpp" />
+    <ClInclude Include="..\..\src\kre\DisplayDevice.hpp" />
+    <ClInclude Include="..\..\src\kre\DisplayDeviceFwd.hpp" />
+    <ClInclude Include="..\..\src\kre\DisplayDeviceOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\DisplayDeviceOpenGLFixed.hpp" />
+    <ClInclude Include="..\..\src\kre\DisplayDeviceSDL.hpp" />
+    <ClInclude Include="..\..\src\kre\Effects.hpp" />
+    <ClInclude Include="..\..\src\kre\EffectsOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\FboOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\Font.hpp" />
+    <ClInclude Include="..\..\src\kre\FontSDL.hpp" />
+    <ClInclude Include="..\..\src\kre\Frustum.hpp" />
+    <ClInclude Include="..\..\src\kre\Geometry.hpp" />
+    <ClInclude Include="..\..\src\kre\LightObject.hpp" />
+    <ClInclude Include="..\..\src\kre\Material.hpp" />
+    <ClInclude Include="..\..\src\kre\MaterialOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\PaletteMap.hpp" />
+    <ClInclude Include="..\..\src\kre\PaletteMapOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\ParticleSystem.hpp" />
+    <ClInclude Include="..\..\src\kre\ParticleSystemAffectors.hpp" />
+    <ClInclude Include="..\..\src\kre\ParticleSystemEmitters.hpp" />
+    <ClInclude Include="..\..\src\kre\ParticleSystemFwd.hpp" />
+    <ClInclude Include="..\..\src\kre\ParticleSystemObservers.hpp" />
+    <ClInclude Include="..\..\src\kre\ParticleSystemParameters.hpp" />
+    <ClInclude Include="..\..\src\kre\PixelFormat.hpp" />
+    <ClInclude Include="..\..\src\kre\Renderable.hpp" />
+    <ClInclude Include="..\..\src\kre\RenderFwd.hpp" />
+    <ClInclude Include="..\..\src\kre\RenderManager.hpp" />
+    <ClInclude Include="..\..\src\kre\RenderQueue.hpp" />
+    <ClInclude Include="..\..\src\kre\RenderTarget.hpp" />
+    <ClInclude Include="..\..\src\kre\SceneFwd.hpp" />
+    <ClInclude Include="..\..\src\kre\SceneGraph.hpp" />
+    <ClInclude Include="..\..\src\kre\SceneNode.hpp" />
+    <ClInclude Include="..\..\src\kre\SceneObject.hpp" />
+    <ClInclude Include="..\..\src\kre\SceneParameters.hpp" />
+    <ClInclude Include="..\..\src\kre\SceneUtil.hpp" />
+    <ClInclude Include="..\..\src\kre\Scissor.hpp" />
+    <ClInclude Include="..\..\src\kre\ScissorOGL.hpp" />
+    <ClInclude Include="..\..\src\kre\SDLWrapper.hpp" />
+    <ClInclude Include="..\..\src\kre\Shaders.hpp" />
+    <ClInclude Include="..\..\src\kre\ShadersOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\spline.hpp" />
+    <ClInclude Include="..\..\src\kre\StencilScope.hpp" />
+    <ClInclude Include="..\..\src\kre\StencilScopeOGL.hpp" />
+    <ClInclude Include="..\..\src\kre\StencilSettings.hpp" />
+    <ClInclude Include="..\..\src\kre\Surface.hpp" />
+    <ClInclude Include="..\..\src\kre\SurfaceSDL.hpp" />
+    <ClInclude Include="..\..\src\kre\Texture.hpp" />
+    <ClInclude Include="..\..\src\kre\TextureOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\TextureSDL.hpp" />
+    <ClInclude Include="..\..\src\kre\TextureUtils.hpp" />
+    <ClInclude Include="..\..\src\kre\UniformBuffer.hpp" />
+    <ClInclude Include="..\..\src\kre\UniformBufferOGL.hpp" />
+    <ClInclude Include="..\..\src\kre\Util.hpp" />
+    <ClInclude Include="..\..\src\kre\variant.hpp" />
+    <ClInclude Include="..\..\src\kre\variant_utils.hpp" />
+    <ClInclude Include="..\..\src\kre\VGraph.hpp" />
+    <ClInclude Include="..\..\src\kre\VGraphCairo.hpp" />
+    <ClInclude Include="..\..\src\kre\VGraphFwd.hpp" />
+    <ClInclude Include="..\..\src\kre\VGraphOpenGL.hpp" />
+    <ClInclude Include="..\..\src\kre\VGraphOpenGLFixed.hpp" />
+    <ClInclude Include="..\..\src\kre\VGraphPatterns.hpp" />
+    <ClInclude Include="..\..\src\kre\WindowManager.hpp" />
+    <ClInclude Include="..\..\src\kre\WindowManagerFwd.hpp" />
     <ClInclude Include="..\..\src\swf_character.hpp" />
     <ClInclude Include="..\..\src\as_object.hpp" />
     <ClInclude Include="..\..\src\avm2.hpp" />
@@ -98,11 +230,13 @@
     <ClInclude Include="..\..\src\test\graphics.hpp" />
     <ClInclude Include="..\..\src\test\profile_timer.hpp" />
     <ClInclude Include="..\..\src\test\sdl_wrapper.hpp" />
-    <ClInclude Include="..\..\src\test\shaders.hpp" />
     <ClInclude Include="..\..\src\test\wm.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="zlib1.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\kre\Geometry.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{58FEECB2-C6A0-4156-A648-6B22AF93731C}</ProjectGuid>
@@ -146,13 +280,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>c:\projects\zlib;c:\projects\swiftly\external\include;C:\Projects\SDL_image\VisualC\external\include;C:\Projects\glm-0.9.4.3;C:\Projects\glee\DATA\output;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\SDL_image;C:\Projects\SDL\include;C:\Projects\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Projects\swiftly\external\include\freetype2;C:\Projects\swiftly\src;c:\projects\zlib;c:\projects\swiftly\external\include;C:\Projects\SDL_image\VisualC\external\include;C:\Projects\glm-0.9.4.3;C:\Projects\glee\DATA\output;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\SDL_image;C:\Projects\SDL\include;C:\Projects\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Projects\glee\DATA\output;C:\Projects\SDL_image\VisualC\Win32\Debug;C:\Projects\SDL\VisualC\Win32\Debug;C:\Projects\boost\stage32-debug-static\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Projects\glee\DATA\output;C:\Projects\SDL_image\VisualC\Win32\Debug;C:\Projects\SDL\VisualC\Win32\Debug;C:\Projects\boost\stage32-debug-static\lib;C:\Projects\swiftly\external\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

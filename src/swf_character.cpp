@@ -23,6 +23,16 @@ namespace swf
 		ASSERT_LOG(false, "XXX character_def::set_registered_class_constructor");
 	}
 
+	void character_def::draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const
+	{
+		handle_draw(mat, ct, instance);
+	}
+
+	void character_def::handle_draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const
+	{
+		LOG_ERROR("called character_def::handle_draw -- you probably want to override this");
+	}
+
 	character::character(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: as_object(player),
 		  parent_(parent),
@@ -127,8 +137,13 @@ namespace swf
 
 	character_ptr character::get_character_ptr()
 	{
-		// XXX I really don't like this here. but c'est la vie. 
 		return std::dynamic_pointer_cast<character>(shared_from_this());
+	}
+
+	const_character_ptr character::get_character_ptr() const
+	{
+		// XXX I really don't like this here. but c'est la vie. 
+		return std::dynamic_pointer_cast<const character>(shared_from_this());
 	}
 
 	character_ptr character::get_named_character(const std::string& name)
@@ -193,5 +208,10 @@ namespace swf
 	as_object_ptr character::get_parent()
 	{
 		return parent_.lock();
+	}
+
+	void character::handle_draw() const
+	{
+		get_definition()->draw(mat_, ct_, std::const_pointer_cast<character>(get_character_ptr()));
 	}
 }

@@ -867,11 +867,11 @@ namespace swf
 			case ActionCode::SetMember: {
 				as_value_ptr value = env->pop();
 				std::string name = env->pop()->to_std_string();
-				as_object_ptr obj = env->pop()->to_object();
-				if(obj) {
-					obj->set_member(name, value);
-				} else {
-					ASSERT_LOG(false, "value for set_member isn't an object");
+				as_value_ptr obj = env->pop();
+				if(obj && obj->to_object()) {
+					obj->to_object()->set_member(name, value);
+				//} else {
+					//ASSERT_LOG(false, "value for set_member isn't an object");
 				}
 				break;
 			}

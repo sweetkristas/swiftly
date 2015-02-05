@@ -34,12 +34,15 @@ namespace swf
 		virtual character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id) = 0;
 
 		virtual void set_registered_class_constructor(as_function_ptr fn);
+
+		void draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const;
 		//template<typename T>
 		//character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id) {
 		//	return typename T::create(player, parent, id, shared_from_this());
 		//}
 
 private:
+		virtual void handle_draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const;
 		std::map<int, std::string> as3_symbol_map_;
 	};
 
@@ -54,7 +57,7 @@ private:
 
 		virtual bool is_a(ASClass id) override { return id == ASClass::CHARACTER; }
 
-		character_def_ptr get_definition() { return def_; }
+		character_def_ptr get_definition() const { return def_; }
 		int get_id() const { return id_; }
 
 		void set_background_color(const rgba& color);
@@ -92,11 +95,15 @@ private:
 		character_ptr get_named_character(const std::string& name);
 		virtual void call_frame_actions(const as_value_ptr& val);
 
-		environment_ptr get_environment() { return environment_; }
+		environment_ptr get_environment() const { return environment_; }
 
 		character_ptr get_character_ptr();
+		const_character_ptr character::get_character_ptr() const;
+
+		const matrix2x3& get_matrix_transform() const { return mat_; }
+		const color_transform& get_color_transform() const { return ct_; }
 	private:
-		virtual void handle_draw() const = 0;
+		virtual void handle_draw() const;
 		weak_character_ptr parent_;
 		int id_;
 		character_def_ptr def_;

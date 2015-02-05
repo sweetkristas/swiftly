@@ -38,6 +38,7 @@ namespace swf
 
 	class character;
 	typedef std::shared_ptr<character> character_ptr;
+	typedef std::shared_ptr<const character> const_character_ptr;
 	typedef std::weak_ptr<character> weak_character_ptr;
 	class character_def;
 	typedef std::shared_ptr<character_def> character_def_ptr;

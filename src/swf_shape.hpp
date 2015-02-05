@@ -123,29 +123,29 @@ namespace swf
 			current_fill_style1_ = fs1;
 			current_line_style_ = ls;
 		}
-		void set_current_fillstyle0(int fs0) const  {
+		void set_current_fillstyle0(int fs0) {
 			current_fill_style0_ = fs0;
 		}
-		void set_current_fillstyle1(int fs1) const  {
+		void set_current_fillstyle1(int fs1) {
 			current_fill_style1_ = fs1;
 		}
-		void set_current_linestyle(int ls) const  {
+		void set_current_linestyle(int ls) {
 			current_line_style_ = ls;
 		}
-		void set_current_fillstyle_array(const fill_style_array& fs_ary) const {
+		void set_current_fillstyle_array(const fill_style_array& fs_ary) {
 			current_fill_style_array_.reset(new fill_style_array(fs_ary));
 		}
-		void set_current_linestyle_array(const line_style_array& ls_ary) const  {
+		void set_current_linestyle_array(const line_style_array& ls_ary) {
 			current_line_style_array_.reset(new line_style_array(ls_ary));
 		}
-		const fill_style* get_fill_style0(int ) const {
+		const fill_style* get_fill_style0() const {
 			if(current_fill_style0_ == 0) {
 				return NULL;
 			} else {
 				return &(*current_fill_style_array_)[current_fill_style0_-1];
 			}
 		}
-		const fill_style* get_fill_style1(int ) const {
+		const fill_style* get_fill_style1() const {
 			if(current_fill_style1_ == 0) {
 				return NULL;
 			} else {
@@ -159,31 +159,31 @@ namespace swf
 				return &(*current_line_style_array_)[current_line_style_-1];
 			}
 		}
-		const void move_to(int32_t x, int32_t y) const {
+		const void move_to(int32_t x, int32_t y) {
 			current_x_ = x;
 			current_y_ = y;
 		}
-		const void line_to(int32_t x, int32_t y) const {
-			//graphics::draw_line(current_x_, current_y_, x, y, get_line_style());
+		const void line_to(int32_t x, int32_t y) {
 			current_x_ = x;
 			current_y_ = y;
 		}
 
-		const std::vector<shape_record_ptr>& get_shape_records() const { return shape_records_; }
 		virtual character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
 	private:
+		virtual void handle_draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const override;
+
 		styles style_;
 		rect bounds_;
 		std::vector<shape_record_ptr> shape_records_;
 
-		mutable int current_fill_style0_;
-		mutable int current_fill_style1_;
-		mutable int current_line_style_;
-		mutable fill_style_array_ptr current_fill_style_array_;
-		mutable line_style_array_ptr current_line_style_array_;
+		int current_fill_style0_;
+		int current_fill_style1_;
+		int current_line_style_;
+		fill_style_array_ptr current_fill_style_array_;
+		line_style_array_ptr current_line_style_array_;
 
-		mutable int32_t current_x_;
-		mutable int32_t current_y_;
+		int32_t current_x_;
+		int32_t current_y_;
 
 		// Stuff for DefineShape4
 		rect edge_bounds_;
@@ -203,6 +203,5 @@ namespace swf
 		shape(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def);
 		virtual bool is_a(ASClass id) override  { return id == ASClass::SHAPE ? true : character::is_a(id); }
 	private:
-		void handle_draw() const override;
 	};
 }

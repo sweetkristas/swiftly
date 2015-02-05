@@ -122,6 +122,10 @@ namespace swf
 		shape_records_ = read_shape_records(bits, version, style_.fill_bits_, style_.line_bits_);
 	}	
 
+	void shape_def::handle_draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const
+	{
+	}
+
 	character_ptr shape_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
 	{
 		return std::make_shared<shape>(player, parent, id, shared_from_this());
@@ -130,10 +134,5 @@ namespace swf
 	shape::shape(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: character(player, parent, id, def)
 	{
-	}
-
-	void shape::handle_draw() const
-	{
-		LOG_DEBUG("drawing shape: " << get_id());
 	}
 }
