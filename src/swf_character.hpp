@@ -95,7 +95,7 @@ private:
 		character_ptr get_named_character(const std::string& name);
 		virtual void call_frame_actions(const as_value_ptr& val);
 
-		environment_ptr get_environment() const { return environment_; }
+		environment_ptr get_environment() const override { return environment_; }
 
 		character_ptr get_character_ptr();
 		const_character_ptr character::get_character_ptr() const;

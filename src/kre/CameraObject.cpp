@@ -33,6 +33,8 @@ using std::round;
 #include "asserts.hpp"
 #include "CameraObject.hpp"
 #include "DisplayDevice.hpp"
+#include "SceneGraph.hpp"
+#include "SceneNode.hpp"
 #include "WindowManager.hpp"
 
 #include "variant_utils.hpp"
@@ -48,9 +50,11 @@ namespace KRE
 		const float default_mouse_speed			= 0.005f;
 		const float default_near_clip			= 0.1f;
 		const float default_far_clip			= 300.0f;
+
+		//static SceneObjectRegistrar<Camera> camera_registrar("camera");
 	}
 
-	Camera::Camera(const std::string& name, const WindowManagerPtr& wnd)
+	Camera::Camera(const std::string& name)
 		: SceneObject(name), 
 		fov_(default_fov), 
 		horizontal_angle_(default_horizontal_angle), 
@@ -62,11 +66,15 @@ namespace KRE
 		type_(CAMERA_PERSPECTIVE), 
 		ortho_left_(0), 
 		ortho_bottom_(0),
-		ortho_top_(wnd->logicalHeight()), 
-		ortho_right_(wnd->logicalWidth()),
+		ortho_top_(0), 
+		ortho_right_(0),
 		clip_planes_set_(false),
 		view_mode_(VIEW_MODE_AUTO)
 	{
+		auto wnd = WindowManager::getMainWindow();
+		ortho_top_ = wnd->logicalHeight(); 
+		ortho_right_ = wnd->logicalWidth();
+
 		up_ = glm::vec3(0.0f, 1.0f, 0.0f);
 		position_ = glm::vec3(0.0f, 0.0f, 0.7f); 
 		aspect_ = float(wnd->logicalWidth())/float(wnd->logicalHeight());
@@ -75,7 +83,7 @@ namespace KRE
 		computeProjection();
 	}
 
-	Camera::Camera(const variant& node, const WindowManagerPtr& wnd)
+	Camera::Camera(const variant& node)
 		: SceneObject(node["name"].as_string()), 
 		fov_(default_fov), 
 		horizontal_angle_(default_horizontal_angle), 
@@ -87,10 +95,14 @@ namespace KRE
 		type_(CAMERA_PERSPECTIVE), 
 		ortho_left_(0), 
 		ortho_bottom_(0),
-		ortho_top_(wnd->logicalHeight()), 
-		ortho_right_(wnd->logicalWidth()),
+		ortho_top_(0), 
+		ortho_right_(0),
 		clip_planes_set_(false)
 	{
+		auto wnd = WindowManager::getMainWindow();
+		ortho_top_ = wnd->logicalHeight(); 
+		ortho_right_ = wnd->logicalWidth();
+
 		position_ = glm::vec3(0.0f, 0.0f, 10.0f); 
 		if(node.has_key("fov")) {
 			fov_ = std::min(90.0f, std::max(15.0f, float(node["fov"].as_float())));
@@ -181,7 +193,7 @@ namespace KRE
 		computeProjection();
 	}
 
-	Camera::Camera(const std::string& name, const WindowManagerPtr& wnd, float fov, float aspect, float near_clip, float far_clip)
+	Camera::Camera(const std::string& name, float fov, float aspect, float near_clip, float far_clip)
 		: SceneObject(name), 
 		fov_(fov), 
 		horizontal_angle_(default_horizontal_angle), 
@@ -194,21 +206,20 @@ namespace KRE
 		type_(CAMERA_PERSPECTIVE), 
 		ortho_left_(0), 
 		ortho_bottom_(0),
-		ortho_top_(wnd->logicalHeight()), 
-		ortho_right_(wnd->logicalWidth()),
+		ortho_top_(0), 
+		ortho_right_(0),
 		clip_planes_set_(true),
 		view_mode_(VIEW_MODE_AUTO)
 	{
+		auto wnd = WindowManager::getMainWindow();
+		ortho_top_ = wnd->logicalHeight(); 
+		ortho_right_ = wnd->logicalWidth();
+
 		up_ = glm::vec3(0.0f, 1.0f, 0.0f);
 		position_ = glm::vec3(0.0f, 0.0f, 10.0f); 
 
 		computeView();
 		computeProjection();
-	}
-
-
-	Camera::~Camera()
-	{
 	}
 
 	variant Camera::write()
@@ -296,6 +307,11 @@ namespace KRE
 		if(type_ == CAMERA_ORTHOGONAL) {
 			computeProjection();
 		}
+	}
+
+	void Camera::createFrustum()
+	{
+		attachFrustum(std::make_shared<Frustum>());
 	}
 
 	/*BEGIN_DEFINE_CALLABLE_NOBASE(Camera)

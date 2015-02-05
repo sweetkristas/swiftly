@@ -363,11 +363,13 @@ namespace KRE
 
 	void WindowManager::destroyWindow()
 	{
-		for(auto it = get_window_list().begin(); it != get_window_list().end(); ) {
-			if(it->second.get() == this) {
-				get_window_list().erase(it++);
-			} else {
-				++it;
+		if(!get_window_list().empty()) {
+			for(auto it = get_window_list().begin(); it != get_window_list().end(); ) {
+				if(it->second.get() == this) {
+					get_window_list().erase(it++);
+				} else {
+					++it;
+				}
 			}
 		}
 		doDestroyWindow();
@@ -399,13 +401,13 @@ namespace KRE
 		// We really only support one sub-class of the window manager
 		// at the moment, so we just return it. We could use hint in the
 		// future if we had more.
-		WindowManager* wm = new SDLWindowManager(title, rend_hint);
-		get_window_list()[wm->getWindowID()] = WindowManagerPtr(wm);
+		WindowManagerPtr wm = std::make_shared<SDLWindowManager>(title, rend_hint);
+		get_window_list()[wm->getWindowID()] = wm;
 		// We consider the first window created the main one.
 		if(main_window == nullptr) {
-			main_window = get_window_list()[wm->getWindowID()];
+			main_window = wm;
 		}
-		return main_window;
+		return wm;
 	}
 
 	std::vector<WindowManagerPtr> WindowManager::getWindowList()

@@ -99,9 +99,8 @@ int main(int argc, char* argv[])
 		SceneNodePtr root = scene->getRootNode();
 		root->setNodeName("root_node");
 		// we should register the cameraobject class with scenegraph. Then use magic to get an instance of one.
-		auto scenecam = std::make_shared<Camera>("cam0", 0, width, 0, height);
-		// XXX we should just add a frustum to the camera by default.
-		scenecam->attachFrustum(std::make_shared<Frustum>());
+		auto scenecam = Camera::createInstance("cam0", 0, width, 0, height);
+		scenecam->createFrustum();
 		root->attachCamera(scenecam);
 
 		// XXX simplify this. The render manager can be created when we create the scene graph, since it's a singleton anway.
@@ -127,8 +126,10 @@ int main(int argc, char* argv[])
 
 			swf_root->update(delta_time.get_time());
 			delta_time.reset();
-
 			swf_root->draw();
+
+			scene->renderScene(rman);
+			rman->render(main_wnd);
 
 			main_wnd->swap();
 

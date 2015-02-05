@@ -102,7 +102,7 @@ namespace swf
 		character_def_ptr get_definition() { return nullptr; }
 		virtual void call_frame_actions(const as_value_ptr& val) {}
 
-		virtual environment_ptr get_environment() { return nullptr; }
+		virtual environment_ptr get_environment() const { return nullptr; }
 
 		virtual bool set_watch(const std::string& property_name, as_function_ptr callback, as_value_ptr argument);
 		virtual bool remove_watch(const std::string& property_name);
