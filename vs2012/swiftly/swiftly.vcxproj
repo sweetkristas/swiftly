@@ -11,6 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\external\src\filesystem.cpp" />
+    <ClCompile Include="..\..\external\src\json.cpp" />
+    <ClCompile Include="..\..\external\src\variant.cpp" />
+    <ClCompile Include="..\..\external\src\variant_utils.cpp" />
     <ClCompile Include="..\..\src\as_array.cpp" />
     <ClCompile Include="..\..\src\as_function.cpp" />
     <ClCompile Include="..\..\src\as_function_params.cpp" />
@@ -21,8 +25,6 @@
     <ClCompile Include="..\..\src\bit_reader.cpp" />
     <ClCompile Include="..\..\src\clipper\clipper.cpp" />
     <ClCompile Include="..\..\src\decompress.cpp" />
-    <ClCompile Include="..\..\src\GLee.c" />
-    <ClCompile Include="..\..\src\graphics.cpp" />
     <ClCompile Include="..\..\src\kre\AttributeSet.cpp" />
     <ClCompile Include="..\..\src\kre\AttributeSetOGL.cpp" />
     <ClCompile Include="..\..\src\kre\Blend.cpp" />
@@ -40,7 +42,6 @@
     <ClCompile Include="..\..\src\kre\DisplayDeviceSDL.cpp" />
     <ClCompile Include="..\..\src\kre\EffectsOpenGL.cpp" />
     <ClCompile Include="..\..\src\kre\FboOpenGL.cpp" />
-    <ClCompile Include="..\..\src\kre\filesystem.cpp" />
     <ClCompile Include="..\..\src\kre\Font.cpp" />
     <ClCompile Include="..\..\src\kre\FontSDL.cpp" />
     <ClCompile Include="..\..\src\kre\Frustum.cpp" />
@@ -75,8 +76,6 @@
     <ClCompile Include="..\..\src\kre\TextureSDL.cpp" />
     <ClCompile Include="..\..\src\kre\UniformBuffer.cpp" />
     <ClCompile Include="..\..\src\kre\UniformBufferOGL.cpp" />
-    <ClCompile Include="..\..\src\kre\variant.cpp" />
-    <ClCompile Include="..\..\src\kre\variant_utils.cpp" />
     <ClCompile Include="..\..\src\kre\VGraph.cpp" />
     <ClCompile Include="..\..\src\kre\VGraphCairo.cpp" />
     <ClCompile Include="..\..\src\kre\VGraphOpenGL.cpp" />
@@ -108,6 +107,13 @@
     <ClCompile Include="..\..\src\test\wm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\external\include\filesystem.hpp" />
+    <ClInclude Include="..\..\external\include\formatter.hpp" />
+    <ClInclude Include="..\..\external\include\geometry.hpp" />
+    <ClInclude Include="..\..\external\include\json.hpp" />
+    <ClInclude Include="..\..\external\include\lexical_cast.hpp" />
+    <ClInclude Include="..\..\external\include\variant.hpp" />
+    <ClInclude Include="..\..\external\include\variant_utils.hpp" />
     <ClInclude Include="..\..\src\asserts.hpp" />
     <ClInclude Include="..\..\src\as_array.hpp" />
     <ClInclude Include="..\..\src\as_function.hpp" />
@@ -137,7 +143,6 @@
     <ClInclude Include="..\..\src\kre\Font.hpp" />
     <ClInclude Include="..\..\src\kre\FontSDL.hpp" />
     <ClInclude Include="..\..\src\kre\Frustum.hpp" />
-    <ClInclude Include="..\..\src\kre\Geometry.hpp" />
     <ClInclude Include="..\..\src\kre\LightObject.hpp" />
     <ClInclude Include="..\..\src\kre\Material.hpp" />
     <ClInclude Include="..\..\src\kre\MaterialOpenGL.hpp" />
@@ -179,8 +184,6 @@
     <ClInclude Include="..\..\src\kre\UniformBuffer.hpp" />
     <ClInclude Include="..\..\src\kre\UniformBufferOGL.hpp" />
     <ClInclude Include="..\..\src\kre\Util.hpp" />
-    <ClInclude Include="..\..\src\kre\variant.hpp" />
-    <ClInclude Include="..\..\src\kre\variant_utils.hpp" />
     <ClInclude Include="..\..\src\kre\VGraph.hpp" />
     <ClInclude Include="..\..\src\kre\VGraphCairo.hpp" />
     <ClInclude Include="..\..\src\kre\VGraphFwd.hpp" />
@@ -236,7 +239,7 @@
     <Library Include="zlib1.lib" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\kre\Geometry.inl" />
+    <None Include="..\..\external\include\geometry.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{58FEECB2-C6A0-4156-A648-6B22AF93731C}</ProjectGuid>

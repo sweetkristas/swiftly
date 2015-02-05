@@ -350,7 +350,10 @@ bool variant::has_key(const variant& v) const
 
 bool variant::has_key(const std::string& key) const
 {
-	ASSERT_LOG(type() == VARIANT_TYPE_MAP, "Tried to index variant that isn't a map, was: " << type_as_string());
+	//ASSERT_LOG(type() == VARIANT_TYPE_MAP, "Tried to index variant that isn't a map, was: " << type_as_string());
+	if(type() != VARIANT_TYPE_MAP) {
+		return false;
+	}
 	return m_.find(variant(key)) != m_.end() ? true : false;
 }
 
@@ -519,6 +522,18 @@ std::vector<std::string> variant::as_list_string() const
 	for(auto& el : l_) {
 		ASSERT_LOG(el.is_string(), "as_list_string: Each element in list must be a string.");
 		result.emplace_back(el.as_string());
+	}
+	return result;
+}
+
+std::vector<int> variant::as_list_int() const
+{
+	std::vector<int> result;
+	ASSERT_LOG(type_ == VARIANT_TYPE_LIST, "as_list_int: variant must be a list.");
+	result.reserve(l_.size());
+	for(auto& el : l_) {
+		ASSERT_LOG(el.is_numeric(), "as_list_int: Each element in list must be an integer");
+		result.emplace_back(el.as_int32());
 	}
 	return result;
 }

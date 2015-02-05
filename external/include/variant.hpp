@@ -52,6 +52,7 @@ public:
 	const variant_list& as_list() const;
 	const variant_map& as_map() const;
 	std::vector<std::string> as_list_string() const;
+	std::vector<int> as_list_int() const;
 
 	variant_list& as_mutable_list();
 	variant_map& as_mutable_map();

@@ -202,7 +202,7 @@ namespace KRE
 			{
 				{ "default", "default_vs", default_vs, "default_fs", default_fs, default_uniform_mapping, default_attribue_mapping },
 				{ "simple", "simple_vs", simple_vs, "simple_fs", simple_fs, simple_uniform_mapping, simple_attribue_mapping },
-				{ "attr_color_shader", "attr_color_vs", attr_color_fs, "attr_color_fs", simple_fs, attr_color_uniform_mapping, attr_color_attribue_mapping },
+				{ "attr_color_shader", "attr_color_vs", attr_color_vs, "attr_color_fs", attr_color_fs, attr_color_uniform_mapping, attr_color_attribue_mapping },
 				{ "vtc_shader", "vtc_vs", vtc_vs, "vtc_fs", vtc_fs, vtc_uniform_mapping, vtc_attribue_mapping },
 			};
 
@@ -442,7 +442,7 @@ namespace KRE
 				a.name = std::string(&name[0], &name[size]);
 				a.location = glGetAttribLocation(object_, a.name.c_str());
 				ASSERT_LOG(a.location >= 0, "Unable to determine the location of the attribute: " << a.name);
-				ASSERT_LOG(a.num_elements != 1, "More than one element was found for an attribute(" << a.name << ") in shader(" << this->name() << "): " << a.num_elements);
+				ASSERT_LOG(a.num_elements == 1, "More than one element was found for an attribute(" << a.name << ") in shader(" << this->name() << "): " << a.num_elements);
 				attribs_[a.name] = a;
 			}
 			return true;

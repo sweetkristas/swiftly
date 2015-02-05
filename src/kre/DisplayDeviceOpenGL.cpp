@@ -169,7 +169,7 @@ namespace KRE
 		GLint minor_version;
 		GLint major_version;
 		glGetIntegerv(GL_MINOR_VERSION, &minor_version);
-		glGetIntegerv(GL_MINOR_VERSION, &major_version);
+		glGetIntegerv(GL_MAJOR_VERSION, &major_version);
 		if(glGetError() != GL_NONE) {
 			// fall-back to old glGetStrings method.
 			const char* version_str = reinterpret_cast<const char*>(glGetString(GL_VERSION));

@@ -24,7 +24,7 @@
 #pragma once
 
 #include <memory>
-#include "Geometry.hpp"
+#include "geometry.hpp"
 #include "Util.hpp"
 
 namespace KRE

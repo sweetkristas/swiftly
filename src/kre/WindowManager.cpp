@@ -71,6 +71,8 @@ namespace KRE
 				renderer_hint_ = "opengl";
 			}
 			current_display_device() = display_ = DisplayDevice::factory(renderer_hint_);
+			// XXX figure out a better way to pass this hint.
+			SDL_SetHint(SDL_HINT_RENDER_DRIVER, renderer_hint_.c_str());
 		}
 		~SDLWindowManager() {
 			destroyWindow();

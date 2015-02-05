@@ -78,9 +78,6 @@
     <ClCompile Include="..\..\src\polygon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\graphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\avm2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -115,9 +112,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\swf_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GLee.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\as_value.cpp">
@@ -184,9 +178,6 @@
       <Filter>Source Files\kre</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\kre\FboOpenGL.cpp">
-      <Filter>Source Files\kre</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\kre\filesystem.cpp">
       <Filter>Source Files\kre</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\kre\Font.cpp">
@@ -306,10 +297,16 @@
     <ClCompile Include="..\..\src\kre\WindowManager.cpp">
       <Filter>Source Files\kre</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\kre\variant.cpp">
+    <ClCompile Include="..\..\external\src\variant.cpp">
       <Filter>Source Files\kre</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\kre\variant_utils.cpp">
+    <ClCompile Include="..\..\external\src\variant_utils.cpp">
+      <Filter>Source Files\kre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\json.cpp">
+      <Filter>Source Files\kre</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\filesystem.cpp">
       <Filter>Source Files\kre</Filter>
     </ClCompile>
   </ItemGroup>
@@ -527,9 +524,6 @@
     <ClInclude Include="..\..\src\kre\Frustum.hpp">
       <Filter>Header Files\kre</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\kre\Geometry.hpp">
-      <Filter>Header Files\kre</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\kre\LightObject.hpp">
       <Filter>Header Files\kre</Filter>
     </ClInclude>
@@ -677,10 +671,25 @@
     <ClInclude Include="..\..\src\kre\WindowManagerFwd.hpp">
       <Filter>Header Files\kre</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\kre\variant.hpp">
+    <ClInclude Include="..\..\external\include\geometry.hpp">
       <Filter>Header Files\kre</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\kre\variant_utils.hpp">
+    <ClInclude Include="..\..\external\include\variant.hpp">
+      <Filter>Header Files\kre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\include\variant_utils.hpp">
+      <Filter>Header Files\kre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\include\filesystem.hpp">
+      <Filter>Header Files\kre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\include\formatter.hpp">
+      <Filter>Header Files\kre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\include\json.hpp">
+      <Filter>Header Files\kre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\include\lexical_cast.hpp">
       <Filter>Header Files\kre</Filter>
     </ClInclude>
   </ItemGroup>
@@ -690,7 +699,7 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\kre\Geometry.inl">
+    <None Include="..\..\external\include\geometry.inl">
       <Filter>Header Files\kre</Filter>
     </None>
   </ItemGroup>

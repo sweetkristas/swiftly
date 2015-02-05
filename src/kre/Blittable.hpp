@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Geometry.hpp"
+#include "geometry.hpp"
 #include "Material.hpp"
 #include "SceneObject.hpp"
 
@@ -50,7 +50,7 @@ namespace KRE
 		void setTexture(const TexturePtr& tex);
 
 		template<typename T>
-		void setDrawRect(const Geometry::Rect<T>& r) {
+		void setDrawRect(const geometry::Rect<T>& r) {
 			draw_rect_ = r.template as_type<float>();
 		}
 
@@ -60,7 +60,7 @@ namespace KRE
 		void setCentre(Centre c);
 		const pointf& getCentreCoords() const { return centre_offset_; }
 		template<typename T>
-		void setCentreCoords(const Geometry::Point<T>& p) {
+		void setCentreCoords(const geometry::Point<T>& p) {
 			centre_offset_ = p;
 			centre_ = Centre::MANUAL;
 		}

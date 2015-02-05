@@ -27,7 +27,7 @@
 #include <string>
 #include "Blend.hpp"
 #include "Color.hpp"
-#include "Geometry.hpp"
+#include "geometry.hpp"
 #include "Surface.hpp"
 #include "variant.hpp"
 
@@ -149,10 +149,10 @@ namespace KRE
 		void setBlendMode(const BlendMode& bm) { blend_mode_.reset(new BlendMode(bm)); }
 
 		template<typename N, typename T>
-		const Geometry::Rect<N> getNormalisedTextureCoords(const Geometry::Rect<T>& r) {
+		const geometry::Rect<N> getNormalisedTextureCoords(const geometry::Rect<T>& r) {
 			float w = static_cast<float>(surface_width_);
 			float h = static_cast<float>(surface_height_);
-			return Geometry::Rect<N>(static_cast<N>(r.x())/w, static_cast<N>(r.y())/h, static_cast<N>(r.x2())/w, static_cast<N>(r.y2())/h);		
+			return geometry::Rect<N>(static_cast<N>(r.x())/w, static_cast<N>(r.y())/h, static_cast<N>(r.x2())/w, static_cast<N>(r.y2())/h);		
 		}
 
 		// Can return NULL if not-implemented, invalid underlying surface.

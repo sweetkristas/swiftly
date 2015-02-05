@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "asserts.hpp"
+#include "variant.hpp"
 
 namespace geometry
 {
@@ -29,7 +30,7 @@ namespace geometry
 		explicit Point(T x=0, T y=0) : x(x), y(y)
 		{}
 		explicit Point(const std::string& s);
-		//explicit Point(const variant& v);
+		explicit Point(const variant& v);
 		explicit Point(const std::vector<T>& v);
 		//variant write() const;
 		void clear() { x = T(0); y = T(0); }
@@ -70,10 +71,10 @@ namespace geometry
 	template<typename T> inline
 	Point<T> normalize(const Point<T>& p);
 
-	//template<> inline Point<int>::Point(const variant& v)
-	//{
-	//	*this = Point<int>(v.as_list_int());
-	//}
+	template<> inline Point<int>::Point(const variant& v)
+	{
+		*this = Point<int>(v.as_list_int());
+	}
 
 	template<typename T>
 	class Rect
@@ -83,7 +84,7 @@ namespace geometry
 		inline explicit Rect(const Point<T>& xy, T w=0, T h=0);
 		explicit Rect(const std::vector<T>& v);
 		explicit Rect(const std::string& s);
-		//explicit Rect(const variant& v);
+		explicit Rect(const variant& v);
 		explicit Rect(const Point<T>& p1, const Point<T>& p2) {
 			top_left_ = p1;
 			bottom_right_ = p2;
@@ -197,7 +198,7 @@ namespace geometry
 	template<typename T> inline
 	Rect<T> operator+(const Rect<T>& r, const Point<T>& p);
 
-	/*template<> inline 
+	template<> inline 
 	Rect<int>::Rect(const variant& v)
 	{
 		if(v.is_list()) {
@@ -227,7 +228,7 @@ namespace geometry
 		if(v.is_list()) {
 			std::vector<float> vec;
 			for(size_t n = 0; n != v.num_elements(); ++n) {
-				vec.push_back(float(v.as_float()));
+				vec.push_back(v.as_float());
 			}
 			from_vector(vec);
 			return;
@@ -243,7 +244,7 @@ namespace geometry
 		} else {
 			ASSERT_LOG(false, "Creating a rect from a variant must be list or map");
 		}
-	}*/
+	}
 }
 
 #include "geometry.inl"
