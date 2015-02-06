@@ -70,5 +70,16 @@ namespace KRE
 		Path::~Path()
 		{
 		}
+
+		Matrix::Matrix()
+		{
+		}
+
+		MatrixPtr multiply(const MatrixPtr& a, const MatrixPtr& b)
+		{
+			auto result = a->clone();
+			result->multiply(b);
+			return result;
+		}
 	}
 }

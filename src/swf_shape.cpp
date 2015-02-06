@@ -130,6 +130,14 @@ namespace swf
 	{
 		// XXX optimize this.
 		auto vgraph = std::dynamic_pointer_cast<KRE::Vector::Context>(instance->get_render_object());
+		auto& mat = instance->get_matrix_transform();
+		auto vmat = vgraph->createMatrix();
+		vmat->init(mat.scale_x.to_double(), mat.rotate_skew1.to_double(), 
+			mat.rotate_skew0.to_double(), mat.scale_y.to_double(), 
+			mat.translate_x, mat.translate_y);
+		vmat->scale(1.0f/20.0, 1.0f/20.0);
+		vgraph->setMatrix(vmat);
+		
 		auto path = vgraph->NewPath();
 		for(auto& sr : shape_records_) {
 			switch(sr->get_type())
@@ -149,7 +157,7 @@ namespace swf
 				break;
 			}
 			case ShapeRecordTypes::STYLE_CHANGE: {
-				auto scr = std::dynamic_pointer_cast<style_change_record>(sr);
+				/*auto scr = std::dynamic_pointer_cast<style_change_record>(sr);
 				if(scr->has_linestyle_change()) {
 					auto ls = get_line_style(scr->get_line_style());
 					// XXX if ls->end_cap_style != ls->start_cap_style we need to split the line.
@@ -184,7 +192,7 @@ namespace swf
 					}
 					vgraph->SetSourceColor(ls->color.r, ls->color.g, ls->color.b, ls->color.a);
 				}
-				break;
+				break;*/
 			}
 			default: break;
 			}
