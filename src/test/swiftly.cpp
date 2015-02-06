@@ -91,13 +91,18 @@ int main(int argc, char* argv[])
 		using namespace KRE;
 
 		SDL::SDL_ptr manager(new SDL::SDL());
-		WindowManagerPtr main_wnd = WindowManager::factory("SDL", "opengl");
+		WindowManagerPtr main_wnd = WindowManager::createInstance("SDL", "opengl");
 		main_wnd->enableVsync(false);
 		main_wnd->createWindow(width, height);
+		main_wnd->setWindowTitle("Swiftly");
 
 		SceneGraphPtr scene = SceneGraph::create("main");
 		SceneNodePtr root = scene->getRootNode();
 		root->setNodeName("root_node");
+
+		player->set_render_attach_fn(
+			[&root](SceneObjectPtr o) { root->attachObject(o); },
+			[&root](SceneObjectPtr o) { root->removeObject(o); });
 
 		auto scenecam = Camera::createInstance("cam0", 0, width, 0, height);
 		scenecam->createFrustum();

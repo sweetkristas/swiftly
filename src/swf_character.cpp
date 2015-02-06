@@ -33,6 +33,11 @@ namespace swf
 		LOG_ERROR("called character_def::handle_draw -- you probably want to override this");
 	}
 
+	void character_def::update(float delta_time, character_ptr instance)
+	{
+		LOG_ERROR("called character_def::update -- you probably want to override this");
+	}
+
 	character::character(const weak_player_ptr& player, const character_ptr& parent, int id, const character_def_ptr& def)
 		: as_object(player),
 		  parent_(parent),
@@ -213,5 +218,22 @@ namespace swf
 	void character::handle_draw() const
 	{
 		get_definition()->draw(mat_, ct_, std::const_pointer_cast<character>(get_character_ptr()));
+	}
+
+	void character::update(float delta_time)
+	{
+		get_definition()->update(delta_time, get_character_ptr());
+	}
+
+	void character::set_render_object(KRE::SceneObjectPtr o)
+	{
+		render_obj_ = o;
+		get_player()->get_render_attach_fn()(o);
+	}
+
+	void character::clear_render_object()
+	{
+		get_player()->get_render_remove_fn()(render_obj_);
+		render_obj_.reset();
 	}
 }

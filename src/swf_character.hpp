@@ -41,6 +41,8 @@ namespace swf
 		//	return typename T::create(player, parent, id, shared_from_this());
 		//}
 
+		virtual void update(float delta_time, character_ptr instance);
+
 private:
 		virtual void handle_draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const;
 		std::map<int, std::string> as3_symbol_map_;
@@ -87,7 +89,7 @@ private:
 
 		void toggle_quality() { high_quality_ = !high_quality_; }
 
-		virtual void update(float delta_time) {}
+		virtual void update(float delta_time);
 		void draw() const;
 
 		const std::string& get_name() const { return name_; }
@@ -102,6 +104,10 @@ private:
 
 		const matrix2x3& get_matrix_transform() const { return mat_; }
 		const color_transform& get_color_transform() const { return ct_; }
+
+		void set_render_object(KRE::SceneObjectPtr o);
+		void clear_render_object();
+		KRE::SceneObjectPtr get_render_object() const { return render_obj_; }
 	private:
 		virtual void handle_draw() const;
 		weak_character_ptr parent_;
@@ -120,5 +126,7 @@ private:
 		clip_actions clip_actions_;
 
 		environment_ptr environment_;
+
+		KRE::SceneObjectPtr render_obj_;
 	};
 }

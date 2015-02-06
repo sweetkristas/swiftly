@@ -396,7 +396,7 @@ namespace KRE
 		}
 	}
 
-	WindowManagerPtr WindowManager::factory(const std::string& title, const std::string& wnd_hint, const std::string& rend_hint)
+	WindowManagerPtr WindowManager::createInstance(const std::string& title, const std::string& wnd_hint, const std::string& rend_hint)
 	{
 		// We really only support one sub-class of the window manager
 		// at the moment, so we just return it. We could use hint in the

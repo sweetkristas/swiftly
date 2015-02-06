@@ -20,22 +20,23 @@ namespace swf
 		unsigned line_bits_;
 	};
 
+	enum class ShapeRecordTypes {
+		STYLE_CHANGE,
+		MOVE,
+		LINE,
+		CURVE,
+	};
+
 	class shape_record
 	{
 	public:
-		enum ShapeRecordTypes {
-			SR_STYLE_CHANGE,
-			SR_LINE,
-			SR_CURVE,
-		};
-
-		shape_record() : type_(SR_LINE) {}
+		explicit shape_record(ShapeRecordTypes type) : type_(type) {}
 		virtual ~shape_record() {}
 
 		void set_delta(const delta_record& delta) { delta_ = delta; }
 		const delta_record& get_delta() const { return delta_; }
 
-		ShapeRecordTypes type() const { return type_; }
+		ShapeRecordTypes get_type() const { return type_; }
 		void set_type(ShapeRecordTypes t) { type_ = t; }
 	private:
 		delta_record delta_;
@@ -44,35 +45,45 @@ namespace swf
 
 	typedef std::shared_ptr<shape_record> shape_record_ptr;
 
+	class move_record : public shape_record
+	{
+	public:
+		move_record() : shape_record(ShapeRecordTypes::MOVE) {}
+	private:
+		move_record(const move_record&);
+	};
+
 	class style_change_record : public shape_record
 	{
 	public:
-		style_change_record() : shape_record(), has_moves_(false), 
-			has_fs0_(false), has_fs1_(false), has_ls_(false), has_new_styles_(false),
-			fillstyle0_(0), fillstyle1_(0), linestyle_(0)
+		style_change_record() 
+			: shape_record(ShapeRecordTypes::STYLE_CHANGE), 
+			  has_fs0_(false), 
+			  has_fs1_(false), 
+			  has_ls_(false), 
+			  has_new_styles_(false),
+			  fillstyle0_(0), 
+			  fillstyle1_(0), 
+			  linestyle_(0)
 		{
-			set_type(SR_STYLE_CHANGE);
 		}
-		virtual ~style_change_record() {}
-		void set_moves(const delta_record& moves) { has_moves_ = true; moves_ = moves; }
 		void set_fillstyle0_index(uint32_t fs) { has_fs0_ = true; fillstyle0_ = fs; }
 		void set_fillstyle1_index(uint32_t fs) { has_fs1_ = true; fillstyle1_ = fs; }
 		void set_linestyle_index(uint32_t ls) { has_ls_ = true; linestyle_ = ls; }
 		void set_styles(const styles& s) { has_new_styles_ = true; styles_ = s; }
 
-		bool has_moves() const { return has_moves_; }
+		int get_line_style() const { return linestyle_; }
+
 		bool has_linestyle_change() const { return has_ls_; }
 		bool has_fillstyle0_change() const { return has_fs0_; }
 		bool has_fillstyle1_change() const { return has_fs1_; }
 		bool has_newstyles() const { return has_new_styles_; }
 	private:
-		bool has_moves_;
 		bool has_fs0_;
 		bool has_fs1_;
 		bool has_ls_;
 		bool has_new_styles_;
 
-		delta_record moves_;
 		unsigned fillstyle0_;
 		unsigned fillstyle1_;
 		unsigned linestyle_;
@@ -84,12 +95,7 @@ namespace swf
 	class curve_edge_record : public shape_record
 	{
 	public:
-		curve_edge_record() : shape_record() 
-		{
-			set_type(SR_CURVE);
-		}
-		virtual ~curve_edge_record() {}
-
+		curve_edge_record() : shape_record(ShapeRecordTypes::CURVE) {}
 		void set_anchor(const delta_record& delta) { anchor_ = delta; }
 		void set_control(const delta_record& delta) { control_ = delta; }
 
@@ -152,11 +158,11 @@ namespace swf
 				return &(*current_fill_style_array_)[current_fill_style1_-1];
 			}
 		}
-		const line_style* get_line_style() const {
-			if(current_line_style_ == 0) {
-				return NULL;
+		const line_style* get_line_style(int line_style) const {
+			if(line_style == 0) {
+				return nullptr;
 			} else {
-				return &(*current_line_style_array_)[current_line_style_-1];
+				return &(*current_line_style_array_)[line_style-1];
 			}
 		}
 		const void move_to(int32_t x, int32_t y) {
@@ -169,6 +175,7 @@ namespace swf
 		}
 
 		virtual character_ptr create_instance(const weak_player_ptr& player, const character_ptr& parent, int id);
+		virtual void update(float delta_time, character_ptr instance);
 	private:
 		virtual void handle_draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const override;
 

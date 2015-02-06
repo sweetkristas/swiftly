@@ -1,11 +1,16 @@
 #pragma once
 
+#include "kre/SceneFwd.hpp"
+
 #include "as_object.hpp"
 #include "swf_root.hpp"
 #include "swf_fwd.hpp"
 
 namespace swf
 {
+	typedef std::function<void(KRE::SceneObjectPtr o)> render_attach_fn;
+	typedef std::function<void(KRE::SceneObjectPtr o)> render_remove_fn;
+
 	class player : public std::enable_shared_from_this<player>
 	{
 	public:
@@ -28,6 +33,13 @@ namespace swf
 		void set_version(int version) { version_ = version; }
 		int get_version() const { return version_; }
 
+		int get_twips() const { return 20; }
+
+		void set_render_attach_fn(render_attach_fn attach_fn, render_remove_fn remove_fn);
+
+		render_attach_fn get_render_attach_fn() const { return attach_fn_; }
+		render_remove_fn get_render_remove_fn() const { return remove_fn_; }
+
 		static as_value_ptr get_builtin_object_method(const std::string& name);
 		static as_value_ptr get_builtin_sprite_method(const std::string& name);
 		static as_value_ptr get_builtin_numeric_method(const std::string& name);
@@ -49,5 +61,8 @@ namespace swf
 		bool transparent_background_;
 		bool realtime_framerate_;
 		int version_;
+
+		render_attach_fn attach_fn_;
+		render_remove_fn remove_fn_;
 	};
 }

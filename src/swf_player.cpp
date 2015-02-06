@@ -204,4 +204,11 @@ namespace swf
 	{
 		return global_;
 	}
+
+	void player::set_render_attach_fn(std::function<void(KRE::SceneObjectPtr o)> attach_fn, 
+		std::function<void(KRE::SceneObjectPtr o)> remove_fn)
+	{
+		attach_fn_ = attach_fn;
+		remove_fn_ = remove_fn;
+	}
 }
