@@ -1,5 +1,7 @@
 #pragma once
 
+#include "kre/SceneFwd.hpp"
+
 #include "as_object.hpp"
 #include "swf_command.hpp"
 #include "swf_environment.hpp"

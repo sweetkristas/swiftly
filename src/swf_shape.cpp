@@ -128,10 +128,6 @@ namespace swf
 
 	void shape_def::update(float delta_time, character_ptr instance)
 	{
-	}
-
-	void shape_def::handle_draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const
-	{
 		// XXX optimize this.
 		auto vgraph = std::dynamic_pointer_cast<KRE::Vector::Context>(instance->get_render_object());
 		auto path = vgraph->NewPath();
@@ -196,8 +192,10 @@ namespace swf
 		vgraph->AddPath(path);
 		vgraph->Stroke(true);
 		vgraph->Fill();
-		
-		instance->get_player()->get_render_attach_fn()(vgraph);
+	}
+
+	void shape_def::handle_draw(const matrix2x3& mat, const color_transform& ct, const character_ptr& instance) const
+	{
 	}
 
 	character_ptr shape_def::create_instance(const weak_player_ptr& player, const character_ptr& parent, int id)
