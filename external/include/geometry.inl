@@ -180,6 +180,15 @@ namespace geometry
 			static_cast<T>(lhs.y2()*rhs.y2()));
 	}
 
+	template<typename T, typename D> inline
+	Rect<D> operator/(const Rect<T>& lhs, D scalar)
+	{
+		return Rect<D>::FromCoordinates(static_cast<D>(lhs.x1()/scalar), 
+			static_cast<D>(lhs.y1()/scalar), 
+			static_cast<D>(lhs.x2()/scalar), 
+			static_cast<D>(lhs.y2()/scalar));
+	}
+
 	template<typename T> inline
 	Rect<T> operator*(const Rect<T>& lhs, const Point<T>& p)
 	{
